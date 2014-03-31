@@ -1,0 +1,96 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+
+<suite name="SCIM-Client" parallel="false">
+     
+     
+    <parameter name="domainURL" value="https://localhost/oxTrust/seam/resource/restv1"/>
+    <parameter name="userName" value="test_user"/>
+    <parameter name="passWord" value="test"/>
+    <parameter name="uid" value="@!1111!0000!D4E7"/>
+    <parameter name="id" value="@!1111!0003!B2C6"/>
+    <parameter name="clientID" value="@!1111!0008!C2EB!75F1"/>
+    <parameter name="clientSecret" value="5967d41c-ce9c-4137-9068-42578df0c606"/>
+    <parameter name="oxAuthDomain" value="https://localhost/oxauth/seam/resource/restv1/oxauth/token"/>
+    <parameter name="registerUrl" value="https://localhost/oxauth/seam/resource/restv1/oxauth/register"/>
+    <parameter name="excelFileLocationUsers" value="doc/SampleXLS/SCIMusers.xls"/>
+    <parameter name="excelFileLocationGroups" value="doc/SampleXLS/SCIMgroups.xls"/>
+    <parameter name="umaMetaDataUrl" value="https://localhost/.well-known/uma-configuration" />
+    <parameter name="umaAatClientId" value="@!1111!0008!0068.3E20" />
+    <parameter name="umaAatClientSecret" value="32c2fb17-409d-48a2-b793-a639c8ac6cb2" />
+    <parameter name="umaRedirectUri" value="https://client.example.com/cb?foo=bar" />
+
+    <!--   
+    <parameter name="domainURL" value="http://localhost:8080/oxTrust/seam/resource/restv1"/>
+    <parameter name="userName" value="test_user"/>
+    <parameter name="passWord" value="test"/>
+    <parameter name="uid" value="@!1111!0000!D4E7"/>
+    <parameter name="id" value="@!1111!0003!B2C6"/>
+    <parameter name="clientID" value="@!1111!0008!C2EB!75F1"/>
+    <parameter name="clientSecret" value="5967d41c-ce9c-4137-9068-42578df0c606"/>
+    <parameter name="oxAuthDomain" value="http://localhost:8080/oxauth/seam/resource/restv1/oxauth/token"/>
+    <parameter name="registerUrl" value="http://localhost:8080/oxauth/seam/resource/restv1/oxauth/register"/>
+    <parameter name="excelFileLocationUsers" value="doc/SampleXLS/SCIMusers.xls"/>
+    <parameter name="excelFileLocationGroups" value="doc/SampleXLS/SCIMgroups.xls"/>
+    -->
+
+    <test name="ScimClientRetreivingEntities test" enabled="true">
+        <classes>
+            <class name="gluu.scim.client.ScimClientRetreivingEntitiesTest"/>
+        </classes>
+    </test>
+
+    <test name="ScimClientPersonWriteOperations OAuth test" enabled="true">
+        <classes>
+            <class name="gluu.scim.client.ScimClientPersonWriteOperationsOAuthTest"/>
+        </classes>
+    </test>
+
+    <test name="ScimClientPersonWriteOperations UMA test" enabled="true">
+        <classes>
+            <class name="gluu.scim.client.ScimClientPersonWriteOperationsUmaTest"/>
+        </classes>
+    </test>
+
+    <test name="ScimClientGroupWriteOperations test" enabled="true">
+        <classes>
+            <class name="gluu.scim.client.ScimClientGroupWriteOperationsTest"/>
+        </classes>
+    </test>
+
+    <test name="ScimClientBulkOperations test" enabled="true">
+        <classes>
+            <class name="gluu.scim.client.ScimClientBulkOperationsTest"/>
+        </classes>
+    </test>
+
+    
+    <test name="ScimClientPersonWriteObject test" enabled="true">
+        <classes>
+            <class name="gluu.scim.client.ScimClientPersonWriteObjectTest"/>
+        </classes>
+    </test>
+    
+
+    <test name="ScimClientGroupWriteObject test" enabled="true">
+        <classes>
+            <class name="gluu.scim.client.ScimClientGroupWriteObjectTest"/>
+        </classes>
+    </test>
+
+    
+    <test name="oxAuthClientCreation test" enabled="true">
+        <classes>
+            <class name="gluu.scim.client.oxAuthClientCreationTest"/>
+        </classes>
+    </test>
+    
+
+    
+    <test name="ExcelMapper test" enabled="true">
+        <classes>
+            <class name="gluu.scim.client.ExcelMapperTest"/>
+        </classes>
+    </test>
+ 
+
+</suite>
