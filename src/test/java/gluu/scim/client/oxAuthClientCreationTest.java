@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
 */
 public class oxAuthClientCreationTest {
 
-	private static String redirectUris = "https://localhost/oxTrust/";
+	private static String redirectUris = "https://seed.gluu.org/oxTrust/";
 	private static String applicationName = "ScimTest" + randomString();
 	CreationResult response;
 	

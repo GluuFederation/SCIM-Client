@@ -44,7 +44,7 @@ public class ScimClientPersonWriteObjectTest {
 	 personToUpdate = new ScimPerson();
 	 personToAdd.setSchemas(schema);
 	 personToAdd.setUserName("scimClientTestPerson");
-	 personToAdd.setPassword("test");
+	 personToAdd.setPassword("secret");
 	 personToAdd.setDisplayName("scimClientTestPerson");
 	 ScimPersonEmails email = new ScimPersonEmails();
 	 email.setValue("scim@gluu.org");

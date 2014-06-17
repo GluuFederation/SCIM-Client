@@ -22,6 +22,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
+import org.xdi.oxauth.client.uma.AuthorizationRequestService;
 import org.xdi.oxauth.client.uma.RequesterPermissionTokenService;
 import org.xdi.oxauth.client.uma.UmaClientFactory;
 import org.xdi.oxauth.client.uma.wrapper.UmaClient;
@@ -139,14 +140,20 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 		}
 	}
 
-	private boolean autorizeRpt(ScimResponse scimResponse) throws IOException, JsonParseException, JsonMappingException {
+	private boolean autorizeRpt(ScimResponse scimResponse) {
 		if (scimResponse.getStatusCode() == 403) {
         	// Forbidden : RPT is not authorized yet
         	
-            final ResourceSetPermissionTicket resourceSetPermissionTicket =  (new ObjectMapper()).readValue(scimResponse.getResponseBody(), ResourceSetPermissionTicket.class);
-            authorizeRpt(resourceSetPermissionTicket.getTicket());
+            final ResourceSetPermissionTicket resourceSetPermissionTicket;
+			try {
+				resourceSetPermissionTicket = (new ObjectMapper()).readValue(scimResponse.getResponseBody(), ResourceSetPermissionTicket.class);
+			} catch (Exception ex) {
+    			throw new ScimInitializationException("UMA ticket is invalid", ex);
+			}
 
-            if ((resourceSetPermissionTicket == null) || StringHelper.isEmpty(resourceSetPermissionTicket.getTicket())) {
+			authorizeRpt(resourceSetPermissionTicket.getTicket());
+
+			if ((resourceSetPermissionTicket == null) || StringHelper.isEmpty(resourceSetPermissionTicket.getTicket())) {
     			throw new ScimInitializationException("UMA ticket is invalid");
             }
             
@@ -161,7 +168,9 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
         ClientResponse<AuthorizationResponse> clientAuthorizationResponse = null;
         try {
             RptAuthorizationRequest rptAuthorizationRequest = new RptAuthorizationRequest(umaRpt.getToken(), ticket);
-            clientAuthorizationResponse = UmaClientFactory.instance().createAuthorizationRequestService(metadataConfiguration).requestRptPermissionAuthorization(
+            AuthorizationRequestService authorizationRequestService = UmaClientFactory.instance().createAuthorizationRequestService(metadataConfiguration); 
+
+            clientAuthorizationResponse = authorizationRequestService.requestRptPermissionAuthorization(
                     "Bearer " + umaAat.getAccessToken(),
                     getHost(metadataConfiguration.getIssuer()),
                     rptAuthorizationRequest);

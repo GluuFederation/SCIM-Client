@@ -4,7 +4,7 @@
 
   <groupId>gluu.scim.client</groupId>
   <artifactId>SCIM-Client</artifactId>
-  <version>1.0.0.Final</version>
+  <version>1.1.0.Final</version>
   <packaging>jar</packaging>
 
   <name>SCIM-Client</name>
@@ -17,8 +17,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jackson.version>1.9.11</jackson.version>
-        <oxauth.version>1.0.0.Final</oxauth.version>
-        <oxcore.version>1.0.0.Final</oxcore.version>
+        <oxauth.version>1.1.0.Final</oxauth.version>
+        <oxcore.version>1.1.0.Final</oxcore.version>
     </properties>
 
 
