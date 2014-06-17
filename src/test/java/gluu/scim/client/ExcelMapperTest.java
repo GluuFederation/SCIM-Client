@@ -31,7 +31,7 @@ public class ExcelMapperTest {
 		
 		operation = ExcelMapper.mapUsers(System.getProperty("user.dir") + File.separator + excelFileLocationUsers);
 		 assertNotNull(operation.getOperations(),"Unexpected result: operation is null");
-		 assertEquals(operation.getOperations().get(0).getData().getUserName(),"mike","Unexpected result: userName does not match");
+		 assertEquals(operation.getOperations().get(0).getData().getUserName(),"test_user","Unexpected result: userName does not match");
 		 assertEquals(operation.getOperations().get(0).getMethod(),"POST","Unexpected result: method does not match");
 
 	}
