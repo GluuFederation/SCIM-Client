@@ -1,7 +1,10 @@
 package gluu.scim.client.auth;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import gluu.scim.client.BaseScimClientImpl;
 import gluu.scim.client.exception.ScimInitializationException;
+
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.xdi.oxauth.client.TokenClient;
 import org.xdi.oxauth.client.TokenResponse;
@@ -26,6 +29,8 @@ public class OAuthScimClientImpl extends BaseScimClientImpl {
 
 	private TokenResponse oAuthToken;
 	private long oAuthAccessTokenExpiration = 0l; // When the "accessToken" will expire;
+
+	private final ReentrantLock lock = new ReentrantLock();
 
 	public OAuthScimClientImpl(String userName, String passWord, String clientID, String clientSecret, String domain,
 			String oAuthTokenEndpoint) {
@@ -57,17 +62,31 @@ public class OAuthScimClientImpl extends BaseScimClientImpl {
 	}
 
 	private void initOAuthAuthentication() {
-		final long now = System.currentTimeMillis();
+		long now = System.currentTimeMillis();
 
-		// AThimel 02/13/2013 Get new access token only if is the previous one is missing or expired
-		if ((this.oAuthToken == null) || (this.oAuthToken.getAccessToken() == null) || (this.oAuthAccessTokenExpiration <= now)) {
+		// Get new access token only if is the previous one is missing or expired
+		if (!isValidToken(now)) {
+			lock.lock();
 			try {
-				this.oAuthToken = getOAuthAccessToken();
-				this.oAuthAccessTokenExpiration = computeAccessTokenExpirationTime(this.oAuthToken.getExpiresIn());
+				now = System.currentTimeMillis();
+				if (!isValidToken(now)) {
+					this.oAuthToken = getOAuthAccessToken();
+					this.oAuthAccessTokenExpiration = computeAccessTokenExpirationTime(this.oAuthToken.getExpiresIn());
+				}
 			} catch (Exception ex) {
 				throw new ScimInitializationException("Could not get accessToken", ex);
+			} finally {
+				  lock.unlock();
 			}
 		}
+	}
+
+	private boolean isValidToken(final long now) {
+		if ((this.oAuthToken == null) || (this.oAuthToken.getAccessToken() == null) || (this.oAuthAccessTokenExpiration <= now)) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	private TokenResponse getOAuthAccessToken() {

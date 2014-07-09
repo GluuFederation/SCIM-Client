@@ -14,7 +14,6 @@ public class ScimClientPersonWriteOperationsOAuthTest extends ScimClientPersonWr
 	@BeforeTest
 	public void init(final String userName, final String passWord, final String domainURL, final String clientID,
 			final String clientSecret, final String oxAuthDomain) {
-		//client = ScimClient.basicInstance(userName,passWord,domainURL);
 		client = ScimClient.oAuthInstance(userName, passWord, clientID, clientSecret, domainURL, oxAuthDomain);
 		response = null;
 		person = null;

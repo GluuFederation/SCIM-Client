@@ -10,6 +10,7 @@ import gluu.scim.client.model.ScimPerson;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
@@ -59,6 +60,8 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 	
 	private long umaAatAccessTokenExpiration = 0l; // When the "accessToken" will expire;
 
+	private final ReentrantLock lock = new ReentrantLock();
+
 	public UmaScimClientImpl(String domain, String umaMetaDataUrl, String umaUserId, String umaUserSecret, String umaAatClientId,
 			String umaAatClientSecret, String umaRedirectUri) {
 		super(domain);
@@ -81,17 +84,31 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 	}
 
 	private void initUmaAuthentication() {
-		final long now = System.currentTimeMillis();
+		long now = System.currentTimeMillis();
 
 		// Get new access token only if is the previous one is missing or expired
-		if ((this.umaAat == null) || (this.umaAat.getAccessToken() == null) || (this.umaAatAccessTokenExpiration <= now)) {
+		if (!isValidToken(now)) {
+			lock.lock();
 			try {
-				initUmaRpt();
-				this.umaAatAccessTokenExpiration = computeAccessTokenExpirationTime(this.umaAat.getExpiresIn());
+				now = System.currentTimeMillis();
+				if (!isValidToken(now)) {
+					initUmaRpt();
+					this.umaAatAccessTokenExpiration = computeAccessTokenExpirationTime(this.umaAat.getExpiresIn());
+				}
 			} catch (Exception ex) {
 				throw new ScimInitializationException("Could not get accessToken", ex);
+			} finally {
+				  lock.unlock();
 			}
 		}
+	}
+
+	private boolean isValidToken(final long now) {
+		if ((this.umaAat == null) || (this.umaAat.getAccessToken() == null) || (this.umaAatAccessTokenExpiration <= now)) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	private void initUmaRpt() {

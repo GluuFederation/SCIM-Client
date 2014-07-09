@@ -1,6 +1,5 @@
 package gluu.scim.client;
 
-import gluu.scim.client.auth.BasicScimClientImpl;
 import gluu.scim.client.auth.OAuthScimClientImpl;
 import gluu.scim.client.auth.UmaScimClientImpl;
 import gluu.scim.client.model.ScimBulkOperation;
@@ -28,12 +27,6 @@ public class ScimClient implements BaseScimClient, Serializable {
 	private static final long serialVersionUID = 5919055665311654721L;
 	
 	private BaseScimClient scimClient;
-
-	public static ScimClient basicInstance(String userName, String passWord, String domain) {
-		BaseScimClient baseClient = new BasicScimClientImpl(userName, passWord, domain);
-
-		return new ScimClient(baseClient);
-	}
 
 	public static ScimClient oAuthInstance(String accessToken, long accessTokenExpiration, String domain, String oAuthTokenEndpoint) {
 		BaseScimClient baseClient = new OAuthScimClientImpl(accessToken, accessTokenExpiration, domain, oAuthTokenEndpoint);

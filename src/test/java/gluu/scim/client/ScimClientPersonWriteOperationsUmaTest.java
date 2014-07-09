@@ -13,7 +13,6 @@ public class ScimClientPersonWriteOperationsUmaTest extends ScimClientPersonWrit
 	@Parameters({ "domainURL", "umaMetaDataUrl", "userName", "passWord", "umaAatClientId", "umaAatClientSecret", "umaRedirectUri" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaUserId, final String umaUserSecret, final String umaAatClientId, final String umaAatClientSecret, final String umaRedirectUri) {
-		//client = ScimClient.basicInstance(userName,passWord,domainURL);
 		client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaUserId, umaUserSecret, umaAatClientId, umaAatClientSecret, umaRedirectUri);
 		response = null;
 		person = null;

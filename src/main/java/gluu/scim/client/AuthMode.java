@@ -7,7 +7,6 @@ package gluu.scim.client;
  */
 public class AuthMode {
 
-	public static String BASIC = "basic";
 	public static String OAUTH = "oauth";
 	
 }
