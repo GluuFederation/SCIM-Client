@@ -10,10 +10,10 @@ import org.testng.annotations.Parameters;
  */
 public class ScimClientPersonWriteOperationsUmaTest extends ScimClientPersonWriteOperationsBaseTest {
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "userName", "passWord", "umaAatClientId", "umaAatClientSecret", "umaRedirectUri" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientSecret" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaUserId, final String umaUserSecret, final String umaAatClientId, final String umaAatClientSecret, final String umaRedirectUri) {
-		client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaUserId, umaUserSecret, umaAatClientId, umaAatClientSecret, umaRedirectUri);
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientSecret) {
+		client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientSecret);
 		response = null;
 		person = null;
 	}

@@ -18,7 +18,6 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.ClientResponse;
@@ -50,27 +49,19 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 	private RequesterPermissionTokenResponse umaRpt;
 
 	private String umaMetaDataUrl;
-	private String umaUserId;
-	private String umaUserSecret;
 
 	private String umaAatClientId;
 	private String umaAatClientSecret;
-
-	private String umaRedirectUri;
 	
 	private long umaAatAccessTokenExpiration = 0l; // When the "accessToken" will expire;
 
 	private final ReentrantLock lock = new ReentrantLock();
 
-	public UmaScimClientImpl(String domain, String umaMetaDataUrl, String umaUserId, String umaUserSecret, String umaAatClientId,
-			String umaAatClientSecret, String umaRedirectUri) {
+	public UmaScimClientImpl(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientSecret) {
 		super(domain);
 		this.umaMetaDataUrl = umaMetaDataUrl;
-		this.umaUserId = umaUserId;
-		this.umaUserSecret = umaUserSecret;
 		this.umaAatClientId = umaAatClientId;
 		this.umaAatClientSecret = umaAatClientSecret;
-		this.umaRedirectUri = umaRedirectUri;
 	}
 
 	@Override
@@ -126,8 +117,7 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 
 		// Get AAT
 		try {
-			this.umaAat = UmaClient.requestAat(metadataConfiguration.getUserEndpoint(),
-					metadataConfiguration.getTokenEndpoint(), umaUserId, umaUserSecret, umaAatClientId, umaAatClientSecret, umaRedirectUri);
+			this.umaAat = UmaClient.requestAat(metadataConfiguration.getTokenEndpoint(), umaAatClientId, umaAatClientSecret);
 		} catch (ClientResponseFailure ex) {
 			String errorMessage = (String) ex.getResponse().getEntity(String.class);
 			throw new ScimInitializationException("Failed to get AAT token. Error: " + errorMessage, ex);
