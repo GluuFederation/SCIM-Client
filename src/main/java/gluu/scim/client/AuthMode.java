@@ -3,10 +3,10 @@ package gluu.scim.client;
 /**
  * SCIM Authorization Mode 
  *
- * @author Reda Zerrad Date: 05.24.2012
+ * @author Yuriy Movchan Date: 07/22/2014
  */
 public class AuthMode {
 
-	public static String OAUTH = "oauth";
+	public static final String BEARER_TOKEN_TYPE_HEADER = "BearerTokenType" ;
 	
 }

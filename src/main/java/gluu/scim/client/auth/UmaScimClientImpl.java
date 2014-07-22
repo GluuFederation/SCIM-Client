@@ -1,5 +1,6 @@
 package gluu.scim.client.auth;
 
+import gluu.scim.client.AuthMode;
 import gluu.scim.client.BaseScimClientImpl;
 import gluu.scim.client.ScimResponse;
 import gluu.scim.client.exception.ScimInitializationException;
@@ -72,6 +73,7 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 	@Override
 	protected void addAuthenticationHeader(HttpMethodBase httpMethod) {
 		httpMethod.setRequestHeader("Authorization", "Bearer " + this.umaRpt.getToken());
+		httpMethod.setRequestHeader(AuthMode.BEARER_TOKEN_TYPE_HEADER, "uma");
 	}
 
 	private void initUmaAuthentication() {

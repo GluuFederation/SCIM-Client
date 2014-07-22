@@ -2,6 +2,7 @@ package gluu.scim.client.auth;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import gluu.scim.client.AuthMode;
 import gluu.scim.client.BaseScimClientImpl;
 import gluu.scim.client.exception.ScimInitializationException;
 
@@ -59,6 +60,7 @@ public class OAuthScimClientImpl extends BaseScimClientImpl {
 	@Override
 	protected void addAuthenticationHeader(HttpMethodBase httpMethod) {
 		httpMethod.setRequestHeader("Authorization", "Bearer " + this.oAuthToken.getAccessToken());
+		httpMethod.setRequestHeader(AuthMode.BEARER_TOKEN_TYPE_HEADER, "oxauth");
 	}
 
 	private void initOAuthAuthentication() {
