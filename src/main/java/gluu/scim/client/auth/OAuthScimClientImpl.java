@@ -26,7 +26,7 @@ public class OAuthScimClientImpl extends BaseScimClientImpl {
 	private String oAuthTokenEndpoint;
 	private String clientID;
 	private String clientSecret;
-	private String scope = "openid profile address email";
+	private String scope = "openid user_name";
 
 	private TokenResponse oAuthToken;
 	private long oAuthAccessTokenExpiration = 0l; // When the "accessToken" will expire;
