@@ -36,7 +36,9 @@ public class Util implements Serializable {
 		 StringWriter sw = new StringWriter();
 		 JAXBContext context = JAXBContext.newInstance(clazz);
 	     context.createMarshaller().marshal(person, sw);
-	     return sw.toString();
+	     String output =sw.toString();
+	     System.out.println(output);
+	     return output;
 	 }
 	 
 	 
