@@ -239,6 +239,49 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 		}
 		return null;
 	}
+	
+	/* (non-Javadoc)
+	 * @see gluu.scim.client.ScimClientService#updatePerson(gluu.scim.client.model.User, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public ScimResponse updatePerson(User person, String uid, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
+
+		init();
+
+		HttpClient httpClient = new HttpClient();
+
+		PutMethod put = new PutMethod(this.domain + "/v2/Users/" + uid);
+		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		addAuthenticationHeader(put);
+
+		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
+			put.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+			put.setRequestEntity(new StringRequestEntity(Util.getJSONString(person), "application/json", "UTF-8"));
+		}
+
+		if (mediaType.equals(MediaType.APPLICATION_XML)) {
+			put.setRequestHeader("Accept", MediaType.APPLICATION_XML);
+			put.setRequestEntity(new StringRequestEntity(Util.getXMLString(person, ScimPerson.class), "text/xml", "UTF-8"));
+
+		}
+		try {
+			httpClient.executeMethod(put);
+
+			ScimResponse response = ResponseMapper.map(put, null);
+
+			return response;
+		} catch (Exception ex) {
+
+			log.error(" an Error occured : ", ex);
+
+		} finally {
+			put.releaseConnection();
+
+		}
+		return null;
+	}
 
 	/* (non-Javadoc)
 	 * @see gluu.scim.client.ScimClientService#deletePerson(java.lang.String)
@@ -250,7 +293,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		HttpClient httpClient = new HttpClient();
 
-		DeleteMethod delete = new DeleteMethod(this.domain + "/Users/" + uid);
+		DeleteMethod delete = new DeleteMethod(this.domain + "/v2/Users/" + uid);
 		delete.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(delete);
@@ -486,7 +529,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		HttpClient httpClient = new HttpClient();
 
-		PutMethod put = new PutMethod(this.domain + "/Users/" + uid);
+		PutMethod put = new PutMethod(this.domain + "/v2/Users/" + uid);
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);

@@ -32,14 +32,16 @@ public class TestScim2Client {
 
 	 */
    	static String userInum = " @!0035.934F.1A51.77B0!0001!402D.66D0!0000!B17F.1FC8";
-	static String clientInum = "@!0035.934F.1A51.77B0!0001!402D.66D0!0008!5B87.6DA0";
-	static String clientSecret = "4a87fa61-2440-43b9-861b-1f5cf9b62670";
+	static String clientInum = "@!0035.934F.1A51.77B0!0001!402D.66D0!0008!23EA.E86E";
+	static String clientSecret = "4de69620-7870-4dd2-9270-18ee0693ea3e";
 
     public static void main(String[] args) {
 //    	getPerson();
-//    	getAllPersons();
-    	createPerson();
-//    	registerClient("My Application","scim client");
+    	// 	getAllPersons();
+    	   	   	deletePerson();
+    	   	//   	    	createPerson();
+    	   	//  	updatePerson();
+    	   	//  		registerClient("My Application","scim client");
     }
 
     private static void getPerson() {
@@ -47,6 +49,18 @@ public class TestScim2Client {
                 "http://localhost:8085/oxtrust-server/seam/resource/restv1", "http://localhost:8085/oxauth/seam/resource/restv1/oxauth/token");
         try {
             ScimResponse response1 = scimClient.retrievePerson(userInum, MediaType.APPLICATION_JSON);
+            System.out.println("response status:"+response1.getStatus());
+            System.out.println(response1.getResponseBodyString());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+	}
+    
+    private static void deletePerson() {
+    	Scim2Client scimClient = Scim2Client.oAuthInstance("admin", "yourpwd", clientInum, clientSecret,
+                "http://localhost:8085/oxtrust-server/seam/resource/restv1", "http://localhost:8085/oxauth/seam/resource/restv1/oxauth/token");
+        try {
+            ScimResponse response1 = scimClient.deletePerson("@!0035.934F.1A51.77B0!0001!402D.66D0!0000!0F1B.D2FD");
             System.out.println("response status:"+response1.getStatus());
             System.out.println(response1.getResponseBodyString());
         } catch (Exception ex) {
@@ -66,12 +80,13 @@ public class TestScim2Client {
         }
 	}
     
-    private static void createPerson() {
+    private static void updatePerson() {
     	Scim2Client scimClient = Scim2Client.oAuthInstance("admin", "jun8azar", clientInum, clientSecret,
                 "http://localhost:8085/oxtrust-server/seam/resource/restv1", "http://localhost:8085/oxauth/seam/resource/restv1/oxauth/token");
         try {
         	
-        	User newUser=new User();
+        	
+User newUser=new User();
         	
         	Name name=new Name();
         	name.setGivenName("UserGivenName");
@@ -80,7 +95,62 @@ public class TestScim2Client {
         	
         	newUser.setUserName("NewTestUser");
         	newUser.setDisplayName("NewTestUserDisplayName");
-        	newUser.setTitle("TestTitle");
+        	newUser.setTitle("TestTitle112233");
+        	newUser.setPassword("rahat");
+        	newUser.setActive(true);
+        	List<Email> emails = new ArrayList<Email>();
+        	Email email = new Email();
+        	email.setDisplay("Rahat");
+        	email.setValue("rahat.jaan@gmail.com");        	
+			emails.add(email );
+			
+        	email = new Email();
+        	email.setDisplay("Rahat");
+        	email.setValue("rahatjaan@gmail.com");        	
+			emails.add(email );
+
+			newUser.setEmails(emails );
+			List<Address> addresses =new ArrayList<Address>();
+			Address address = new Address();
+			address.setCountry("Pakistan");
+			address.setDisplay("Something something");
+			address.setFormatted("formatted");
+			address.setPostalCode("46000");
+			address.setRegion("ABCD");
+		
+			addresses.add(address );
+			newUser.setAddresses(addresses );
+			List<Role> roles = new ArrayList<Role>();
+			Role role = new Role();
+			role.setDisplay("ADMIN");
+			role.setOperation("Operation");
+			role.setValue("ADMIN");
+			roles.add(role );
+			newUser.setRoles(roles);
+        	
+            ScimResponse response1 = scimClient.updatePerson(newUser, "@!0035.934F.1A51.77B0!0001!402D.66D0!0000!B865.F744", MediaType.APPLICATION_JSON);
+            System.out.println("response status:"+response1.getStatus());
+            System.out.println(response1.getResponseBodyString());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+	}
+    
+    private static void createPerson() {
+    	Scim2Client scimClient = Scim2Client.oAuthInstance("admin", "jun8azar", clientInum, clientSecret,
+                "http://localhost:8085/oxtrust-server/seam/resource/restv1", "http://localhost:8085/oxauth/seam/resource/restv1/oxauth/token");
+        try {
+        	
+        	User newUser=new User();
+        	
+        	Name name=new Name();
+        	name.setGivenName("Anwar");
+        	name.setFamilyName("Ali");
+        	newUser.setName(name);
+        	
+        	newUser.setUserName("AnwarAli");
+        	newUser.setDisplayName("Anwar Ali");
+        	newUser.setTitle("Mr");
         	newUser.setPassword("rahat");
         	newUser.setActive(true);
         	List<Email> emails = new ArrayList<Email>();

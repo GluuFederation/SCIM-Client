@@ -80,6 +80,15 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 			UnsupportedEncodingException, IOException, JAXBException {
 		return scimClient.updatePerson(person, uid, mediaType);
 	}
+	
+	/*
+	 * @see gluu.scim.client.ScimClientService#updatePerson(gluu.scim.client.model.User, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public ScimResponse updatePerson(User person, String uid, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
+		return scimClient.updatePerson(person, uid, mediaType);
+	}
 
 	/*
 	 * @see gluu.scim.client.ScimClientService#deletePerson(java.lang.String)
