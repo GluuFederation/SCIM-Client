@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpException;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.gluu.oxtrust.model.scim2.BulkOperation;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
 
@@ -192,6 +193,15 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 */
 	@Override
 	public ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
+		return scimClient.bulkOperation(operation, mediaType);
+	}
+	
+	/*
+	 * @see gluu.scim.client.ScimClientService#bulkOperation(gluu.scim.client.model.BulkOperation, java.lang.String)
+	 */
+	@Override
+	public ScimResponse bulkOperation(BulkOperation operation, String mediaType) throws JsonGenerationException, JsonMappingException,
 			UnsupportedEncodingException, IOException, JAXBException {
 		return scimClient.bulkOperation(operation, mediaType);
 	}

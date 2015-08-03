@@ -7,11 +7,13 @@ import javax.xml.bind.JAXBException;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.gluu.oxtrust.model.scim2.BulkOperation;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
 
 import gluu.scim.client.BaseScimClient;
 import gluu.scim.client.ScimResponse;
+import gluu.scim.client.model.ScimBulkOperation;
 import gluu.scim.client.model.ScimGroup;
 import gluu.scim.client.model.ScimPerson;
 
@@ -57,4 +59,18 @@ public interface BaseScim2Client extends BaseScimClient {
      * @throws Exception
      */
 	public ScimResponse updateGroup(Group group,String id, String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
+	
+	/**
+     * Bulk operation with BulkOperation as input
+     * @param ScimBulkOperation operation
+     * @param String mediaType
+     * @return ScimResponse
+	 * @throws IOException 
+	 * @throws UnsupportedEncodingException 
+	 * @throws JsonMappingException 
+	 * @throws JsonGenerationException 
+	 * @throws JAXBException 
+     * @throws Exception
+     */
+	public ScimResponse bulkOperation(BulkOperation operation,String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
 }

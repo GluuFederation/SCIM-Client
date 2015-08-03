@@ -28,6 +28,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.gluu.oxtrust.model.scim2.BulkOperation;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
 import org.slf4j.Logger;
@@ -752,6 +753,48 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 		HttpClient httpClient = new HttpClient();
 
 		PostMethod post = new PostMethod(this.domain + "/Bulk/");
+		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		addAuthenticationHeader(post);
+
+		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
+			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(operation), "application/json", "UTF-8"));
+		}
+
+		if (mediaType.equals(MediaType.APPLICATION_XML)) {
+			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
+			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(operation, ScimGroup.class), "text/xml", "UTF-8"));
+
+		}
+		try {
+			httpClient.executeMethod(post);
+
+			ScimResponse response = ResponseMapper.map(post, null);
+
+			return response;
+		} catch (Exception ex) {
+
+			log.error(" an Error occured : ", ex);
+
+		} finally {
+			post.releaseConnection();
+
+		}
+		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see gluu.scim.client.ScimClientService#bulkOperation(gluu.scim.client.model.BulkOperation, java.lang.String)
+	 */
+	@Override
+	public ScimResponse bulkOperation(BulkOperation operation, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
+		init();
+
+		HttpClient httpClient = new HttpClient();
+
+		PostMethod post = new PostMethod(this.domain + "/v2/Bulk/");
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);

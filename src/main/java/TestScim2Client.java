@@ -9,10 +9,13 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import org.gluu.oxtrust.model.scim2.Address;
+import org.gluu.oxtrust.model.scim2.BulkOperation;
+import org.gluu.oxtrust.model.scim2.BulkRequests;
 import org.gluu.oxtrust.model.scim2.Email;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.Name;
 import org.gluu.oxtrust.model.scim2.Role;
+import org.gluu.oxtrust.model.scim2.ScimData;
 import org.gluu.oxtrust.model.scim2.User;
 import org.xdi.oxauth.client.RegisterClient;
 import org.xdi.oxauth.client.RegisterRequest;
@@ -35,8 +38,9 @@ public class TestScim2Client {
 
 	public static void main(String[] args) {
 		// getPerson();
-		// getAllPersons();
-		getAllGroups();
+		 getAllPersons();
+		//getAllGroups();
+		 //bulkOperation();
 		//deleteGroup();
 		//updateGroup();
 		//getGroup();
@@ -45,6 +49,77 @@ public class TestScim2Client {
 		// createPerson();
 		// updatePerson();
 		// registerClient("My Application","scim client");
+	}
+	
+	private static void bulkOperation() {
+		Scim2Client scimClient = Scim2Client
+				.oAuthInstance(
+						"admin",
+						"yourpwd",
+						clientInum,
+						clientSecret,
+						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
+						"http://localhost:8085/oxauth/seam/resource/restv1/oxauth/token");
+		try {
+			BulkOperation op=new BulkOperation();
+			List<BulkRequests> bulkRequests=new ArrayList<BulkRequests>();
+			BulkRequests req1=new BulkRequests();
+			ScimData data1=new ScimData();
+			data1.setDisplayName("Umar Gul");
+			
+			Name name = new Name();
+			name.setGivenName("UserGivenName");
+			name.setFamilyName("UserFamilyName");
+			data1.setName(name);
+
+			data1.setUserName("NewTestUser");
+			data1.setTitle("TestTitle112233");
+			data1.setPassword("rahat");
+			data1.setActive(true);
+			List<Email> emails = new ArrayList<Email>();
+			Email email = new Email();
+			email.setDisplay("Rahat");
+			email.setValue("rahat.jaan@gmail.com");
+			emails.add(email);
+
+			email = new Email();
+			email.setDisplay("Rahat");
+			email.setValue("rahatjaan@gmail.com");
+			emails.add(email);
+
+			data1.setEmails(emails);
+			List<Address> addresses = new ArrayList<Address>();
+			Address address = new Address();
+			address.setCountry("Pakistan");
+			address.setDisplay("Something something");
+			address.setFormatted("formatted");
+			address.setPostalCode("46000");
+			address.setRegion("ABCD");
+
+			addresses.add(address);
+			data1.setAddresses(addresses);
+			List<Role> roles = new ArrayList<Role>();
+			Role role = new Role();
+			role.setDisplay("ADMIN");
+			role.setOperation("Operation");
+			role.setValue("ADMIN");
+			roles.add(role);
+			data1.setRoles(roles);
+			
+			req1.setMethod("PUT");
+			req1.setPath("/Users/@!0035.934F.1A51.77B0!0001!402D.66D0!0000!B865.F744");
+			req1.setData(data1);
+			
+			bulkRequests.add(req1);
+			op.setOperations(bulkRequests);
+			
+			
+			ScimResponse response1 = scimClient.bulkOperation(op, MediaType.APPLICATION_JSON);
+			System.out.println("response status:" + response1.getStatus());
+			System.out.println(response1.getResponseBodyString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private static void getPerson() {
@@ -70,7 +145,7 @@ public class TestScim2Client {
 		Scim2Client scimClient = Scim2Client
 				.oAuthInstance(
 						"admin",
-						"jun8azar",
+						"yourpwd",
 						clientInum,
 						clientSecret,
 						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
@@ -89,7 +164,7 @@ public class TestScim2Client {
 		Scim2Client scimClient = Scim2Client
 				.oAuthInstance(
 						"admin",
-						"jun8azar",
+						"yourpwd",
 						clientInum,
 						clientSecret,
 						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
@@ -108,7 +183,7 @@ public class TestScim2Client {
 		Scim2Client scimClient = Scim2Client
 				.oAuthInstance(
 						"admin",
-						"jun8azar",
+						"yourpwd",
 						clientInum,
 						clientSecret,
 						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
@@ -127,7 +202,7 @@ public class TestScim2Client {
 		Scim2Client scimClient = Scim2Client
 				.oAuthInstance(
 						"admin",
-						"jun8azar",
+						"yourpwd",
 						clientInum,
 						clientSecret,
 						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
@@ -146,7 +221,7 @@ public class TestScim2Client {
 		Scim2Client scimClient = Scim2Client
 				.oAuthInstance(
 						"admin",
-						"jun8azar",
+						"yourpwd",
 						clientInum,
 						clientSecret,
 						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
@@ -209,7 +284,7 @@ public class TestScim2Client {
 		Scim2Client scimClient = Scim2Client
 				.oAuthInstance(
 						"admin",
-						"jun8azar",
+						"yourpwd",
 						clientInum,
 						clientSecret,
 						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
@@ -270,7 +345,7 @@ public class TestScim2Client {
 		Scim2Client scimClient = Scim2Client
 				.oAuthInstance(
 						"admin",
-						"jun8azar",
+						"yourpwd",
 						clientInum,
 						clientSecret,
 						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
@@ -293,7 +368,7 @@ public class TestScim2Client {
 		Scim2Client scimClient = Scim2Client
 				.oAuthInstance(
 						"admin",
-						"jun8azar",
+						"yourpwd",
 						clientInum,
 						clientSecret,
 						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
@@ -317,7 +392,7 @@ public class TestScim2Client {
 		Scim2Client scimClient = Scim2Client
 				.oAuthInstance(
 						"admin",
-						"jun8azar",
+						"yourpwd",
 						clientInum,
 						clientSecret,
 						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
