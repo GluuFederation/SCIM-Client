@@ -28,6 +28,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -323,7 +324,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		init();
 		HttpClient httpClient = new HttpClient();
-		GetMethod get = new GetMethod(this.domain + "/Groups/" + id);
+		GetMethod get = new GetMethod(this.domain + "/v2/Groups/" + id);
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
@@ -397,6 +398,50 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 		}
 		return null;
 	}
+	
+	/* (non-Javadoc)
+	 * @see gluu.scim.client.ScimClientService#createGroup(gluu.scim.client.model.ScimGroup, java.lang.String)
+	 */
+	@Override
+	public ScimResponse createGroup(Group group, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
+
+		init();
+
+		HttpClient httpClient = new HttpClient();
+
+		PostMethod post = new PostMethod(this.domain + "/v2/Groups/");
+		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		addAuthenticationHeader(post);
+
+		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
+			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(group), "application/json", "UTF-8"));
+		}
+
+		if (mediaType.equals(MediaType.APPLICATION_XML)) {
+			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
+			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(group, ScimGroup.class), "text/xml", "UTF-8"));
+
+		}
+
+		try {
+			httpClient.executeMethod(post);
+
+			ScimResponse response = ResponseMapper.map(post, null);
+
+			return response;
+		} catch (Exception ex) {
+
+			log.error(" an Error occured : ", ex);
+
+		} finally {
+			post.releaseConnection();
+
+		}
+		return null;
+	}
 
 	/* (non-Javadoc)
 	 * @see gluu.scim.client.ScimClientService#updateGroup(gluu.scim.client.model.ScimGroup, java.lang.String, java.lang.String)
@@ -410,6 +455,50 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 		HttpClient httpClient = new HttpClient();
 
 		PutMethod put = new PutMethod(this.domain + "/Groups/" + id);
+		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		addAuthenticationHeader(put);
+
+		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
+			put.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+			put.setRequestEntity(new StringRequestEntity(Util.getJSONString(group), "application/json", "UTF-8"));
+		}
+
+		if (mediaType.equals(MediaType.APPLICATION_XML)) {
+			put.setRequestHeader("Accept", MediaType.APPLICATION_XML);
+			put.setRequestEntity(new StringRequestEntity(Util.getXMLString(group, ScimGroup.class), "text/xml", "UTF-8"));
+
+		}
+
+		try {
+			httpClient.executeMethod(put);
+
+			ScimResponse response = ResponseMapper.map(put, null);
+
+			return response;
+		} catch (Exception ex) {
+
+			log.error(" an Error occured : ", ex);
+
+		} finally {
+			put.releaseConnection();
+
+		}
+		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see gluu.scim.client.ScimClientService#updateGroup(gluu.scim.client.model.Group, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public ScimResponse updateGroup(Group group, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
+
+		init();
+
+		HttpClient httpClient = new HttpClient();
+
+		PutMethod put = new PutMethod(this.domain + "/v2/Groups/" + id);
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
@@ -782,7 +871,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 	public ScimResponse retrieveAllGroups(String mediaType) throws HttpException, IOException {
 		init();
 		HttpClient httpClient = new HttpClient();
-		GetMethod get = new GetMethod(this.domain + "/Groups/");
+		GetMethod get = new GetMethod(this.domain + "/v2/Groups/");
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);

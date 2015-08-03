@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpException;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
 
 /**
@@ -114,12 +115,30 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 			UnsupportedEncodingException, IOException, JAXBException {
 		return scimClient.createGroup(group, mediaType);
 	}
+	
+	/*
+	 * @see gluu.scim.client.ScimClientService#createGroup(gluu.scim.client.model.Group, java.lang.String)
+	 */
+	@Override
+	public ScimResponse createGroup(Group group, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
+		return scimClient.createGroup(group, mediaType);
+	}
 
 	/*
 	 * @see gluu.scim.client.ScimClientService#updateGroup(gluu.scim.client.model.ScimGroup, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public ScimResponse updateGroup(ScimGroup group, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
+		return scimClient.updateGroup(group, id, mediaType);
+	}
+	
+	/*
+	 * @see gluu.scim.client.ScimClientService#updateGroup(gluu.scim.client.model.Group, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public ScimResponse updateGroup(Group group, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
 			UnsupportedEncodingException, IOException, JAXBException {
 		return scimClient.updateGroup(group, id, mediaType);
 	}
