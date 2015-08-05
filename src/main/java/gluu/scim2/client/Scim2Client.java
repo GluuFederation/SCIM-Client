@@ -16,7 +16,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpException;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.gluu.oxtrust.model.scim2.BulkOperation;
+import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
 
@@ -192,19 +192,11 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * @see gluu.scim.client.ScimClientService#bulkOperation(gluu.scim.client.model.ScimBulkOperation, java.lang.String)
 	 */
 	@Override
-	public ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws JsonGenerationException, JsonMappingException,
+	public ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws JsonGenerationException, JsonMappingException,
 			UnsupportedEncodingException, IOException, JAXBException {
-		return scimClient.bulkOperation(operation, mediaType);
+		return scimClient.bulkOperation(bulkRequest, mediaType);
 	}
 	
-	/*
-	 * @see gluu.scim.client.ScimClientService#bulkOperation(gluu.scim.client.model.BulkOperation, java.lang.String)
-	 */
-	@Override
-	public ScimResponse bulkOperation(BulkOperation operation, String mediaType) throws JsonGenerationException, JsonMappingException,
-			UnsupportedEncodingException, IOException, JAXBException {
-		return scimClient.bulkOperation(operation, mediaType);
-	}
 
 	/*
 	 * @see gluu.scim.client.ScimClientService#bulkOperationString(java.lang.String, java.lang.String)
@@ -246,6 +238,15 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)
 			throws JsonGenerationException, JsonMappingException, IOException, JAXBException {
 		return scimClient.personSearchByObject(attribute, value, valueMediaType, outPutMediaType);
+	}
+
+	@Override
+	public ScimResponse bulkOperation(ScimBulkOperation operation,
+			String mediaType) throws JsonGenerationException,
+			JsonMappingException, UnsupportedEncodingException, IOException,
+			JAXBException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

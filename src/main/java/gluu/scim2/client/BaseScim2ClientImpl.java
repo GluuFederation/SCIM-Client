@@ -28,7 +28,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.gluu.oxtrust.model.scim2.BulkOperation;
+import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
 import org.slf4j.Logger;
@@ -788,8 +788,8 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 	 * @see gluu.scim.client.ScimClientService#bulkOperation(gluu.scim.client.model.BulkOperation, java.lang.String)
 	 */
 	@Override
-	public ScimResponse bulkOperation(BulkOperation operation, String mediaType) throws JsonGenerationException, JsonMappingException,
-			UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws JsonGenerationException, JsonMappingException,
+	UnsupportedEncodingException, IOException, JAXBException  {
 		init();
 
 		HttpClient httpClient = new HttpClient();
@@ -801,12 +801,12 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(operation), "application/json", "UTF-8"));
+			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(bulkRequest), "application/json", "UTF-8"));
 		}
 
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(operation, ScimGroup.class), "text/xml", "UTF-8"));
+			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(bulkRequest, BulkRequest.class), "text/xml", "UTF-8"));
 
 		}
 		try {

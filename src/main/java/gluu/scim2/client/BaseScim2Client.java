@@ -1,5 +1,8 @@
 package gluu.scim2.client;
 
+import gluu.scim.client.BaseScimClient;
+import gluu.scim.client.ScimResponse;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
@@ -7,15 +10,9 @@ import javax.xml.bind.JAXBException;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.gluu.oxtrust.model.scim2.BulkOperation;
+import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
-
-import gluu.scim.client.BaseScimClient;
-import gluu.scim.client.ScimResponse;
-import gluu.scim.client.model.ScimBulkOperation;
-import gluu.scim.client.model.ScimGroup;
-import gluu.scim.client.model.ScimPerson;
 
 /**
  * BaseClient
@@ -72,5 +69,6 @@ public interface BaseScim2Client extends BaseScimClient {
 	 * @throws JAXBException 
      * @throws Exception
      */
-	public ScimResponse bulkOperation(BulkOperation operation,String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
+	public ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws JsonGenerationException, JsonMappingException,
+	UnsupportedEncodingException, IOException, JAXBException ;
 }
