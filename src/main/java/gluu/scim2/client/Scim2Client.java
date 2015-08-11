@@ -245,8 +245,22 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 			String mediaType) throws JsonGenerationException,
 			JsonMappingException, UnsupportedEncodingException, IOException,
 			JAXBException {
+
+		return scimClient.bulkOperation(operation, mediaType);
+	}
+
+	@Override
+	public ScimResponse retrieveServiceProviderConfig(String mediaType)
+			throws HttpException, IOException {
+		
+		return scimClient.retrieveServiceProviderConfig(mediaType);
+	}
+
+	@Override
+	public ScimResponse retrieveResourceTypes(String mediaType)
+			throws HttpException, IOException {
 		// TODO Auto-generated method stub
-		return null;
+		return scimClient.retrieveResourceTypes(mediaType);
 	}
 
 }

@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.httpclient.HttpException;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
@@ -71,4 +72,10 @@ public interface BaseScim2Client extends BaseScimClient {
      */
 	public ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws JsonGenerationException, JsonMappingException,
 	UnsupportedEncodingException, IOException, JAXBException ;
+
+	ScimResponse retrieveServiceProviderConfig(String mediaType)
+			throws HttpException, IOException;
+
+	ScimResponse retrieveResourceTypes(String mediaType) throws HttpException,
+			IOException;
 }

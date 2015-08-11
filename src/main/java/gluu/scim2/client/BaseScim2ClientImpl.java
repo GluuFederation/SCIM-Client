@@ -69,6 +69,79 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 		return calendar.getTimeInMillis();
 	}
 
+
+	/* (non-Javadoc)
+	 * @see gluu.scim.client.ScimClientService#retrieveServiceProviderConfig(java.lang.String)
+	 */
+	@Override
+	public ScimResponse retrieveServiceProviderConfig(String mediaType) throws HttpException, IOException {
+		init();
+		HttpClient httpClient = new HttpClient();
+		GetMethod get = new GetMethod(this.domain + "/v2/ServiceProviderConfig");
+		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		addAuthenticationHeader(get);
+
+		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
+			get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+
+		}
+
+		if (mediaType.equals(MediaType.APPLICATION_XML)) {
+			get.setRequestHeader("Accept", MediaType.APPLICATION_XML);
+
+		}
+
+		try {
+
+			httpClient.executeMethod(get);
+			ScimResponse response = ResponseMapper.map(get, null);
+			return response;
+		} catch (Exception ex) {
+
+			log.error(" an Error occured : ", ex);
+
+		} finally {
+			get.releaseConnection();
+
+		}
+		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see gluu.scim.client.ScimClientService#retrieveServiceProviderConfig(java.lang.String)
+	 */
+	@Override
+	public ScimResponse retrieveResourceTypes(String mediaType) throws HttpException, IOException {
+		init();
+		HttpClient httpClient = new HttpClient();
+		GetMethod get = new GetMethod(this.domain + "/v2/ResourceTypes");
+		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+		addAuthenticationHeader(get);
+		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
+			get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+		}
+
+		if (mediaType.equals(MediaType.APPLICATION_XML)) {
+			get.setRequestHeader("Accept", MediaType.APPLICATION_XML);
+		}
+
+		try {
+			httpClient.executeMethod(get);
+			ScimResponse response = ResponseMapper.map(get, null);
+			return response;
+		} catch (Exception ex) {
+			log.error(" an Error occured : ", ex);
+
+		} finally {
+			get.releaseConnection();
+
+		}
+		return null;
+	}
+
+	
+	
 	/* (non-Javadoc)
 	 * @see gluu.scim.client.ScimClientService#retrievePerson(java.lang.String, java.lang.String)
 	 */

@@ -34,16 +34,20 @@ public class TestScim2Client {
     "client_secret": "3ca2854c-69e9-41e0-9068-b1a0edaaf11f",
 	 */
 	static String userInum = "@!0035.934F.1A51.77B0!0001!402D.66D0!0000!B17F.1FC8";
-	static String clientInum = "@!0035.934F.1A51.77B0!0001!402D.66D0!0008!8500.F76D";
-	static String clientSecret = "3ca2854c-69e9-41e0-9068-b1a0edaaf11f";
+	static String clientInum = "@!0035.934F.1A51.77B0!0001!402D.66D0!0008!0C74.90D3";
+	static String clientSecret = "5ada7186-5cc9-4a61-9f73-eab15218dcc2";
 	static Scim2Client scimClient ;
 	public static void main(String[] args) {
+
 		createClient();
-//		 registerClient("My Application","scim client");
+//		registerClient("My Application","scim client");		
+//		retrieveServiceProviderConfig();
+		retrieveResourceTypes();
+
 //		 getPerson();
 //		 getAllPersons();
 		//getAllGroups();
-		 bulkOperation();
+//		 bulkOperation();
 		//deleteGroup();
 		//updateGroup();
 		//getGroup();
@@ -64,6 +68,28 @@ public class TestScim2Client {
 						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
 						"http://localhost:8085/oxauth/seam/resource/restv1/oxauth/token");
 	}
+	private static void retrieveServiceProviderConfig() {
+		
+		try {
+			ScimResponse response1 = scimClient.retrieveServiceProviderConfig(MediaType.APPLICATION_JSON);
+			System.out.println("response status:" + response1.getStatus());
+			System.out.println(response1.getResponseBodyString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	private static void retrieveResourceTypes() {
+		
+		try {
+			ScimResponse response1 = scimClient.retrieveResourceTypes(MediaType.APPLICATION_JSON);
+			System.out.println("response status:" + response1.getStatus());
+			System.out.println(response1.getResponseBodyString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	private static void bulkOperation() {
 		
 		try {
