@@ -87,6 +87,11 @@
     </repositories>
   
   <dependencies>
+      <dependency>
+          <groupId>org.xdi</groupId>
+          <artifactId>oxtrust-scim</artifactId>
+          <version>3.0.2-SNAPSHOT</version>
+      </dependency>
         <dependency>
             <groupId>org.xdi</groupId>
             <artifactId>oxauth-client</artifactId>
