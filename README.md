@@ -1,7 +1,7 @@
 SCIM-Client
 ===========
 
-Simple Cloud Identity Management (SCIM) is a standard REST/JSON API to standardize User and Group CRUD (Create, read, update, delete). For developers and system administrators, it reduces the cost and complexity of user management operations by providing a common user schema and extension model, as well as binding documents to provide patterns for exchanging this schema using standard protocols. 
+Simple Cloud Identity Management (SCIM) is a standard REST/JSON API to standardize User and Group CRUD (Create, Read, Update, Delete). For developers and system administrators, it reduces the cost and complexity of user management operations by providing a common user schema and extension model, as well as binding documents to provide patterns for exchanging this schema using standard protocols. 
 
 Detailed specifications for SCIM can be found at [http://www.simplecloud.info](http://www.simplecloud.info). 
 
