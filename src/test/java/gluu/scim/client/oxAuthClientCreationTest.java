@@ -13,41 +13,37 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 /**
-* oxAuthClientCreationTest
-*
-* @author Reda Zerrad Date: 06.04.2012
-*/
+ * oxAuthClientCreationTest
+ *
+ * @author Reda Zerrad Date: 06.04.2012
+ */
 public class oxAuthClientCreationTest {
 
 	private static String redirectUris = "https://localhost/oxTrust/";
 	private static String applicationName = "ScimTest" + randomString();
 	CreationResult response;
-	
-	
-	
+
 	@BeforeTest
-	public void init(){
+	public void init() {
 		response = null;
 	}
-	
-	@Parameters({"registerUrl"})
+
+	@Parameters({ "registerUrl" })
 	@Test
-	public void oxAuthclientRegistrationTest(String registerUrl){
-		
-		response = OxAuthClientCreator.create( applicationName, registerUrl, redirectUris);
+	public void oxAuthclientRegistrationTest(String registerUrl) {
+
+		response = OxAuthClientCreator.create(applicationName, registerUrl, redirectUris);
 		assertEquals(response.getStatus(), 200, "Unexpected response code: " + response.getEntity());
-        assertNotNull(response.getClientId(), "Unexpected result: clientId is null");
-        assertNotNull(response.getClientSecret(), "Unexpected result: clientSecret is null");
-        assertNotNull(response.getExpiresAt(), "Unexpected result: expiresAt is null");
-        
+		assertNotNull(response.getClientId(), "Unexpected result: clientId is null");
+		assertNotNull(response.getClientSecret(), "Unexpected result: clientSecret is null");
+		assertNotNull(response.getExpiresAt(), "Unexpected result: expiresAt is null");
+
 	}
-	
-	public static String randomString()
-	  {
+
+	public static String randomString() {
 		SecureRandom random = new SecureRandom();
 
-	    return new BigInteger(130, random).toString(32);
-	  }
+		return new BigInteger(130, random).toString(32);
+	}
 
-	
 }
