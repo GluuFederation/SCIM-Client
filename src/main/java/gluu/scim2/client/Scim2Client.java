@@ -1,11 +1,10 @@
 package gluu.scim2.client;
 
 import gluu.scim.client.ScimResponse;
-import gluu.scim.client.auth.UmaScimClientImpl;
 import gluu.scim.client.model.ScimBulkOperation;
 import gluu.scim.client.model.ScimGroup;
 import gluu.scim.client.model.ScimPerson;
-import gluu.scim2.client.auth.OAuthScim2ClientImpl;
+import gluu.scim2.client.auth.UmaScim2ClientImpl;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -32,20 +31,13 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	
 	private BaseScim2Client scimClient;
 
-	public static Scim2Client oAuthInstance(String userName, String passWord, String clientID, String clientSecret, String domain,
-			String oAuthTokenEndpoint) {
-		BaseScim2Client baseClient =  new OAuthScim2ClientImpl(userName, passWord, clientID, clientSecret, domain, oAuthTokenEndpoint);
-
-		return new Scim2Client(baseClient);
+	public Scim2Client(BaseScim2Client baseClient) {
+		this.scimClient = baseClient;
 	}
 
 	public static Scim2Client umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientSecret) {
-		BaseScim2Client baseClient = (BaseScim2Client) new UmaScimClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientSecret); 
+		BaseScim2Client baseClient = new UmaScim2ClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientSecret); 
 		return new Scim2Client(baseClient);
-	}
-
-	public Scim2Client(BaseScim2Client baseClient) {
-		this.scimClient = baseClient;
 	}
 
 	/*

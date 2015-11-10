@@ -33,8 +33,7 @@ public class TestScimClient {
     	
 //        final ScimClient scimClient = ScimClient.oAuthInstance("admin", "rahat", clientInum, clientSecret,
 //                "http://localhost:8085/oxtrust-server/seam/resource/restv1", "http://localhost:8085/oxauth/seam/resource/restv1/oxauth/token");
-    	final ScimClient scimClient = ScimClient.oAuthInstance("admin", "yourpwd", clientInum, clientSecret,
-                "http://localhost:8085/oxtrust-server/seam/resource/restv1", "http://localhost:8085/oxauth/seam/resource/restv1/oxauth/token");
+        final ScimClient scimClient = ScimClient.umaInstance("domain", "umaMetaDataUrl", clientInum, clientSecret);
         try {
             ScimResponse response1 = scimClient.retrievePerson(userInum, MediaType.APPLICATION_JSON);
             System.out.println("response status:"+response1.getStatus());
