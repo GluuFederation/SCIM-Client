@@ -1,12 +1,19 @@
 package gluu.scim2.client.auth;
 
-import gluu.scim.client.AuthMode;
-import gluu.scim.client.BaseScimClientImpl;
 import gluu.scim.client.ScimResponse;
 import gluu.scim.client.exception.ScimInitializationException;
 import gluu.scim.client.model.ScimBulkOperation;
 import gluu.scim.client.model.ScimGroup;
 import gluu.scim.client.model.ScimPerson;
+import gluu.scim2.client.BaseScim2ClientImpl;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.xml.bind.JAXBException;
+
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -16,15 +23,13 @@ import org.xdi.oxauth.client.uma.CreateRptService;
 import org.xdi.oxauth.client.uma.RptAuthorizationRequestService;
 import org.xdi.oxauth.client.uma.UmaClientFactory;
 import org.xdi.oxauth.client.uma.wrapper.UmaClient;
-import org.xdi.oxauth.model.uma.*;
+import org.xdi.oxauth.model.uma.RPTResponse;
+import org.xdi.oxauth.model.uma.ResourceSetPermissionTicket;
+import org.xdi.oxauth.model.uma.RptAuthorizationRequest;
+import org.xdi.oxauth.model.uma.RptAuthorizationResponse;
+import org.xdi.oxauth.model.uma.UmaConfiguration;
 import org.xdi.oxauth.model.uma.wrapper.Token;
 import org.xdi.util.StringHelper;
-
-import javax.xml.bind.JAXBException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * SCIM UMA client
@@ -32,7 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Yuriy Movchan
  * @author Yuriy Zabrovarnyy
  */
-public class UmaScim2ClientImpl extends BaseScimClientImpl {
+public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 
 	private static final long serialVersionUID = 7099883500099353832L;
 
@@ -65,7 +70,6 @@ public class UmaScim2ClientImpl extends BaseScimClientImpl {
 	@Override
 	protected void addAuthenticationHeader(HttpMethodBase httpMethod) {
 		httpMethod.setRequestHeader("Authorization", "Bearer " + this.umaRpt.getRpt());
-		httpMethod.setRequestHeader(AuthMode.BEARER_TOKEN_TYPE_HEADER, "uma");
 	}
 
 	private void initUmaAuthentication() {

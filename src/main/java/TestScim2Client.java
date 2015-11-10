@@ -59,14 +59,7 @@ public class TestScim2Client {
 	}
 	
 	private static void createClient(){
-		scimClient = Scim2Client
-				.oAuthInstance(
-						USER_NAME,
-						PASSWORD,
-						clientInum,
-						clientSecret,
-						"http://localhost:8085/oxtrust-server/seam/resource/restv1",
-						"http://localhost:8085/oxauth/seam/resource/restv1/oxauth/token");
+        scimClient = Scim2Client.umaInstance("domain", "umaMetaDataUrl", clientInum, clientSecret);
 	}
 	private static void retrieveServiceProviderConfig() {
 		
