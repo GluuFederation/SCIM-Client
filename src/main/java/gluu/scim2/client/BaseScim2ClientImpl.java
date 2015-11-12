@@ -77,7 +77,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 	public ScimResponse retrieveServiceProviderConfig(String mediaType) throws HttpException, IOException {
 		init();
 		HttpClient httpClient = new HttpClient();
-		GetMethod get = new GetMethod(this.domain + "/v2/ServiceProviderConfig");
+		GetMethod get = new GetMethod(this.domain + "/scim/v2/ServiceProviderConfig");
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
@@ -115,7 +115,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 	public ScimResponse retrieveResourceTypes(String mediaType) throws HttpException, IOException {
 		init();
 		HttpClient httpClient = new HttpClient();
-		GetMethod get = new GetMethod(this.domain + "/v2/ResourceTypes");
+		GetMethod get = new GetMethod(this.domain + "/scim/v2/ResourceTypes");
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 		addAuthenticationHeader(get);
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
@@ -149,7 +149,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 	public ScimResponse retrievePerson(String uid, String mediaType) throws HttpException, IOException {
 		init();
 		HttpClient httpClient = new HttpClient();
-		GetMethod get = new GetMethod(this.domain + "/v2/Users/" + uid);
+		GetMethod get = new GetMethod(this.domain + "/scim/v2/Users/" + uid);
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
@@ -238,7 +238,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		HttpClient httpClient = new HttpClient();
 
-		PostMethod post = new PostMethod(this.domain + "/v2/Users/");
+		PostMethod post = new PostMethod(this.domain + "/scim/v2/Users/");
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
@@ -326,7 +326,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		HttpClient httpClient = new HttpClient();
 
-		PutMethod put = new PutMethod(this.domain + "/v2/Users/" + uid);
+		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/" + uid);
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
@@ -368,7 +368,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		HttpClient httpClient = new HttpClient();
 
-		DeleteMethod delete = new DeleteMethod(this.domain + "/v2/Users/" + uid);
+		DeleteMethod delete = new DeleteMethod(this.domain + "/scim/v2/Users/" + uid);
 		delete.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(delete);
@@ -398,7 +398,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		init();
 		HttpClient httpClient = new HttpClient();
-		GetMethod get = new GetMethod(this.domain + "/v2/Groups/" + id);
+		GetMethod get = new GetMethod(this.domain + "/scim/v2/Groups/" + id);
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
@@ -484,7 +484,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		HttpClient httpClient = new HttpClient();
 
-		PostMethod post = new PostMethod(this.domain + "/v2/Groups/");
+		PostMethod post = new PostMethod(this.domain + "/scim/v2/Groups/");
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
@@ -572,7 +572,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		HttpClient httpClient = new HttpClient();
 
-		PutMethod put = new PutMethod(this.domain + "/v2/Groups/" + id);
+		PutMethod put = new PutMethod(this.domain + "/scim/v2/Groups/" + id);
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
@@ -692,7 +692,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		HttpClient httpClient = new HttpClient();
 
-		PutMethod put = new PutMethod(this.domain + "/v2/Users/" + uid);
+		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/" + uid);
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
@@ -867,7 +867,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 
 		HttpClient httpClient = new HttpClient();
 
-		PostMethod post = new PostMethod(this.domain + "/v2/Bulk/");
+		PostMethod post = new PostMethod(this.domain + "/scim/v2/Bulk/");
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
@@ -948,7 +948,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 	public ScimResponse retrieveAllPersons(String mediaType) throws HttpException, IOException {
 		init();
 		HttpClient httpClient = new HttpClient();
-		GetMethod get = new GetMethod(this.domain + "/v2/Users/");
+		GetMethod get = new GetMethod(this.domain + "/scim/v2/Users/");
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
@@ -987,7 +987,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client{
 	public ScimResponse retrieveAllGroups(String mediaType) throws HttpException, IOException {
 		init();
 		HttpClient httpClient = new HttpClient();
-		GetMethod get = new GetMethod(this.domain + "/v2/Groups/");
+		GetMethod get = new GetMethod(this.domain + "/scim/v2/Groups/");
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);

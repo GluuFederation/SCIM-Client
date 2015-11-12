@@ -23,10 +23,10 @@ public class ScimClientGroupWriteObjectTest {
 	ScimResponse response;
 	ScimGroup group;
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientSecret" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientSecret", "umaAatClientJwks" , "umaAatClientKeyId" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientSecret) {
-		client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientSecret);
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId) {
+		client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwks, umaAatClientKeyId);
 		response = null;
 		group = null;
 		groupToAdd = new ScimGroup();
