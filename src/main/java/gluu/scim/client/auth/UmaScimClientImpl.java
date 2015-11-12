@@ -19,16 +19,22 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.ClientResponseFailure;
+import org.xdi.oxauth.client.TokenRequest;
 import org.xdi.oxauth.client.uma.CreateRptService;
 import org.xdi.oxauth.client.uma.RptAuthorizationRequestService;
 import org.xdi.oxauth.client.uma.UmaClientFactory;
 import org.xdi.oxauth.client.uma.wrapper.UmaClient;
+import org.xdi.oxauth.model.common.AuthenticationMethod;
+import org.xdi.oxauth.model.common.GrantType;
+import org.xdi.oxauth.model.crypto.signature.ECDSAPrivateKey;
+import org.xdi.oxauth.model.crypto.signature.RSAPrivateKey;
 import org.xdi.oxauth.model.uma.RPTResponse;
 import org.xdi.oxauth.model.uma.ResourceSetPermissionTicket;
 import org.xdi.oxauth.model.uma.RptAuthorizationRequest;
 import org.xdi.oxauth.model.uma.RptAuthorizationResponse;
 import org.xdi.oxauth.model.uma.UmaConfiguration;
 import org.xdi.oxauth.model.uma.wrapper.Token;
+import org.xdi.oxauth.model.util.JwtUtil;
 import org.xdi.util.StringHelper;
 
 /**
@@ -49,17 +55,19 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 	private String umaMetaDataUrl;
 
 	private String umaAatClientId;
-	private String umaAatClientSecret;
+	private String umaAatClientKeyId;
+	private String umaAatClientJwks;
 	
 	private long umaAatAccessTokenExpiration = 0l; // When the "accessToken" will expire;
 
 	private final ReentrantLock lock = new ReentrantLock();
 
-	public UmaScimClientImpl(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientSecret) {
+	public UmaScimClientImpl(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJwks, String umaAatClientKeyId) {
 		super(domain);
 		this.umaMetaDataUrl = umaMetaDataUrl;
 		this.umaAatClientId = umaAatClientId;
-		this.umaAatClientSecret = umaAatClientSecret;
+		this.umaAatClientJwks = umaAatClientJwks;
+		this.umaAatClientKeyId = umaAatClientKeyId;
 	}
 
 	@Override
@@ -102,20 +110,40 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 
 	private void initUmaRpt() {
 		// Remove old tokens
-		this.umaAat = null;
+ 		this.umaAat = null;
 		this.umaRpt = null;
 
 		// Get metadata configuration
-		this.metadataConfiguration = UmaClientFactory.instance().createMetaDataConfigurationService(umaMetaDataUrl)
-				.getMetadataConfiguration();
+		this.metadataConfiguration = UmaClientFactory.instance().createMetaDataConfigurationService(umaMetaDataUrl).getMetadataConfiguration();
 
 		if ((metadataConfiguration == null) || !StringHelper.equals(metadataConfiguration.getVersion(), "1.0")) {
 			throw new ScimInitializationException("Failed to load valid UMA metadata configuration");
 		}
 
 		// Get AAT
+
+		org.xdi.oxauth.model.crypto.PrivateKey privateKey = null;
 		try {
-			this.umaAat = UmaClient.requestAat(metadataConfiguration.getTokenEndpoint(), umaAatClientId, umaAatClientSecret);
+			privateKey = JwtUtil.getPrivateKey(null, umaAatClientJwks, umaAatClientKeyId);		
+			if (privateKey == null) {
+				throw new ScimInitializationException("There is no keyId in JWKS");
+			}
+
+			TokenRequest tokenRequest = TokenRequest.builder().aat().grantType(GrantType.CLIENT_CREDENTIALS).build();
+			if (privateKey instanceof ECDSAPrivateKey) {
+				tokenRequest.setEcPrivateKey((ECDSAPrivateKey) privateKey);
+			} else if (privateKey instanceof RSAPrivateKey) {
+				tokenRequest.setRsaPrivateKey((RSAPrivateKey) privateKey);
+			}
+
+			tokenRequest.setAuthenticationMethod(AuthenticationMethod.PRIVATE_KEY_JWT);
+	        tokenRequest.setAuthUsername(umaAatClientId);
+	        tokenRequest.setAlgorithm(privateKey.getSignatureAlgorithm());
+	        tokenRequest.setKeyId(privateKey.getKeyId());
+	        tokenRequest.setAudience(umaAatClientId);
+	        tokenRequest.setAssertion(metadataConfiguration.getTokenEndpoint());
+
+			this.umaAat = UmaClient.request(metadataConfiguration.getTokenEndpoint(), tokenRequest);
 		} catch (ClientResponseFailure ex) {
 			String errorMessage = (String) ex.getResponse().getEntity(String.class);
 			throw new ScimInitializationException("Failed to get AAT token. Error: " + errorMessage, ex);

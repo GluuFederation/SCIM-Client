@@ -27,8 +27,8 @@ public class ScimClient implements BaseScimClient, Serializable {
 	
 	private BaseScimClient scimClient;
 
-	public static ScimClient umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientSecret) {
-		BaseScimClient baseClient = new UmaScimClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientSecret); 
+	public static ScimClient umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJwks, String umaAatClientKeyId) {
+		BaseScimClient baseClient = new UmaScimClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwks, umaAatClientKeyId); 
 		return new ScimClient(baseClient);
 	}
 
