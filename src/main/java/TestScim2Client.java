@@ -59,7 +59,7 @@ public class TestScim2Client {
 	}
 	
 	private static void createClient(){
-        scimClient = Scim2Client.umaInstance("domain", "umaMetaDataUrl", clientInum, clientSecret);
+        scimClient = Scim2Client.umaInstance("domain", "umaMetaDataUrl", "client_id", "jwks", "key_id");
 	}
 	private static void retrieveServiceProviderConfig() {
 		

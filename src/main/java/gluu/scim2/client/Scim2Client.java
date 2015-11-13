@@ -1,6 +1,9 @@
 package gluu.scim2.client;
 
+import gluu.scim.client.BaseScimClient;
+import gluu.scim.client.ScimClient;
 import gluu.scim.client.ScimResponse;
+import gluu.scim.client.auth.UmaScimClientImpl;
 import gluu.scim.client.model.ScimBulkOperation;
 import gluu.scim.client.model.ScimGroup;
 import gluu.scim.client.model.ScimPerson;
@@ -18,6 +21,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
+import org.xdi.oxauth.model.util.SecurityProviderUtility;
 
 /**
  * SCIM Client
@@ -35,8 +39,9 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 		this.scimClient = baseClient;
 	}
 
-	public static Scim2Client umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientSecret) {
-		BaseScim2Client baseClient = new UmaScim2ClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientSecret); 
+	public static Scim2Client umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJwks, String umaAatClientKeyId) {
+    	SecurityProviderUtility.installBCProvider();
+    	BaseScim2Client baseClient = new UmaScim2ClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwks, umaAatClientKeyId); 
 		return new Scim2Client(baseClient);
 	}
 

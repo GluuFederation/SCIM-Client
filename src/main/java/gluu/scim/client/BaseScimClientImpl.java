@@ -735,7 +735,7 @@ public abstract class BaseScimClientImpl implements BaseScimClient, Serializable
 
 		HttpClient httpClient = new HttpClient();
 
-		PostMethod post = new PostMethod(this.domain + "/scim/v1//Users/Search");
+		PostMethod post = new PostMethod(this.domain + "/scim/v1/Users/Search");
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		ScimPersonSearch searchPattern = new ScimPersonSearch();

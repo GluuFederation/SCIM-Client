@@ -121,7 +121,6 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 		}
 
 		// Get AAT
-
 		org.xdi.oxauth.model.crypto.PrivateKey privateKey = null;
 		try {
 			privateKey = JwtUtil.getPrivateKey(null, umaAatClientJwks, umaAatClientKeyId);		
