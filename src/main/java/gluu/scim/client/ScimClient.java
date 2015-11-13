@@ -14,6 +14,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpException;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.xdi.oxauth.model.util.SecurityProviderUtility;
 
 /**
  * SCIM Client
@@ -28,6 +29,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	private BaseScimClient scimClient;
 
 	public static ScimClient umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJwks, String umaAatClientKeyId) {
+    	SecurityProviderUtility.installBCProvider();
 		BaseScimClient baseClient = new UmaScimClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwks, umaAatClientKeyId); 
 		return new ScimClient(baseClient);
 	}
