@@ -39,8 +39,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	public static Scim2Client umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJwks,
 			String umaAatClientKeyId) {
 		SecurityProviderUtility.installBCProvider();
-		BaseScim2Client baseClient = new UmaScim2ClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwks,
-				umaAatClientKeyId);
+		BaseScim2Client baseClient = new UmaScim2ClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwks, umaAatClientKeyId);
 		return new Scim2Client(baseClient);
 	}
 
@@ -70,8 +69,8 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * .User, java.lang.String)
 	 */
 	@Override
-	public ScimResponse createPerson(User person, String mediaType) throws JsonGenerationException, JsonMappingException,
-			IOException, JAXBException {
+	public ScimResponse createPerson(User person, String mediaType) throws JsonGenerationException, JsonMappingException, IOException,
+			JAXBException {
 		return scimClient.createPerson(person, mediaType);
 	}
 
@@ -81,8 +80,8 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * .ScimPerson, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse updatePerson(ScimPerson person, String uid, String mediaType) throws JsonGenerationException,
-			JsonMappingException, UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse updatePerson(ScimPerson person, String uid, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
 		return scimClient.updatePerson(person, uid, mediaType);
 	}
 
@@ -92,8 +91,8 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * .User, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse updatePerson(User person, String uid, String mediaType) throws JsonGenerationException,
-			JsonMappingException, UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse updatePerson(User person, String uid, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
 		return scimClient.updatePerson(person, uid, mediaType);
 	}
 
@@ -142,8 +141,8 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * .ScimGroup, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse updateGroup(ScimGroup group, String id, String mediaType) throws JsonGenerationException,
-			JsonMappingException, UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse updateGroup(ScimGroup group, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
 		return scimClient.updateGroup(group, id, mediaType);
 	}
 
@@ -205,8 +204,8 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse updateGroupString(String group, String id, String mediaType) throws JsonGenerationException,
-			JsonMappingException, UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse updateGroupString(String group, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
 		return scimClient.updateGroupString(group, id, mediaType);
 	}
 
@@ -216,8 +215,8 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * .ScimBulkOperation, java.lang.String)
 	 */
 	@Override
-	public ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws JsonGenerationException,
-			JsonMappingException, UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
 		return scimClient.bulkOperation(bulkRequest, mediaType);
 	}
 
@@ -271,8 +270,8 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	}
 
 	@Override
-	public ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws JsonGenerationException,
-			JsonMappingException, UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws JsonGenerationException, JsonMappingException,
+			UnsupportedEncodingException, IOException, JAXBException {
 
 		return scimClient.bulkOperation(operation, mediaType);
 	}
