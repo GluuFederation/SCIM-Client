@@ -16,7 +16,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jackson.version>1.9.11</jackson.version>
+        <jackson.version>1.9.13</jackson.version>
         <oxauth.version>3.0.3-SNAPSHOT</oxauth.version>
         <oxcore.version>3.0.3-SNAPSHOT</oxcore.version>
     </properties>
