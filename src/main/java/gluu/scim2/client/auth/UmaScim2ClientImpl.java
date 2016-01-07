@@ -18,6 +18,7 @@ import org.apache.commons.httpclient.HttpMethodBase;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.gluu.oxtrust.model.scim2.User;
 import org.jboss.resteasy.client.ClientResponseFailure;
 import org.xdi.oxauth.client.TokenRequest;
 import org.xdi.oxauth.client.uma.CreateRptService;
@@ -230,7 +231,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse createPerson(ScimPerson person, String mediaType) throws IOException, JAXBException {
+	public ScimResponse createPerson(User person, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.createPerson(person, mediaType);
 		if (autorizeRpt(scimResponse)) {
             scimResponse = super.createPerson(person, mediaType);
