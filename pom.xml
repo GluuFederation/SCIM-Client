@@ -4,7 +4,7 @@
 
   <groupId>gluu.scim.client</groupId>
   <artifactId>SCIM-Client</artifactId>
-  <version>2.4.1.Final</version>
+  <version>3.0.3-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>SCIM-Client</name>
@@ -16,9 +16,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jackson.version>1.9.11</jackson.version>
-        <oxauth.version>2.4.1.Final</oxauth.version>
-        <oxcore.version>2.4.1.Final</oxcore.version>
+        <jackson.version>1.9.13</jackson.version>
+        <oxauth.version>3.0.3-SNAPSHOT</oxauth.version>
+        <oxcore.version>3.0.3-SNAPSHOT</oxcore.version>
     </properties>
 
 
@@ -90,7 +90,7 @@
       <dependency>
           <groupId>org.xdi</groupId>
           <artifactId>oxtrust-scim</artifactId>
-          <version>2.4.1.Final</version>
+          <version>3.0.3-SNAPSHOT</version>
       </dependency>
         <dependency>
             <groupId>org.xdi</groupId>
