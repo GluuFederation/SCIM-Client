@@ -286,5 +286,11 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	public ScimResponse retrieveResourceTypes(String mediaType) throws HttpException, IOException {
 		return scimClient.retrieveResourceTypes(mediaType);
 	}
+	
+	@Override
+	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws JsonGenerationException,
+	JsonMappingException, IOException, JAXBException {
+		return scimClient.searchPersons( attribute, value, mediaType);
+	}
 
 }

@@ -78,4 +78,7 @@ public interface BaseScim2Client extends BaseScimClient {
 
 	ScimResponse retrieveResourceTypes(String mediaType) throws HttpException,
 			IOException;
+	
+	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws JsonGenerationException,
+	JsonMappingException, IOException, JAXBException;
 }

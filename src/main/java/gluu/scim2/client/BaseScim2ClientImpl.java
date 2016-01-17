@@ -356,7 +356,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			put.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			put.setRequestEntity(new StringRequestEntity(Util.getXMLString(person, ScimPerson.class), "text/xml", "UTF-8"));
+			put.setRequestEntity(new StringRequestEntity(Util.getXMLString(person, User.class), "text/xml", "UTF-8"));
 
 		}
 		try {
@@ -523,7 +523,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(group, ScimGroup.class), "text/xml", "UTF-8"));
+			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(group, Group.class), "text/xml", "UTF-8"));
 
 		}
 
@@ -617,7 +617,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			put.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			put.setRequestEntity(new StringRequestEntity(Util.getXMLString(group, ScimGroup.class), "text/xml", "UTF-8"));
+			put.setRequestEntity(new StringRequestEntity(Util.getXMLString(group, Group.class), "text/xml", "UTF-8"));
 
 		}
 
@@ -1166,6 +1166,54 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		}
 
 		if (outPutMediaType.equals(MediaType.APPLICATION_XML)) {
+			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
+			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(searchPattern, ScimPersonSearch.class), "text/xml", "UTF-8"));
+
+		}
+		try {
+			httpClient.executeMethod(post);
+
+			ScimResponse response = ResponseMapper.map(post, null);
+
+			return response;
+
+		} catch (Exception ex) {
+
+			log.error(" an Error occured : ", ex);
+
+		} finally {
+			post.releaseConnection();
+
+		}
+		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see gluu.scim.client.ScimClientService#personSearch(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws JsonGenerationException,
+			JsonMappingException, IOException, JAXBException {
+
+		init();
+
+		HttpClient httpClient = new HttpClient();
+
+		PostMethod post = new PostMethod(this.domain + "/scim/v2/Users/SearchPersons");
+		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		ScimPersonSearch searchPattern = new ScimPersonSearch();
+		searchPattern.setAttribute(attribute);
+		searchPattern.setValue(value);
+
+		addAuthenticationHeader(post);
+
+		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
+			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), "application/json", "UTF-8"));
+		}
+
+		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
 			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(searchPattern, ScimPersonSearch.class), "text/xml", "UTF-8"));
 

@@ -3,8 +3,6 @@ package gluu.scim2.client.auth;
 import gluu.scim.client.ScimResponse;
 import gluu.scim.client.exception.ScimInitializationException;
 import gluu.scim.client.model.ScimBulkOperation;
-import gluu.scim.client.model.ScimGroup;
-import gluu.scim.client.model.ScimPerson;
 import gluu.scim2.client.BaseScim2ClientImpl;
 
 import java.io.IOException;
@@ -18,6 +16,7 @@ import org.apache.commons.httpclient.HttpMethodBase;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
 import org.jboss.resteasy.client.ClientResponseFailure;
 import org.xdi.oxauth.client.TokenRequest;
@@ -241,7 +240,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse updatePerson(ScimPerson person, String uid, String mediaType) throws IOException, JAXBException {
+	public ScimResponse updatePerson(User person, String uid, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.updatePerson(person, uid, mediaType);
 		if (autorizeRpt(scimResponse)) {
             scimResponse = super.updatePerson(person, uid, mediaType);
@@ -271,7 +270,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse createGroup(ScimGroup group, String mediaType) throws IOException, JAXBException {
+	public ScimResponse createGroup(Group group, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.createGroup(group, mediaType);
 		if (autorizeRpt(scimResponse)) {
             scimResponse = super.createGroup(group, mediaType);
@@ -281,7 +280,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse updateGroup(ScimGroup group, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
+	public ScimResponse updateGroup(Group group, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
 			UnsupportedEncodingException, IOException, JAXBException {
 		ScimResponse scimResponse = super.updateGroup(group, id, mediaType);
 		if (autorizeRpt(scimResponse)) {
