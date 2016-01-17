@@ -401,4 +401,16 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 		return scimResponse;
 	}
 
+	
+	@Override
+	public ScimResponse searchPersons(String attribute, String value,
+			String mediaType) throws JsonGenerationException,
+			JsonMappingException, IOException, JAXBException {
+		ScimResponse scimResponse = super.searchPersons(attribute, value, mediaType);
+		if (autorizeRpt(scimResponse)) {
+            scimResponse = super.searchPersons(attribute, value, mediaType);
+		}
+
+		return scimResponse;
+	}
 }

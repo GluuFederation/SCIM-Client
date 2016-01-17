@@ -192,5 +192,16 @@ public class ScimClient implements BaseScimClient, Serializable {
 			throws JsonGenerationException, JsonMappingException, IOException, JAXBException {
 		return scimClient.personSearchByObject(attribute, value, valueMediaType, outPutMediaType);
 	}
+	
+	
+
+	/*
+	 * @see gluu.scim.client.ScimClientService#searchPersons(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws JsonGenerationException,
+			JsonMappingException, IOException, JAXBException {
+		return scimClient.searchPersons(attribute, value, mediaType);
+	}
 
 }

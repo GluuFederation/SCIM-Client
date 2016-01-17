@@ -166,4 +166,7 @@ public interface BaseScimClient extends Serializable {
 	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)
 			throws JsonGenerationException, JsonMappingException, IOException, JAXBException;
 
+	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws JsonGenerationException,
+	JsonMappingException, IOException, JAXBException;
+
 }
