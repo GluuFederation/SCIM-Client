@@ -33,57 +33,11 @@ public class UserWebServiceTestCases {
 	User userAdd;
 	User userToUpdate;
 	
-	String uid;//"@!90AF.4554.38D5.8D7B!0001!12A8.BB2E!0000!607F.2973";
+	String uid;
 	Scim2Client client;
 	ScimResponse response;
-	String username = "scimClientTestUser5";
-
-	
-	public void init1(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId) throws IOException {
-		String umaAatClientJwksData = FileUtils.readFileToString(new File(umaAatClientJwks));
-		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwksData, umaAatClientKeyId);
-		response = null;
-		//List<String> schema = new ArrayList<String>();
-		//schema.add("urn:scim:schemas:core:2.0");
-		//schema.add("urn:ietf:params:scim:api:messages:2.0:ListResponse");
-		personToAdd = new User();
-		personToUpdate = new User();
-		//personToAdd.setSchemas(schema);
-		personToAdd.setUserName(username);
-		personToAdd.setPassword("test");
-		personToAdd.setDisplayName("scimClientTestPerson");
-		Email email = new Email();
-		email.setValue("scim@gluu.org");
-		email.setType(org.gluu.oxtrust.model.scim2.Email.Type.WORK);
-		email.setPrimary(true);
-		personToAdd.getEmails().add(email);
-		PhoneNumber phone = new PhoneNumber();
-		phone.setType(org.gluu.oxtrust.model.scim2.PhoneNumber.Type.WORK);
-		phone.setValue("654-6509-263");
-		personToAdd.getPhoneNumbers().add(phone);
-		org.gluu.oxtrust.model.scim2.Address address = new org.gluu.oxtrust.model.scim2.Address();
-		address.setCountry("US");
-		address.setStreetAddress("random street");
-		address.setLocality("Austin");
-		address.setPostalCode("65672");
-		address.setRegion("TX");
-		address.setPrimary(true);
-		address.setType(org.gluu.oxtrust.model.scim2.Address.Type.WORK);
-		address.setFormatted(address.getStreetAddress() + " " + address.getLocality() + " " + address.getPostalCode() + " " + address.getRegion() + " "
-				+ address.getCountry());
-		
-		personToAdd.getAddresses().add(address);
-		personToAdd.setPreferredLanguage("US_en");
-		org.gluu.oxtrust.model.scim2.Name name = new  org.gluu.oxtrust.model.scim2.Name();		
-		name.setFamilyName("SCIM");//getName().setFamilyName("SCIM");
-		name.setGivenName("SCIM");
-		personToAdd.setName(name);
-
-		personToUpdate = personToAdd;
-		personToUpdate.setDisplayName("SCIM");
-
-	}	
-	
+	String username = "scimClientTestUser100";
+	String updateDisplayName="SCIM";
 	
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
 	@BeforeTest
@@ -91,25 +45,18 @@ public class UserWebServiceTestCases {
 		String umaAatClientJwksData = FileUtils.readFileToString(new File(umaAatClientJwks));
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwksData, umaAatClientKeyId);
 		response = null;
-		//person = null;
 		List<String> schema = new ArrayList<String>();
-		//schema.add("urn:scim:schemas:core:2.0");
-		//schema.add("urn:ietf:params:scim:api:messages:2.0:ListResponse");
 		userAdd = new User();
 		userToUpdate = new User();
-		//personToAdd.setSchemas(schema);
 		userAdd.setUserName("scimClientTestPerson19");
 		userAdd.setPassword("test");
 		userAdd.setDisplayName("scimClientTestPerson6");
 		Email email = new Email();
-		//org.gluu.oxtrust.model.scim2.Email.Type emailType = new org.gluu.oxtrust.model.scim2.Email.Type("Work");
 		email.setValue("scim@gluu.org");
 		email.setType(org.gluu.oxtrust.model.scim2.Email.Type.WORK);
 		email.setPrimary(true);
 		userAdd.getEmails().add(email);
-		PhoneNumber phone = new PhoneNumber();
-		//org.gluu.oxtrust.model.scim2.PhoneNumber.Type phoneType = new org.gluu.oxtrust.model.scim2.PhoneNumber.Type("Work");
-		
+		PhoneNumber phone = new PhoneNumber();		
 		phone.setType(org.gluu.oxtrust.model.scim2.PhoneNumber.Type.WORK);
 		phone.setValue("654-6509-263");
 		userAdd.getPhoneNumbers().add(phone);
@@ -136,15 +83,6 @@ public class UserWebServiceTestCases {
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonInString = mapper.writeValueAsString(userAdd);
 		System.out.println("jsonInString   :  "+jsonInString);
-		
-		//ObjectMapper mapper1 = new ObjectMapper();
-		//String jsonInString = "{'name' : 'mkyong'}";
-
-		//JSON from String to Object
-		//User userDeser = mapper1.readValue(jsonInString, User.class);
-		//System.out.println("userDeser   :  "+userDeser.getDisplayName());
-		
-
 	}
 	
 	@Test
@@ -185,7 +123,10 @@ public class UserWebServiceTestCases {
 		response = client.updatePerson(userToUpdate, uid, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases :updatePersonTest: response " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not update the person, status != 200");
-		
+		byte[] bytes = response.getResponseBody();
+		String responseStr = new String(bytes);
+		User person = (User) jsonToObject(responseStr, User.class);
+		assertEquals(person.getDisplayName(), updateDisplayName, "could not update the user");
 	}
 
 	@Test(dependsOnGroups = "a")

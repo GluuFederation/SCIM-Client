@@ -27,9 +27,10 @@ public class GroupWebServiceTestCase {
 	Scim2Client client;
 	ScimResponse response;
 	Group group;
+	String updateDisplayName="ScimObjecttesting1";
 	
 	//Please increment this value if create method response status 400 may be this display value alreasy exist.
-	String DisplayName = "ScimObjecttesting11";
+	String DisplayName = "ScimObjecttesting100";
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
 	@BeforeTest
@@ -42,7 +43,7 @@ public class GroupWebServiceTestCase {
 		groupToUpdate = new Group();
 		groupToAdd.setDisplayName(DisplayName);
 		groupToUpdate.equals(groupToAdd);
-		groupToUpdate.setDisplayName("ScimObjecttesting1");
+		groupToUpdate.setDisplayName(updateDisplayName);
 	}
 
 @Test(groups = "a")
@@ -62,7 +63,9 @@ public class GroupWebServiceTestCase {
 		response = client.updateGroup(groupToUpdate, this.id, MediaType.APPLICATION_JSON);
 		System.out.println("GroupWebServiceTestCase updateGroupTest :response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
-		
+		String responseStr = response.getResponseBodyString();
+		group = (Group) jsonToObject(responseStr, Group.class);
+		assertEquals(group.getDisplayName(), updateDisplayName, "could not update the user");
 	}
 
 	@Test(dependsOnGroups = "a")

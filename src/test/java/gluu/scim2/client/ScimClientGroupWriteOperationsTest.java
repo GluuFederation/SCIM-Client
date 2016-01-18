@@ -19,10 +19,12 @@ import org.testng.annotations.Test;
  * @author Shekhar Laad 
  */
 public class ScimClientGroupWriteOperationsTest {
-	String dispalyName = "Gluu Testing JSON GroupSCIMCLIENT3";
-	String inum = "@!90AF.4554.38D5.8D7B!0001!12A8.BB2E!0000!068D.C584";
+	//Please increment this value if create method response status 400 may be this display value already exist.
+	String dispalyName = "Gluu Testing JSON GroupSCIMCLIENT200";
+	String updatedDispalyName = "Updated Gluu Testing JSON";
+	String inum = "@!90AF.4554.38D5.8D7B!0001!12A8.BB2E!0000!85C9.66A1";
 	final String CREATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:2.0:Group\"],\"displayName\":\""+dispalyName+"\",\"members\":[{\"value\":\""+inum+"\",\"display\":\"Micheal Schwartz\"}]}";
-	final String UPDATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:2.0:Group\"],\"displayName\":\"Gluu Testing GroupSCIMCLIENTUpdate\",\"members\":[{\"value\":\""+inum+"\",\"display\":\"Micheal Schwartz\"}]}";
+	final String UPDATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:2.0:Group\"],\"displayName\":\""+updatedDispalyName+"\",\"members\":[{\"value\":\""+inum+"\",\"display\":\"Micheal Schwartz\"}]}";
 	String id;
 	Scim2Client client;
 	ScimResponse response;
@@ -52,11 +54,12 @@ public class ScimClientGroupWriteOperationsTest {
 
 	@Test(groups = "a")
 	public void updateGroupTest() throws Exception {
-
 		response = client.updateGroupString(UPDATEJSON, this.id, MediaType.APPLICATION_JSON);
 		System.out.println("updateGroupTest + responseStr" + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
-
+		String responseStr = response.getResponseBodyString();
+		group = (Group) jsonToObject(responseStr, Group.class);
+		assertEquals(group.getDisplayName(), updatedDispalyName, "could not update the group");
 	}
 
 	@Test(dependsOnGroups = "a")
