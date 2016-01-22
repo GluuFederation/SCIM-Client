@@ -401,5 +401,15 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 
 		return scimResponse;
 	}
+	
+	@Override
+	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException {
+		ScimResponse scimResponse = super.personSearch(attribute, value, mediaType);
+		if (autorizeRpt(scimResponse)) {
+            scimResponse = super.searchPersons(attribute, value, mediaType);
+		}
+
+		return scimResponse;
+	}
 
 }
