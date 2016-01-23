@@ -18,6 +18,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
+import org.jboss.resteasy.client.ClientExecutor;
 import org.jboss.resteasy.client.ClientResponseFailure;
 import org.xdi.oxauth.client.TokenRequest;
 import org.xdi.oxauth.client.uma.CreateRptService;
@@ -31,7 +32,7 @@ import org.xdi.oxauth.model.crypto.signature.RSAPrivateKey;
 import org.xdi.oxauth.model.uma.RPTResponse;
 import org.xdi.oxauth.model.uma.ResourceSetPermissionTicket;
 import org.xdi.oxauth.model.uma.RptAuthorizationRequest;
-import org.xdi.oxauth.model.uma.RptAuthorizationResponse;
+import org.xdi.oxauth.model.uma.RptAuthorizationResponse;	
 import org.xdi.oxauth.model.uma.UmaConfiguration;
 import org.xdi.oxauth.model.uma.wrapper.Token;
 import org.xdi.oxauth.model.util.JwtUtil;
@@ -57,6 +58,8 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	private String umaAatClientId;
 	private String umaAatClientKeyId;
 	private String umaAatClientJwks;
+
+    protected ClientExecutor executor;
 	
 	private long umaAatAccessTokenExpiration = 0l; // When the "accessToken" will expire;
 
@@ -114,7 +117,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 		this.umaRpt = null;
 
 		// Get metadata configuration
-		this.metadataConfiguration = UmaClientFactory.instance().createMetaDataConfigurationService(umaMetaDataUrl)
+		this.metadataConfiguration = UmaClientFactory.instance().createMetaDataConfigurationService(umaMetaDataUrl,executor)
 				.getMetadataConfiguration();
 
 		if ((metadataConfiguration == null) || !StringHelper.equals(metadataConfiguration.getVersion(), "1.0")) {
@@ -154,7 +157,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 			throw new ScimInitializationException("Failed to get UMA AAT token");
 		}
 
-		CreateRptService rptService = UmaClientFactory.instance().createRequesterPermissionTokenService(metadataConfiguration);
+		CreateRptService rptService = UmaClientFactory.instance().createRequesterPermissionTokenService(metadataConfiguration,executor);
 
 		// Get RPT
 		this.umaRpt = null;
@@ -198,7 +201,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	private boolean authorizeRpt(String ticket) {
         try {
             RptAuthorizationRequest rptAuthorizationRequest = new RptAuthorizationRequest(umaRpt.getRpt(), ticket);
-			RptAuthorizationRequestService authorizationRequestService = UmaClientFactory.instance().createAuthorizationRequestService(metadataConfiguration);
+			RptAuthorizationRequestService authorizationRequestService = UmaClientFactory.instance().createAuthorizationRequestService(metadataConfiguration,executor);
 
 			RptAuthorizationResponse rptAuthorizationResponse = authorizationRequestService.requestRptPermissionAuthorization(
                     "Bearer " + umaAat.getAccessToken(),
@@ -410,6 +413,14 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 		}
 
 		return scimResponse;
+	}
+
+	public ClientExecutor getExecutor() {
+		return executor;
+	}
+
+	public void setExecutor(ClientExecutor executor) {
+		this.executor = executor;
 	}
 
 }
