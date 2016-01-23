@@ -117,8 +117,13 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 		this.umaRpt = null;
 
 		// Get metadata configuration
-		this.metadataConfiguration = UmaClientFactory.instance().createMetaDataConfigurationService(umaMetaDataUrl,executor)
+		if (this.executor == null) {
+			this.metadataConfiguration = UmaClientFactory.instance().createMetaDataConfigurationService(umaMetaDataUrl)
 				.getMetadataConfiguration();
+		}else{
+			this.metadataConfiguration = UmaClientFactory.instance().createMetaDataConfigurationService(umaMetaDataUrl,executor)
+					.getMetadataConfiguration();
+		}
 
 		if ((metadataConfiguration == null) || !StringHelper.equals(metadataConfiguration.getVersion(), "1.0")) {
 			throw new ScimInitializationException("Failed to load valid UMA metadata configuration");
@@ -156,9 +161,13 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 		if (this.umaAat == null) {
 			throw new ScimInitializationException("Failed to get UMA AAT token");
 		}
-
-		CreateRptService rptService = UmaClientFactory.instance().createRequesterPermissionTokenService(metadataConfiguration,executor);
-
+		
+		CreateRptService rptService = null;
+		if (this.executor == null) {
+			rptService = UmaClientFactory.instance().createRequesterPermissionTokenService(metadataConfiguration);
+		}else{
+			rptService = UmaClientFactory.instance().createRequesterPermissionTokenService(metadataConfiguration,executor);	
+		}
 		// Get RPT
 		this.umaRpt = null;
 		try {
@@ -200,9 +209,15 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 
 	private boolean authorizeRpt(String ticket) {
         try {
+        	RptAuthorizationRequestService authorizationRequestService = null;
             RptAuthorizationRequest rptAuthorizationRequest = new RptAuthorizationRequest(umaRpt.getRpt(), ticket);
-			RptAuthorizationRequestService authorizationRequestService = UmaClientFactory.instance().createAuthorizationRequestService(metadataConfiguration,executor);
-
+            
+            if (this.executor == null) {
+            	authorizationRequestService = UmaClientFactory.instance().createAuthorizationRequestService(metadataConfiguration);
+			}else{
+				authorizationRequestService = UmaClientFactory.instance().createAuthorizationRequestService(metadataConfiguration,executor);				
+			}
+            
 			RptAuthorizationResponse rptAuthorizationResponse = authorizationRequestService.requestRptPermissionAuthorization(
                     "Bearer " + umaAat.getAccessToken(),
                     getHost(metadataConfiguration.getIssuer()),
