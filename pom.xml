@@ -19,6 +19,7 @@
         <jackson.version>1.9.13</jackson.version>
         <oxauth.version>3.0.3-SNAPSHOT</oxauth.version>
         <oxcore.version>3.0.3-SNAPSHOT</oxcore.version>
+        <resteasy.version>2.3.7.Final</resteasy.version>
     </properties>
 
 
@@ -156,12 +157,12 @@
   		<dependency>
   			<groupId>org.jboss.resteasy</groupId>
   			<artifactId>resteasy-jaxrs</artifactId>
-  			<version>2.3.4.Final</version>
+  			<version>${resteasy.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>org.jboss.resteasy</groupId>
   			<artifactId>resteasy-jackson-provider</artifactId>
-  			<version>2.3.4.Final</version>
+  			<version>${resteasy.version}</version>
   		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
