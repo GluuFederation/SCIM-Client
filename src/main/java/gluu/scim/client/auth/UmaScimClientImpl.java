@@ -6,14 +6,6 @@ import gluu.scim.client.exception.ScimInitializationException;
 import gluu.scim.client.model.ScimBulkOperation;
 import gluu.scim.client.model.ScimGroup;
 import gluu.scim.client.model.ScimPerson;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.xml.bind.JAXBException;
-
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -28,14 +20,16 @@ import org.xdi.oxauth.model.common.AuthenticationMethod;
 import org.xdi.oxauth.model.common.GrantType;
 import org.xdi.oxauth.model.crypto.signature.ECDSAPrivateKey;
 import org.xdi.oxauth.model.crypto.signature.RSAPrivateKey;
-import org.xdi.oxauth.model.uma.RPTResponse;
-import org.xdi.oxauth.model.uma.ResourceSetPermissionTicket;
-import org.xdi.oxauth.model.uma.RptAuthorizationRequest;
-import org.xdi.oxauth.model.uma.RptAuthorizationResponse;
-import org.xdi.oxauth.model.uma.UmaConfiguration;
+import org.xdi.oxauth.model.uma.*;
 import org.xdi.oxauth.model.uma.wrapper.Token;
 import org.xdi.oxauth.model.util.JwtUtil;
 import org.xdi.util.StringHelper;
+
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * SCIM UMA client
@@ -101,7 +95,8 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 	}
 
 	private boolean isValidToken(final long now) {
-		if ((this.umaAat == null) || (this.umaAat.getAccessToken() == null) || (this.umaAatAccessTokenExpiration <= now)) {
+		if ((this.umaAat == null) || (this.umaAat.getAccessToken() == null) ||
+				(this.umaAatAccessTokenExpiration <= now)) {
 			return false;
 		}
 
@@ -175,16 +170,16 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 		if (scimResponse.getStatusCode() == 403) {
         	// Forbidden : RPT is not authorized yet
         	
-            final ResourceSetPermissionTicket resourceSetPermissionTicket;
+            final PermissionTicket resourceSetPermissionTicket;
 			try {
-				resourceSetPermissionTicket = (new ObjectMapper()).readValue(scimResponse.getResponseBody(), ResourceSetPermissionTicket.class);
+				resourceSetPermissionTicket = (new ObjectMapper()).readValue(scimResponse.getResponseBody(), PermissionTicket.class);
 			} catch (Exception ex) {
     			throw new ScimInitializationException("UMA ticket is invalid", ex);
 			}
 
 			authorizeRpt(resourceSetPermissionTicket.getTicket());
 
-			if ((resourceSetPermissionTicket == null) || StringHelper.isEmpty(resourceSetPermissionTicket.getTicket())) {
+			if (StringHelper.isEmpty(resourceSetPermissionTicket.getTicket())) {
     			throw new ScimInitializationException("UMA ticket is invalid");
             }
             
