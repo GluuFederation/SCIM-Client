@@ -53,7 +53,7 @@
 
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+                        <suiteXmlFile>target/test-classes/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <!-- jdk6 support -->
                     <argLine>-Dsun.lang.ClassLoader.allowArraySyntax=true</argLine>

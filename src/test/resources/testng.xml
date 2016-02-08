@@ -2,44 +2,6 @@
 
 <suite name="SCIM-Client" parallel="false">
      
-     
-    <parameter name="domainURL" value="http://${test.server.name}/identity/seam/resource/restv1"/>
-    <parameter name="userName" value="admin"/>
-    <parameter name="passWord" value="gluuserver"/>
-    <parameter name="uid" value="${uid}"/>
-    <parameter name="id" value="${id}"/>
-    <parameter name="clientID" value="${clientID}"/>
-    <parameter name="clientSecret" value="${clientSecret}"/>
-    <parameter name="oxAuthDomain" value="http://${test.server.name}/oxauth/seam/resource/restv1/oxauth/token"/>
-    <parameter name="registerUrl" value="http://${test.server.name}/oxauth/seam/resource/restv1/oxauth/register"/>
-    <parameter name="excelFileLocationUsers" value="${excelFileLocationUsers}"/>
-    <parameter name="excelFileLocationGroups" value="${excelFileLocationGroups}"/>
-    <parameter name="umaMetaDataUrl" value="http://${test.server.name}/oxauth/seam/resource/restv1/oxauth/uma-configuration" />
-    <parameter name="umaAatClientId" value="${umaAatClientId}" />
-    <parameter name="umaAatClientSecret" value="${umaAatClientSecret}" />
-    <parameter name="umaRedirectUri" value="${umaRedirectUri}" />
-
-    <parameter name="umaAatClientJwks" value="${umaAatClientJwks}" />
-    <parameter name="umaAatClientKeyId" value="${umaAatClientKeyId}" />
-
-    <parameter name="username" value="${username}" />
-    <parameter name="usernamejson" value="${username}" />
-
-    <parameter name="userwebservice.add.username" value="${userwebservice.add.username}" />
-    <parameter name="userwebservice.update.displayname" value="${userwebservice.update.displayname}" />
-
-    <parameter name="groupwebservice.add.displayname" value="${groupwebservice.add.displayname}" />
-    <parameter name="groupwebservice.update.displayname" value="${groupwebservice.update.displayname}" />
-
-    <parameter name="userjson.add.username" value="${userjson.add.username}" />
-    <parameter name="userjson.update.givenname" value="${userjson.update.givenname}" />
-
-    <parameter name="ScimClientBulkOperationsTest.username" value="${ScimClientBulkOperationsTest.username}" />
-
-    <parameter name="groupjson.displayName" value="${groupjson.displayName}" />
-    <parameter name="groupjson.updateddisplayname" value="${groupjson.updateddisplayname}" />
-    <parameter name="groupjson.inum" value="${groupjson.inum}" />
-
     <test name="ScimClientRetreivingEntities test" enabled="true">
         <classes>
             <class name="gluu.scim.client.ScimClientRetreivingEntitiesTest"/>

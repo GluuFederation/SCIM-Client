@@ -29,7 +29,7 @@ public abstract class BaseScimTest {
     @BeforeSuite
     public void initTestSuite(ITestContext context) throws FileNotFoundException, IOException {
         SecurityProviderUtility.installBCProvider();
-/*
+
         Reporter.log("Invoked init test suite method \n", true);
 
         String propertiesFile = context.getCurrentXmlTest().getParameter("propertiesFile");
@@ -55,7 +55,6 @@ public abstract class BaseScimTest {
 
         // Overrided test paramters
         context.getSuite().getXmlSuite().setParameters(parameters);
-*/
     }
 
   }
