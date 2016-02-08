@@ -92,6 +92,53 @@
             <class name="gluu.scim.client.ExcelMapperTest"/>
         </classes>
     </test>
+    
+    <!--           SCIM 2 test cases            -->
+
+	<test name="SCIM 2 UserWebServiceTestCases test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.UserWebServiceTestCases" />
+		</classes>
+	</test>
+
+	<test name="SCIM 2 GroupWebServiceTestCase test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.GroupWebServiceTestCase" />
+		</classes>
+	</test>
+
+	<test name="SCIM 2 ScimClientGroupWriteOperationsTest test"
+		enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.ScimClientGroupWriteOperationsTest" />
+		</classes>
+	</test>
+
+	<test name="SCIM 2 ScimClientRetreivingEntitiesTest test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.ScimClientRetreivingEntitiesTest" />
+		</classes>
+	</test>
+
+	<test name="SCIM 2 oxAuthClientCreationTest test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.oxAuthClientCreationTest" />
+		</classes>
+	</test>
+
+	<test name="SCIM 2 ScimClientPersonWriteOperationsBaseTest test"
+		enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.ScimClientPersonWriteOperationsBaseTest" />
+		</classes>
+	</test>
+
+	<test name="SCIM 2 ScimClientBulkOperationsTest test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.ScimClientBulkOperationsTest" />
+		</classes>
+	</test>
+
  
 
 </suite>
