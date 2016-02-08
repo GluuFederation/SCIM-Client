@@ -3,45 +3,46 @@
 <suite name="SCIM-Client" parallel="false">
      
      
-    <parameter name="domainURL" value="https://localhost/oxTrust/seam/resource/restv1"/>
-    <parameter name="userName" value="test_user"/>
-    <parameter name="passWord" value="test"/>
-    <parameter name="uid" value="@!1111!0000!D4E7"/>
-    <parameter name="id" value="@!1111!0003!B2C6"/>
-    <parameter name="clientID" value="@!1111!0008!C2EB!75F1"/>
-    <parameter name="clientSecret" value="11111111-2222-3333-4444-555555555555"/>
-    <parameter name="oxAuthDomain" value="https://localhost/oxauth/seam/resource/restv1/oxauth/token"/>
-    <parameter name="registerUrl" value="https://localhost/oxauth/seam/resource/restv1/oxauth/register"/>
-    <parameter name="excelFileLocationUsers" value="doc/SampleXLS/SCIMusers.xls"/>
-    <parameter name="excelFileLocationGroups" value="doc/SampleXLS/SCIMgroups.xls"/>
-    <parameter name="umaMetaDataUrl" value="https://localhost/.well-known/uma-configuration" />
-    <parameter name="umaAatClientId" value="@!1111!0008!0068.3E20" />
-    <parameter name="umaAatClientSecret" value="11111111-2222-3333-4444-555555555555" />
-    <parameter name="umaRedirectUri" value="https://client.example.com/cb?foo=bar" />
+    <parameter name="domainURL" value="http://${test.server.name}/identity/seam/resource/restv1"/>
+    <parameter name="userName" value="admin"/>
+    <parameter name="passWord" value="gluuserver"/>
+    <parameter name="uid" value="${uid}"/>
+    <parameter name="id" value="${id}"/>
+    <parameter name="clientID" value="${clientID}"/>
+    <parameter name="clientSecret" value="${clientSecret}"/>
+    <parameter name="oxAuthDomain" value="http://${test.server.name}/oxauth/seam/resource/restv1/oxauth/token"/>
+    <parameter name="registerUrl" value="http://${test.server.name}/oxauth/seam/resource/restv1/oxauth/register"/>
+    <parameter name="excelFileLocationUsers" value="${excelFileLocationUsers}"/>
+    <parameter name="excelFileLocationGroups" value="${excelFileLocationGroups}"/>
+    <parameter name="umaMetaDataUrl" value="http://${test.server.name}/oxauth/seam/resource/restv1/oxauth/uma-configuration" />
+    <parameter name="umaAatClientId" value="${umaAatClientId}" />
+    <parameter name="umaAatClientSecret" value="${umaAatClientSecret}" />
+    <parameter name="umaRedirectUri" value="${umaRedirectUri}" />
 
-    <!--   
-    <parameter name="domainURL" value="http://localhost:8080/oxTrust/seam/resource/restv1"/>
-    <parameter name="userName" value="test_user"/>
-    <parameter name="passWord" value="test"/>
-    <parameter name="uid" value="@!1111!0000!D4E7"/>
-    <parameter name="id" value="@!1111!0003!B2C6"/>
-    <parameter name="clientID" value="@!1111!0008!C2EB!75F1"/>
-    <parameter name="clientSecret" value="11111111-2222-3333-4444-555555555555"/>
-    <parameter name="oxAuthDomain" value="http://localhost:8080/oxauth/seam/resource/restv1/oxauth/token"/>
-    <parameter name="registerUrl" value="http://localhost:8080/oxauth/seam/resource/restv1/oxauth/register"/>
-    <parameter name="excelFileLocationUsers" value="doc/SampleXLS/SCIMusers.xls"/>
-    <parameter name="excelFileLocationGroups" value="doc/SampleXLS/SCIMgroups.xls"/>
-    -->
+    <parameter name="umaAatClientJwks" value="${umaAatClientJwks}" />
+    <parameter name="umaAatClientKeyId" value="${umaAatClientKeyId}" />
+
+    <parameter name="username" value="${username}" />
+    <parameter name="usernamejson" value="${username}" />
+
+    <parameter name="userwebservice.add.username" value="${userwebservice.add.username}" />
+    <parameter name="userwebservice.update.displayname" value="${userwebservice.update.displayname}" />
+
+    <parameter name="groupwebservice.add.displayname" value="${groupwebservice.add.displayname}" />
+    <parameter name="groupwebservice.update.displayname" value="${groupwebservice.update.displayname}" />
+
+    <parameter name="userjson.add.username" value="${userjson.add.username}" />
+    <parameter name="userjson.update.givenname" value="${userjson.update.givenname}" />
+
+    <parameter name="ScimClientBulkOperationsTest.username" value="${ScimClientBulkOperationsTest.username}" />
+
+    <parameter name="groupjson.displayName" value="${groupjson.displayName}" />
+    <parameter name="groupjson.updateddisplayname" value="${groupjson.updateddisplayname}" />
+    <parameter name="groupjson.inum" value="${groupjson.inum}" />
 
     <test name="ScimClientRetreivingEntities test" enabled="true">
         <classes>
             <class name="gluu.scim.client.ScimClientRetreivingEntitiesTest"/>
-        </classes>
-    </test>
-
-    <test name="ScimClientPersonWriteOperations OAuth test" enabled="true">
-        <classes>
-            <class name="gluu.scim.client.ScimClientPersonWriteOperationsOAuthTest"/>
         </classes>
     </test>
 
