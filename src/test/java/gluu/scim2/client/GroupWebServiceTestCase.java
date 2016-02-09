@@ -1,6 +1,7 @@
 package gluu.scim2.client;
 
 import static org.testng.Assert.assertEquals;
+import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 
 import java.io.File;
@@ -19,29 +20,24 @@ import org.testng.annotations.Test;
 /**
  * @author Shekhar Laad 
  */
-public class GroupWebServiceTestCase {
+public class GroupWebServiceTestCase  extends BaseScimTest{
 	
 	Group groupToAdd;
 	Group groupToUpdate;
 	String id;
 	Scim2Client client;
 	ScimResponse response;
-	Group group;
-	String updateDisplayName="ScimObjecttesting1";
-	
-	//Please increment this value if create method response status 400 may be this display value alreasy exist.
-	String DisplayName = "ScimObjecttesting100";
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" , "groupwebservice.add.displayname" , "groupwebservice.update.displayname" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId) throws IOException {
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId ,final String displayName ,final String updateDisplayName) throws IOException {
+		System.out.println(" displayName : "+ displayName + "   updateDisplayName : "+ updateDisplayName);
 		String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));;
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
 		response = null;
-		group = null;
 		groupToAdd = new Group();
 		groupToUpdate = new Group();
-		groupToAdd.setDisplayName(DisplayName);
+		groupToAdd.setDisplayName(displayName);
 		groupToUpdate.equals(groupToAdd);
 		groupToUpdate.setDisplayName(updateDisplayName);
 	}
@@ -53,9 +49,10 @@ public class GroupWebServiceTestCase {
 		System.out.println("GroupWebServiceTestCase :  createGroupTest :  response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 201, "cold not Add the group, status != 201");
 		String responseStr = response.getResponseBodyString();
-		group = (Group) jsonToObject(responseStr, Group.class);
+		Group group = (Group) jsonToObject(responseStr, Group.class);
 		this.id = group.getId();
 		System.out.println("response : " + response.getResponseBodyString());
+		assertEquals(group.getDisplayName(), groupToAdd.getDisplayName(), "Username MisMatch");
 	}
 
 	@Test(groups = "a")
@@ -64,8 +61,8 @@ public class GroupWebServiceTestCase {
 		System.out.println("GroupWebServiceTestCase updateGroupTest :response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
 		String responseStr = response.getResponseBodyString();
-		group = (Group) jsonToObject(responseStr, Group.class);
-		assertEquals(group.getDisplayName(), updateDisplayName, "could not update the user");
+		Group group = (Group) jsonToObject(responseStr, Group.class);
+		assertEquals(group.getDisplayName(), groupToUpdate.getDisplayName(), "could not update the user");
 	}
 
 	@Test(dependsOnGroups = "a")

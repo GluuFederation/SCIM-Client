@@ -1,12 +1,15 @@
 package gluu.scim.client;
 
 import static org.testng.Assert.assertEquals;
+import gluu.BaseScimTest;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.io.FileUtils;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -16,16 +19,21 @@ import org.testng.annotations.Test;
  *
  * @author Reda Zerrad Date: 05.24.2012
  */
-public class ScimClientRetreivingEntitiesTest {
+public class ScimClientRetreivingEntitiesTest extends BaseScimTest{
 
 	ScimClient client;
 	ScimResponse response;
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientSecret", "umaAatClientJwks" , "umaAatClientKeyId" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId) {
-		client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwks, umaAatClientKeyId);
-		response = null;
+		try {
+			String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));				
+			client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
+			response = null;
+		} catch (IOException e) {
+			System.out.println("exception in reading fle " + e.getMessage());
+		}
 	}
 
 	@Parameters({ "uid" })

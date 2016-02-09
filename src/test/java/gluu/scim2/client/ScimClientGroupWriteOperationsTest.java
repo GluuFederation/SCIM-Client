@@ -1,6 +1,7 @@
 package gluu.scim2.client;
 
 import static org.testng.Assert.assertEquals;
+import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 
 import java.io.File;
@@ -18,21 +19,25 @@ import org.testng.annotations.Test;
 /**
  * @author Shekhar Laad 
  */
-public class ScimClientGroupWriteOperationsTest {
+public class ScimClientGroupWriteOperationsTest   extends BaseScimTest{
 	//Please increment this value if create method response status 400 may be this display value already exist.
-	String dispalyName = "Gluu Testing JSON GroupSCIMCLIENT200";
-	String updatedDispalyName = "Updated Gluu Testing JSON";
-	String inum = "@!90AF.4554.38D5.8D7B!0001!12A8.BB2E!0000!85C9.66A1";
-	final String CREATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:2.0:Group\"],\"displayName\":\""+dispalyName+"\",\"members\":[{\"value\":\""+inum+"\",\"display\":\"Micheal Schwartz\"}]}";
-	final String UPDATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:2.0:Group\"],\"displayName\":\""+updatedDispalyName+"\",\"members\":[{\"value\":\""+inum+"\",\"display\":\"Micheal Schwartz\"}]}";
+
+
+	String CREATEJSON ;
+	String UPDATEJSON ;
+	String updatedDisplayName;	 
 	String id;
 	Scim2Client client;
 	ScimResponse response;
 	Group group;
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" , "groupjson.displayName" , "groupjson.updateddisplayname" , "groupjson.inum" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId) throws IOException {
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId , String displayName ,  String updatedDisplayName ,  String inum) throws IOException {
+		System.out.println("displayName :"+  displayName +" updatedDisplayName : " + updatedDisplayName +" inum : "+   inum);
+		this.updatedDisplayName = updatedDisplayName ; 
+		CREATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:2.0:Group\"],\"displayName\":\""+displayName+"\",\"members\":[{\"value\":\""+inum+"\",\"display\":\"Micheal Schwartz\"}]}";
+		UPDATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:2.0:Group\"],\"displayName\":\""+updatedDisplayName+"\",\"members\":[{\"value\":\""+inum+"\",\"display\":\"Micheal Schwartz\"}]}";
 		String umaAatClientJwksData = FileUtils.readFileToString(new File(umaAatClientJwks));
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwksData, umaAatClientKeyId);
 		response = null;
@@ -59,7 +64,7 @@ public class ScimClientGroupWriteOperationsTest {
 		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
 		String responseStr = response.getResponseBodyString();
 		group = (Group) jsonToObject(responseStr, Group.class);
-		assertEquals(group.getDisplayName(), updatedDispalyName, "could not update the group");
+		assertEquals(group.getDisplayName(), updatedDisplayName, "could not update the group");
 	}
 
 	@Test(dependsOnGroups = "a")

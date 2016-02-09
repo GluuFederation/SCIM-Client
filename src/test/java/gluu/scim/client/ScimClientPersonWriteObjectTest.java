@@ -1,16 +1,20 @@
 package gluu.scim.client;
 
 import static org.testng.Assert.assertEquals;
+import gluu.BaseScimTest;
 import gluu.scim.client.model.ScimPerson;
 import gluu.scim.client.model.ScimPersonAddresses;
 import gluu.scim.client.model.ScimPersonEmails;
 import gluu.scim.client.model.ScimPersonPhones;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
@@ -21,7 +25,7 @@ import org.testng.annotations.Test;
  *
  * @author Reda Zerrad Date: 06.05.2012
  */
-public class ScimClientPersonWriteObjectTest {
+public class ScimClientPersonWriteObjectTest extends BaseScimTest {
 
 	ScimPerson personToAdd;
 	ScimPerson personToUpdate;
@@ -30,11 +34,14 @@ public class ScimClientPersonWriteObjectTest {
 	ScimResponse response;
 	ScimPerson person;
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientSecret", "umaAatClientJwks" , "umaAatClientKeyId" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId) {
-		client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwks, umaAatClientKeyId);
-		response = null;
+		try {
+			String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));				
+			client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
+			response = null;
+		
 		person = null;
 		List<String> schema = new ArrayList<String>();
 		schema.add("urn:scim:schemas:core:1.0");
@@ -70,6 +77,9 @@ public class ScimClientPersonWriteObjectTest {
 
 		personToUpdate = personToAdd;
 		personToUpdate.setDisplayName("SCIM");
+		} catch (IOException e) {
+			System.out.println("exception in reading fle " + e.getMessage());
+		}
 
 	}
 

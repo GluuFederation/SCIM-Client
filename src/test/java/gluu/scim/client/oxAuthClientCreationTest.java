@@ -2,6 +2,7 @@ package gluu.scim.client;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import gluu.BaseScimTest;
 import gluu.scim.client.model.CreationResult;
 import gluu.scim.client.util.OxAuthClientCreator;
 
@@ -17,7 +18,7 @@ import org.testng.annotations.Test;
  *
  * @author Reda Zerrad Date: 06.04.2012
  */
-public class oxAuthClientCreationTest {
+public class oxAuthClientCreationTest extends BaseScimTest{
 
 	private static String redirectUris = "https://localhost/oxTrust/";
 	private static String applicationName = "ScimTest" + randomString();

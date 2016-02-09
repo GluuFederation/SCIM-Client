@@ -1,10 +1,16 @@
 package gluu.scim.client;
 
 import static org.testng.Assert.assertEquals;
+
+import java.io.File;
+import java.io.IOException;
+
+import gluu.BaseScimTest;
 import gluu.scim.client.model.ScimGroup;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
@@ -15,7 +21,7 @@ import org.testng.annotations.Test;
  *
  * @author Reda Zerrad Date: 06.01.2012
  */
-public class ScimClientGroupWriteOperationsTest {
+public class ScimClientGroupWriteOperationsTest extends BaseScimTest{
 
 	final String CREATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:1.0\"],\"displayName\":\"Gluu Testing GroupSCIMCLIENT\",\"members\":[{\"value\":\"@!1111!0000!D4E7\",\"display\":\"Micheal Schwartz\"}]}";
 	final String UPDATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:1.0\"],\"displayName\":\"Gluu Testing GroupSCIMCLIENTUpdate\",\"members\":[{\"value\":\"@!1111!0000!D4E7\",\"display\":\"Micheal Schwartz\"}]}";
@@ -24,12 +30,16 @@ public class ScimClientGroupWriteOperationsTest {
 	ScimResponse response;
 	ScimGroup group;
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientSecret", "umaAatClientJwks" , "umaAatClientKeyId" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId) {
-		client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwks, umaAatClientKeyId);
-		response = null;
-		group = null;
+		try {
+			String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));				
+			client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
+			response = null;
+		} catch (IOException e) {
+			System.out.println("exception in reading fle " + e.getMessage());
+		}
 	}
 
 	@Test(groups = "a")

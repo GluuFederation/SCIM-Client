@@ -1,6 +1,7 @@
 package gluu.scim2.client;
 
 import static org.testng.Assert.assertEquals;
+import gluu.BaseScimTest;
 import gluu.scim.client.ScimClient;
 import gluu.scim.client.ScimResponse;
 
@@ -18,7 +19,7 @@ import org.testng.annotations.Test;
 /**
  * @author Shekhar Laad 
  */
-public class ScimClientRetreivingEntitiesTest {
+public class ScimClientRetreivingEntitiesTest  extends BaseScimTest {
 
 	Scim2Client client;
 	ScimResponse response;

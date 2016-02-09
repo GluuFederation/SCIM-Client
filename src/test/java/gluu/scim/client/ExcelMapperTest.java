@@ -2,6 +2,7 @@ package gluu.scim.client;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import gluu.BaseScimTest;
 import gluu.scim.client.model.ScimBulkOperation;
 import gluu.scim.client.util.ExcelMapper;
 
@@ -16,7 +17,7 @@ import org.testng.annotations.Test;
  *
  * @author Reda Zerrad Date: 06.06.2012
  */
-public class ExcelMapperTest {
+public class ExcelMapperTest extends BaseScimTest {
 
 	ScimBulkOperation operation;
 
@@ -30,6 +31,8 @@ public class ExcelMapperTest {
 	public void excelFileParsingUsersTest(final String excelFileLocationUsers) {
 
 		operation = ExcelMapper.mapUsers(System.getProperty("user.dir") + File.separator + excelFileLocationUsers);
+		System.out.println("excelFileLocationGroups : " + excelFileLocationUsers + "  operation : " + operation );
+		System.out.println("operation : " + operation.getOperations() );
 		assertNotNull(operation.getOperations(), "Unexpected result: operation is null");
 		assertEquals(operation.getOperations().get(0).getData().getUserName(), "test_user", "Unexpected result: userName does not match");
 		assertEquals(operation.getOperations().get(0).getMethod(), "POST", "Unexpected result: method does not match");
@@ -41,6 +44,8 @@ public class ExcelMapperTest {
 	public void excelFileParsingGroupTest(final String excelFileLocationGroups) {
 
 		operation = ExcelMapper.mapGroups(System.getProperty("user.dir") + File.separator + excelFileLocationGroups);
+		System.out.println("excelFileLocationGroups : " + excelFileLocationGroups + "  operation : " + operation );
+		System.out.println("operation : " + operation.getOperations() );
 		assertNotNull(operation.getOperations(), "Unexpected result: operation is null");
 		assertEquals(operation.getOperations().get(0).getData().getId(), "@!1111!0003!D9B4", "Unexpected result: Id does not match");
 		assertEquals(operation.getOperations().get(0).getMethod(), "PUT", "Unexpected result: method does not match");

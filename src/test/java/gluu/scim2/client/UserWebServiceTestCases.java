@@ -1,6 +1,7 @@
 package gluu.scim2.client;
 
 import static org.testng.Assert.assertEquals;
+import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 import gluu.scim.client.model.ScimPerson;
 
@@ -26,7 +27,7 @@ import org.testng.annotations.Test;
 /**
  * @author Shekhar Laad 
  */
-public class UserWebServiceTestCases {	
+public class UserWebServiceTestCases extends BaseScimTest {	
 
 	User personToAdd;
 	User personToUpdate;
@@ -36,21 +37,19 @@ public class UserWebServiceTestCases {
 	String uid;
 	Scim2Client client;
 	ScimResponse response;
-	String username = "scimClientTestUser100";
-	String updateDisplayName="SCIM";
 	
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId","userwebservice.add.username","userwebservice.update.displayname" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId) throws IOException {
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId,final String username ,final String updateDisplayName ) throws IOException {
+		System.out.println(" username :  "+username +" updateDisplayName :" + updateDisplayName);
 		String umaAatClientJwksData = FileUtils.readFileToString(new File(umaAatClientJwks));
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwksData, umaAatClientKeyId);
 		response = null;
-		List<String> schema = new ArrayList<String>();
 		userAdd = new User();
 		userToUpdate = new User();
-		userAdd.setUserName("scimClientTestPerson19");
+		userAdd.setUserName(username);
 		userAdd.setPassword("test");
-		userAdd.setDisplayName("scimClientTestPerson6");
+		userAdd.setDisplayName("Scim2DisplayName");
 		Email email = new Email();
 		email.setValue("scim@gluu.org");
 		email.setType(org.gluu.oxtrust.model.scim2.Email.Type.WORK);
@@ -79,7 +78,7 @@ public class UserWebServiceTestCases {
 		userAdd.setName(name);
 
 		userToUpdate = userAdd;
-		userToUpdate.setDisplayName("SCIM");
+		userToUpdate.setDisplayName(updateDisplayName);
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonInString = mapper.writeValueAsString(userAdd);
 		System.out.println("jsonInString   :  "+jsonInString);
@@ -94,7 +93,7 @@ public class UserWebServiceTestCases {
 		
 	}
 	
-	@Parameters({ "uid" })
+	/*@Parameters({ "uid" })
 	@Test
 	public void retrievePersonTest(final String uid) throws HttpException, IOException {
 
@@ -126,7 +125,7 @@ public class UserWebServiceTestCases {
 		byte[] bytes = response.getResponseBody();
 		String responseStr = new String(bytes);
 		User person = (User) jsonToObject(responseStr, User.class);
-		assertEquals(person.getDisplayName(), updateDisplayName, "could not update the user");
+		assertEquals(person.getDisplayName(), userToUpdate.getDisplayName(), "could not update the user");
 	}
 
 	@Test(dependsOnGroups = "a")
@@ -150,10 +149,10 @@ public class UserWebServiceTestCases {
 	@Test
 	public void personSearchListByAttribute() throws Exception {
 
-		response = client.personSearch("mail", "abc123@cc.com", MediaType.APPLICATION_JSON);
+		response = client.searchPersons("mail", "abc123@cc.com", MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases :personSearchListByAttribute :response " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "unable to retrive person, status != 200");
-	}
+	}*/
 	
 	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
 
