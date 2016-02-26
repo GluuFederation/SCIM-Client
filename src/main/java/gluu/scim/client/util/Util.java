@@ -8,8 +8,12 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.Version;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.module.SimpleModule;
+import org.gluu.oxtrust.model.scim2.User;
 
 /**
  * SCIM Utils 
@@ -31,7 +35,24 @@ public class Util implements Serializable {
 	 	mapper.writeValue(sw, person);
 	     return sw.toString();
 	 }
-	 
+
+	/**
+	 * For an SCIM 2.0 User class with extensions.
+	 *
+	 * @param person
+	 * @return
+	 * @throws IOException
+     */
+	public static String getJSONStringUser(User person) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+		SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
+		simpleModule.addSerializer(User.class, new UserSerializer());
+		mapper.registerModule(simpleModule);
+		String value = mapper.writeValueAsString(person);
+		return value;
+	}
+
 	 public static String getXMLString(Object person,Class<?> clazz) throws JAXBException {
 		 StringWriter sw = new StringWriter();
 		 JAXBContext context = JAXBContext.newInstance(clazz);

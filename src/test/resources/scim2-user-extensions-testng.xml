@@ -1,0 +1,14 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+
+<suite name="SCIM2-User-Extensions" parallel="false">
+    <test name="UserExtensionJsonTest test" enabled="true">
+        <classes>
+            <class name="gluu.scim2.client.UserExtensionsJsonTest"/>
+        </classes>
+    </test>
+    <test name="UserExtensionPersonTest test" enabled="true">
+        <classes>
+            <class name="gluu.scim2.client.UserExtensionsPersonTest"/>
+        </classes>
+    </test>
+</suite>

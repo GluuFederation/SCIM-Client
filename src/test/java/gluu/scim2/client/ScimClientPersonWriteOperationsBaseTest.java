@@ -7,11 +7,11 @@ import java.io.IOException;
 
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
-import gluu.scim.client.model.ScimPerson;
 
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.FileUtils;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.User;
 import org.testng.annotations.BeforeTest;
@@ -64,7 +64,6 @@ public class ScimClientPersonWriteOperationsBaseTest  extends BaseScimTest{
 			e.printStackTrace();
 		}
 	}
-	
 
 	@Test(groups = "a")
 	public void updatePersonTest() throws Exception {
@@ -86,8 +85,8 @@ public class ScimClientPersonWriteOperationsBaseTest  extends BaseScimTest{
 
 	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 		Object clazzObject = mapper.readValue(json, clazz);
 		return clazzObject;
 	}
-
 }
