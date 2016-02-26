@@ -257,7 +257,8 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(person), "application/json", "UTF-8"));
+			// post.setRequestEntity(new StringRequestEntity(Util.getJSONString(person), "application/json", "UTF-8"));
+			post.setRequestEntity(new StringRequestEntity(Util.getJSONStringUser(person), "application/json", "UTF-8"));
 		}
 
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
@@ -351,7 +352,8 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			put.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			put.setRequestEntity(new StringRequestEntity(Util.getJSONString(person), "application/json", "UTF-8"));
+			// put.setRequestEntity(new StringRequestEntity(Util.getJSONString(person), "application/json", "UTF-8"));
+			put.setRequestEntity(new StringRequestEntity(Util.getJSONStringUser(person), "application/json", "UTF-8"));
 		}
 
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
@@ -702,6 +704,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		}
 
 		try {
+
 			httpClient.executeMethod(post);
 
 			ScimResponse response = ResponseMapper.map(post, null);
