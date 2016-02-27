@@ -12,6 +12,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.*;
 import org.gluu.oxtrust.model.scim2.schema.AttributeHolder;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
+import org.joda.time.DateTime;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -20,13 +21,14 @@ import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Date;
 
 import static org.testng.Assert.assertEquals;
 
 /**
  * README:
  *
- * Before running this test, you first need to manually add two custom attributes in oxTrust:
+ * Before running this test, you first need to manually add three custom attributes in oxTrust:
  * 1. customFirst - Text, not multi-valued
  * 2. customSecond - Date, multi-valued
  * 3. customThird - Numeric, not multi-valued
@@ -170,7 +172,8 @@ public class UserExtensionsPersonTest extends BaseScimTest {
         // User Extensions
         Extension.Builder extensionBuilder = new Extension.Builder(Constants.USER_EXT_SCHEMA_ID);
         extensionBuilder.setField("customFirst", "valueUpdated");
-        extensionBuilder.setFieldAsList("customSecond", Arrays.asList(new String[]{"1969-02-23T03:35:22Z"}));
+        // extensionBuilder.setFieldAsList("customSecond", Arrays.asList(new String[]{"1969-02-23T03:35:22Z"}));
+        extensionBuilder.setFieldAsList("customSecond", Arrays.asList(new Date[]{(new DateTime("1969-01-02")).toDate(), (new DateTime("1970-02-27")).toDate()}));
         extensionBuilder.setField("customThird", new BigDecimal(5000));
         personToUpdate.addExtension(extensionBuilder.build());
 
