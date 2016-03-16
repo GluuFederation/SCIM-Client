@@ -15,6 +15,7 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.User;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
@@ -31,7 +32,7 @@ public class ScimClientPersonWriteOperationsBaseTest  extends BaseScimTest{
 	
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" , "userjson.add.username" , "userjson.update.givenname"})
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId ,  String username,  String updateGivenName) throws IOException {
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId ,  String username,  String updateGivenName) throws IOException {
 		
 		System.out.println(" String username : "+username+ " updateGivenName :"+updateGivenName);
 		this.updateGivenName=updateGivenName;

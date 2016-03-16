@@ -3,6 +3,7 @@ package gluu.scim2.client;
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 import gluu.scim.client.util.ResponseMapper;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
@@ -14,10 +15,12 @@ import org.gluu.oxtrust.model.scim2.schema.AttributeHolder;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
 import org.joda.time.DateTime;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.MediaType;
+
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -49,7 +52,7 @@ public class UserExtensionsPersonTest extends BaseScimTest {
 
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks", "umaAatClientKeyId"})
-    public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId) throws Exception {
+    public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId) throws Exception {
 
         this.domainURL = domainURL;
         String umaAatClientJwksData = FileUtils.readFileToString(new File(umaAatClientJwks));

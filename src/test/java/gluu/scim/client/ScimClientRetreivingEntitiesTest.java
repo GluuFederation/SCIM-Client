@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
@@ -26,7 +27,7 @@ public class ScimClientRetreivingEntitiesTest extends BaseScimTest{
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId) {
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId) {
 		try {
 			String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));				
 			client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);

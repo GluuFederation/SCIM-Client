@@ -1,7 +1,7 @@
 <!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
 
 <suite name="SCIM-Client" parallel="false">
-     
+<!--     
     <test name="ScimClientRetreivingEntities test" enabled="true">
         <classes>
             <class name="gluu.scim.client.ScimClientRetreivingEntitiesTest"/>
@@ -54,7 +54,7 @@
             <class name="gluu.scim.client.ExcelMapperTest"/>
         </classes>
     </test>
-    
+-->    
     <!--           SCIM 2 test cases            -->
 
 	<test name="SCIM 2 UserWebServiceTestCases test" enabled="true">

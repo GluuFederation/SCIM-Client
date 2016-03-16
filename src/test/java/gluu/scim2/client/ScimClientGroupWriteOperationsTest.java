@@ -13,6 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
@@ -33,7 +34,7 @@ public class ScimClientGroupWriteOperationsTest   extends BaseScimTest{
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" , "groupjson.displayName" , "groupjson.updateddisplayname" , "groupjson.inum" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId , String displayName ,  String updatedDisplayName ,  String inum) throws IOException {
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId , String displayName ,  String updatedDisplayName ,  String inum) throws IOException {
 		System.out.println("displayName :"+  displayName +" updatedDisplayName : " + updatedDisplayName +" inum : "+   inum);
 		this.updatedDisplayName = updatedDisplayName ; 
 		CREATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:2.0:Group\"],\"displayName\":\""+displayName+"\",\"members\":[{\"value\":\""+inum+"\",\"display\":\"Micheal Schwartz\"}]}";

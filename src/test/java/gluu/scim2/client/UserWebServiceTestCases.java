@@ -22,6 +22,7 @@ import org.gluu.oxtrust.model.scim2.Email;
 import org.gluu.oxtrust.model.scim2.PhoneNumber;
 import org.gluu.oxtrust.model.scim2.User;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
@@ -41,7 +42,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 	
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId","userwebservice.add.username","userwebservice.update.displayname" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId,final String username ,final String updateDisplayName ) throws IOException {
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId,final String username ,final String updateDisplayName ) throws IOException {
 		System.out.println(" username :  "+username +" updateDisplayName :" + updateDisplayName);
 		String umaAatClientJwksData = FileUtils.readFileToString(new File(umaAatClientJwks));
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwksData, umaAatClientKeyId);
