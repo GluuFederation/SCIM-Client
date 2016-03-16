@@ -50,11 +50,11 @@ public class ScimClientRetreivingEntitiesTest  extends BaseScimTest {
 		assertEquals(response.getStatusCode(), 200, "cold not get a list of all persons, status != 200");
 	}
 
-	@Parameters({ "id" })
+	@Parameters({ "group1Inum" })
 	@Test
-	public void retrieveGroupTest(final String id) throws HttpException, IOException {
+	public void retrieveGroupTest(final String group1Inum) throws HttpException, IOException {
 
-		response = client.retrieveGroup(id, MediaType.APPLICATION_JSON);
+		response = client.retrieveGroup(group1Inum, MediaType.APPLICATION_JSON);
 		System.out.println("retrieveGroupTest + responseStr"  + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not get the group, status != 200");
 	}

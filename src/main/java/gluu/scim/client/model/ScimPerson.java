@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
 
 
@@ -192,8 +193,8 @@ public class ScimPerson {
     }
 
    
-    @XmlElementWrapper(name="PhoneNumbers")
-    @XmlElement(name="PhoneNumber")
+    @XmlElementWrapper(name="phoneNumbers")
+    @XmlElement(name="phoneNumber")
     public List<ScimPersonPhones> getPhoneNumbers() {
         return phoneNumbers;
     }

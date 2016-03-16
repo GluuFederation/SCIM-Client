@@ -24,16 +24,16 @@ import org.testng.annotations.Test;
  */
 public class ScimClientGroupWriteOperationsTest extends BaseScimTest{
 
-	final String CREATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:1.0\"],\"displayName\":\"Gluu Testing GroupSCIMCLIENT\",\"members\":[{\"value\":\"@!1111!0000!D4E7\",\"display\":\"Micheal Schwartz\"}]}";
-	final String UPDATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:1.0\"],\"displayName\":\"Gluu Testing GroupSCIMCLIENTUpdate\",\"members\":[{\"value\":\"@!1111!0000!D4E7\",\"display\":\"Micheal Schwartz\"}]}";
+	String CREATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:1.0\"],\"displayName\":\"Gluu Testing GroupSCIMCLIENT\",\"members\":[{\"value\":\"<test_user_inum>\",\"display\":\"Micheal Schwartz\"}]}";
+	String UPDATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:1.0\"],\"displayName\":\"Gluu Testing GroupSCIMCLIENTUpdate\",\"members\":[{\"value\":\"<test_user_inum>\",\"display\":\"Micheal Schwartz\"}]}";
 	String id;
 	ScimClient client;
 	ScimResponse response;
 	ScimGroup group;
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId", "uid" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId) {
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId, final String userInum) {
 		try {
 			String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));				
 			client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
@@ -41,6 +41,9 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest{
 		} catch (IOException e) {
 			System.out.println("exception in reading fle " + e.getMessage());
 		}
+
+		this.CREATEJSON = CREATEJSON.replaceAll("<test_user_inum>", userInum);
+		this.UPDATEJSON = UPDATEJSON.replaceAll("<test_user_inum>", userInum);
 	}
 
 	@Test(groups = "a")

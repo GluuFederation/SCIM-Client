@@ -74,11 +74,11 @@ public class GroupWebServiceTestCase  extends BaseScimTest{
 		assertEquals(response.getStatusCode(), 200, "cold not delete the Group, status != 200");
 	}
 	
-	@Parameters({ "id" })
+	@Parameters({ "group1Inum" })
 	@Test
-	public void retrieveGroupTest(final String id) throws HttpException, IOException {
+	public void retrieveGroupTest(final String group1Inum) throws HttpException, IOException {
 
-		response = client.retrieveGroup(id, MediaType.APPLICATION_JSON);
+		response = client.retrieveGroup(group1Inum, MediaType.APPLICATION_JSON);
 		System.out.println("GroupWebServiceTestCase retrieveGroupTest :response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not get the group, status != 200");
 		
