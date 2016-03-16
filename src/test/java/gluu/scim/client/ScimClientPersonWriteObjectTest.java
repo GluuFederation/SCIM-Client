@@ -55,7 +55,7 @@ public class ScimClientPersonWriteObjectTest extends BaseScimTest {
 		ScimPersonEmails email = new ScimPersonEmails();
 		email.setValue("scim@gluu.org");
 		email.setType("Work");
-		email.setPrimary("True");
+		email.setPrimary("true");
 		personToAdd.getEmails().add(email);
 		ScimPersonPhones phone = new ScimPersonPhones();
 		phone.setType("Work");
