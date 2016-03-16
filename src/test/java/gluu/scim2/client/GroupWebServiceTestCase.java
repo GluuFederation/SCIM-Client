@@ -14,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
@@ -30,7 +31,7 @@ public class GroupWebServiceTestCase  extends BaseScimTest{
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" , "groupwebservice.add.displayname" , "groupwebservice.update.displayname" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, final String umaAatClientKeyId ,final String displayName ,final String updateDisplayName) throws IOException {
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId ,final String displayName ,final String updateDisplayName) throws IOException {
 		System.out.println(" displayName : "+ displayName + "   updateDisplayName : "+ updateDisplayName);
 		String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));;
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
