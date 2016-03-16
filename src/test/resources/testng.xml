@@ -1,62 +1,52 @@
 <!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
 
 <suite name="SCIM-Client" parallel="false">
-    <!--           SCIM 1 test cases            -->
 
-    <test name="ScimClientRetreivingEntities test" enabled="true">
-        <classes>
-            <class name="gluu.scim.client.ScimClientRetreivingEntitiesTest"/>
-        </classes>
-    </test>
+    	<!-- SCIM 1 test cases -->
 
-    <test name="ScimClientPersonWriteOperations UMA test" enabled="true">
-        <classes>
-            <class name="gluu.scim.client.ScimClientPersonWriteOperationsUmaTest"/>
-        </classes>
-    </test>
+	<test name="ScimClientRetreivingEntities test" enabled="true">
+		<classes>
+			<class name="gluu.scim.client.ScimClientRetreivingEntitiesTest" />
+		</classes>
+	</test>
 
-    <test name="ScimClientGroupWriteOperations test" enabled="true">
-        <classes>
-            <class name="gluu.scim.client.ScimClientGroupWriteOperationsTest"/>
-        </classes>
-    </test>
+	<test name="ScimClientPersonWriteOperations UMA test" enabled="true">
+		<classes>
+			<class name="gluu.scim.client.ScimClientPersonWriteOperationsUmaTest" />
+		</classes>
+	</test>
 
-    <test name="ScimClientBulkOperations test" enabled="true">
-        <classes>
-            <class name="gluu.scim.client.ScimClientBulkOperationsTest"/>
-        </classes>
-    </test>
+	<test name="ScimClientGroupWriteOperations test" enabled="true">
+		<classes>
+			<class name="gluu.scim.client.ScimClientGroupWriteOperationsTest" />
+		</classes>
+	</test>
 
-    
-    <test name="ScimClientPersonWriteObject test" enabled="true">
-        <classes>
-            <class name="gluu.scim.client.ScimClientPersonWriteObjectTest"/>
-        </classes>
-    </test>
-    
+	<test name="ScimClientBulkOperations test" enabled="true">
+		<classes>
+			<class name="gluu.scim.client.ScimClientBulkOperationsTest" />
+		</classes>
+	</test>
 
-    <test name="ScimClientGroupWriteObject test" enabled="true">
-        <classes>
-            <class name="gluu.scim.client.ScimClientGroupWriteObjectTest"/>
-        </classes>
-    </test>
+	<test name="ScimClientPersonWriteObject test" enabled="true">
+		<classes>
+			<class name="gluu.scim.client.ScimClientPersonWriteObjectTest" />
+		</classes>
+	</test>
 
-    
-    <test name="oxAuthClientCreation test" enabled="true">
-        <classes>
-            <class name="gluu.scim.client.oxAuthClientCreationTest"/>
-        </classes>
-    </test>
-    
+	<test name="ScimClientGroupWriteObject test" enabled="true">
+		<classes>
+			<class name="gluu.scim.client.ScimClientGroupWriteObjectTest" />
+		</classes>
+	</test>
 
-    
-    <test name="ExcelMapper test" enabled="true">
-        <classes>
-            <class name="gluu.scim.client.ExcelMapperTest"/>
-        </classes>
-    </test>
+	<test name="ExcelMapper test" enabled="true">
+		<classes>
+			<class name="gluu.scim.client.ExcelMapperTest" />
+		</classes>
+	</test>
 
-    <!--           SCIM 2 test cases            -->
+	<!-- SCIM 2 test cases -->
 
 	<test name="SCIM 2 UserWebServiceTestCases test" enabled="true">
 		<classes>
@@ -83,12 +73,6 @@
 		</classes>
 	</test>
 
-	<test name="SCIM 2 oxAuthClientCreationTest test" enabled="true">
-		<classes>
-			<class name="gluu.scim2.client.oxAuthClientCreationTest" />
-		</classes>
-	</test>
-
 	<test name="SCIM 2 ScimClientPersonWriteOperationsBaseTest test"
 		enabled="true">
 		<classes>
@@ -101,7 +85,5 @@
 			<class name="gluu.scim2.client.ScimClientBulkOperationsTest" />
 		</classes>
 	</test>
-
- 
 
 </suite>
