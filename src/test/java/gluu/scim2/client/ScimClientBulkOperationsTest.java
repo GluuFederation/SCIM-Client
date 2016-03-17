@@ -40,7 +40,7 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
 	@Test
 	@Parameters({ "scim2.request_json" })
 	public void bulkOperationTest(String requestJson) throws Exception {
-		System.out.println("requestJson   :  " + requestJson);
+		System.out.println("bulkOperationTest requestJson:  " + requestJson);
 
 		response = client.bulkOperationString(requestJson, MediaType.APPLICATION_JSON);
 		System.out.println("reponse : " + response.getResponseBodyString());
