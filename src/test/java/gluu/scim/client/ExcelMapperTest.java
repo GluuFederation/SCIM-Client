@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
  * ExcelMapper tests
  *
  * @author Reda Zerrad Date: 06.06.2012
+ * @author Yuriy Movchan Date: 03/17/2016
  */
 public class ExcelMapperTest extends BaseScimTest {
 

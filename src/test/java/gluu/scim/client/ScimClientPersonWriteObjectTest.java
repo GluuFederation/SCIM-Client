@@ -25,25 +25,23 @@ import org.testng.annotations.Test;
  * SCIM Client person Create,Update,Delete as an object tests
  *
  * @author Reda Zerrad Date: 06.05.2012
+ * @author Yuriy Movchan Date: 03/17/2016
  */
 public class ScimClientPersonWriteObjectTest extends BaseScimTest {
 
-	ScimPerson personToAdd;
-	ScimPerson personToUpdate;
-	String uid;
-	ScimClient client;
-	ScimResponse response;
-	ScimPerson person;
+	private ScimClient client;
+
+	private ScimPerson personToAdd;
+	private ScimPerson personToUpdate;
+
+	private String uid;
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId) {
-		try {
-			String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));				
-			client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
-			response = null;
-		
-		person = null;
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId) throws IOException {
+		String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));				
+		client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
+
 		List<String> schema = new ArrayList<String>();
 		schema.add("urn:scim:schemas:core:1.0");
 		personToAdd = new ScimPerson();
@@ -78,44 +76,35 @@ public class ScimClientPersonWriteObjectTest extends BaseScimTest {
 
 		personToUpdate = personToAdd;
 		personToUpdate.setDisplayName("SCIM");
-		} catch (IOException e) {
-			System.out.println("exception in reading fle " + e.getMessage());
-		}
-
 	}
 
-	@Test(groups = "a")
+	@Test
 	public void createPersonTest() throws Exception {
-
-		response = client.createPerson(personToAdd, MediaType.APPLICATION_JSON);
+		ScimResponse response = client.createPerson(personToAdd, MediaType.APPLICATION_JSON);
 
 		assertEquals(response.getStatusCode(), 201, "cold not Add the person, status != 201");
 		byte[] bytes = response.getResponseBody();
 		String responseStr = new String(bytes);
-		person = (ScimPerson) jsonToObject(responseStr, ScimPerson.class);
+		ScimPerson person = (ScimPerson) jsonToObject(responseStr, ScimPerson.class);
 		this.uid = person.getId();
-
 	}
 
-	@Test(groups = "a")
+	@Test(dependsOnMethods = "createPersonTest")
 	public void updatePersonTest() throws Exception {
-
-		response = client.updatePerson(personToUpdate, this.uid, MediaType.APPLICATION_JSON);
+		ScimResponse response = client.updatePerson(personToUpdate, this.uid, MediaType.APPLICATION_JSON);
 
 		assertEquals(response.getStatusCode(), 200, "cold not update the person, status != 200");
 	}
 
-	@Test(dependsOnGroups = "a")
+	@Test(dependsOnMethods = "updatePersonTest")
 	public void deletePersonTest() throws Exception {
-
-		response = client.deletePerson(this.uid);
+		ScimResponse response = client.deletePerson(this.uid);
 
 		assertEquals(response.getStatusCode(), 200, "cold not delete the person, status != 200");
 
 	}
 
 	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-
 		ObjectMapper mapper = new ObjectMapper();
 		Object clazzObject = mapper.readValue(json, clazz);
 		return clazzObject;

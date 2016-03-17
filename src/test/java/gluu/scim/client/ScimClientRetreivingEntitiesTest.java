@@ -19,37 +19,30 @@ import org.testng.annotations.Test;
  * SCIM Client tests
  *
  * @author Reda Zerrad Date: 05.24.2012
+ * @author Yuriy Movchan Date: 03/17/2016
  */
 public class ScimClientRetreivingEntitiesTest extends BaseScimTest{
 
-	ScimClient client;
-	ScimResponse response;
+	private ScimClient client;
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId) {
-		try {
-			String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));				
-			client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
-			response = null;
-		} catch (IOException e) {
-			System.out.println("exception in reading fle " + e.getMessage());
-		}
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId) throws IOException {
+		String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));				
+		client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
 	}
 
 	@Parameters({ "userInum" })
 	@Test
 	public void retrievePersonTest(final String uid) throws HttpException, IOException {
-
-		response = client.retrievePerson(uid, MediaType.APPLICATION_JSON);
+		ScimResponse response = client.retrievePerson(uid, MediaType.APPLICATION_JSON);
 
 		assertEquals(response.getStatusCode(), 200, "cold not get the person, status != 200");
 	}
 
 	@Test
 	public void retrieveAllPersonsTest() throws HttpException, IOException {
-
-		response = client.retrieveAllPersons(MediaType.APPLICATION_JSON);
+		ScimResponse response = client.retrieveAllPersons(MediaType.APPLICATION_JSON);
 
 		assertEquals(response.getStatusCode(), 200, "cold not get a list of all persons, status != 200");
 	}
@@ -57,16 +50,14 @@ public class ScimClientRetreivingEntitiesTest extends BaseScimTest{
 	@Parameters({ "group1Inum" })
 	@Test
 	public void retrieveGroupTest(final String group1Inum) throws HttpException, IOException {
-
-		response = client.retrieveGroup(group1Inum, MediaType.APPLICATION_JSON);
+		ScimResponse response = client.retrieveGroup(group1Inum, MediaType.APPLICATION_JSON);
 
 		assertEquals(response.getStatusCode(), 200, "cold not get the group, status != 200");
 	}
 
 	@Test
 	public void retrieveAllGroupsTest() throws HttpException, IOException {
-
-		response = client.retrieveAllGroups(MediaType.APPLICATION_JSON);
+		ScimResponse response = client.retrieveAllGroups(MediaType.APPLICATION_JSON);
 
 		assertEquals(response.getStatusCode(), 200, "cold not get a list of all groups, status != 200");
 	}

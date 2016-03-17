@@ -105,7 +105,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 		
 	}
 	
-	@Test(groups = "a")
+	@Test
 	public void createPersonTest() throws Exception {
 		response = client.createPerson(userAdd, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases createPersonTest :response " + response.getResponseBodyString());
@@ -118,7 +118,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 
 	}
 
-	@Test(groups = "a")
+	@Test
 	public void updatePersonTest() throws Exception {
 
 		response = client.updatePerson(userToUpdate, uid, MediaType.APPLICATION_JSON);
@@ -130,7 +130,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 		assertEquals(person.getDisplayName(), userToUpdate.getDisplayName(), "could not update the user");
 	}
 
-	@Test(dependsOnGroups = "a")
+	@Test
 	public void deletePersonTest() throws Exception {
 
 		response = client.deletePerson(this.uid);
