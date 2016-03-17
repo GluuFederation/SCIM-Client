@@ -73,10 +73,10 @@
 		</classes>
 	</test>
 
-	<test name="SCIM 2 ScimClientPersonWriteOperationsBaseTest test"
+	<test name="SCIM 2 ScimClientPersonWriteOperationsTest test"
 		enabled="true">
 		<classes>
-			<class name="gluu.scim2.client.ScimClientPersonWriteOperationsBaseTest" />
+			<class name="gluu.scim2.client.ScimClientPersonWriteOperationsTest" />
 		</classes>
 	</test>
 

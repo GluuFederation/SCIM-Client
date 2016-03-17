@@ -24,9 +24,8 @@ import org.testng.annotations.Test;
  * @author Yuriy Movchan Date: 03/17/2016
  */
 public class ScimClientBulkOperationsTest extends BaseScimTest {
+
 	private Scim2Client client;
-	private ScimResponse response;
-	private BulkResponse BulkResponse;
 	private String uid;
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks", "umaAatClientKeyId" })
@@ -38,26 +37,26 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
 	}
 
 	@Test
-	@Parameters({ "scim2.request_json" })
+	@Parameters({ "scim2.builk.request_json" })
 	public void bulkOperationTest(String requestJson) throws Exception {
-		System.out.println("bulkOperationTest requestJson:  " + requestJson);
+		System.out.println("bulkOperationTest requestJson:" + requestJson);
 
-		response = client.bulkOperationString(requestJson, MediaType.APPLICATION_JSON);
-		System.out.println("reponse : " + response.getResponseBodyString());
+		ScimResponse response = client.bulkOperationString(requestJson, MediaType.APPLICATION_JSON);
+		System.out.println("reponse: " + response.getResponseBodyString());
 
 		assertEquals(response.getStatusCode(), 200, "cold not Add the person, status != 200");
 		byte[] bytes = response.getResponseBody();
 		String responseStr = new String(bytes);
-		BulkResponse = (BulkResponse) jsonToObject(responseStr, BulkResponse.class);
-		String location = BulkResponse.getOperations().get(0).getLocation();
+		BulkResponse  bulkResponse = (BulkResponse) jsonToObject(responseStr, BulkResponse.class);
+		String location = bulkResponse.getOperations().get(0).getLocation();
 		this.uid = getUID(location.split("/"));
 
 	}
 
 	@Test(dependsOnMethods = "bulkOperationTest")
 	public void cleanUp() throws Exception {
-		System.out.println("delete " + this.uid);
-		response = client.deletePerson(this.uid);
+		System.out.println("delete: " + this.uid);
+		ScimResponse response = client.deletePerson(this.uid);
 		assertEquals(response.getStatusCode(), 200, "cold not delete the person, status != 200");
 		System.out.println("reponse : " + response.getResponseBodyString());
 	}
@@ -73,7 +72,6 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
 	}
 
 	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-
 		ObjectMapper mapper = new ObjectMapper();
 		Object clazzObject = mapper.readValue(json, clazz);
 		return clazzObject;
