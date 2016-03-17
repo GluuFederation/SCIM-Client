@@ -31,7 +31,7 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest{
 	ScimResponse response;
 	ScimGroup group;
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId", "uid" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId", "userInum" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId, final String userInum) {
 		try {

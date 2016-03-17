@@ -33,7 +33,7 @@ public class ScimClientRetreivingEntitiesTest  extends BaseScimTest {
 		response = null;
 	}
 
-	@Parameters({ "uid" })
+	@Parameters({ "userInum" })
 	@Test
 	public void retrievePersonTest(final String uid) throws HttpException, IOException {
 

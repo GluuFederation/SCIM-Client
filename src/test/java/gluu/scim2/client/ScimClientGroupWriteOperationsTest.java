@@ -32,7 +32,7 @@ public class ScimClientGroupWriteOperationsTest   extends BaseScimTest{
 	ScimResponse response;
 	Group group;
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" , "groupjson.displayName" , "groupjson.updateddisplayname" , "uid" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" , "groupjson.displayName" , "groupjson.updateddisplayname" , "userInum" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId , String displayName ,  String updatedDisplayName ,  String inum) throws IOException {
 		System.out.println("displayName :"+  displayName +" updatedDisplayName : " + updatedDisplayName +" inum : "+   inum);
