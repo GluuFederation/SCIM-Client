@@ -18,69 +18,64 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 /**
- * @author Shekhar Laad 
+ * @author Shekhar Laad
+ * @author Yuriy Movchan Date: 03/17/2016
  */
-public class ScimClientGroupWriteOperationsTest   extends BaseScimTest{
-	//Please increment this value if create method response status 400 may be this display value already exist.
+public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 
+	private Scim2Client client;
+	private String id;
 
-	String CREATEJSON ;
-	String UPDATEJSON ;
-	String updatedDisplayName;	 
-	String id;
-	Scim2Client client;
-	ScimResponse response;
-	Group group;
-
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" , "groupjson.displayName" , "groupjson.updateddisplayname" , "userInum" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks", "umaAatClientKeyId" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId , String displayName ,  String updatedDisplayName ,  String inum) throws IOException {
-		System.out.println("displayName :"+  displayName +" updatedDisplayName : " + updatedDisplayName +" inum : "+   inum);
-		this.updatedDisplayName = updatedDisplayName ; 
-		CREATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:2.0:Group\"],\"displayName\":\""+displayName+"\",\"members\":[{\"value\":\""+inum+"\",\"display\":\"Micheal Schwartz\"}]}";
-		UPDATEJSON = "{\"schemas\":[\"urn:scim:schemas:core:2.0:Group\"],\"displayName\":\""+updatedDisplayName+"\",\"members\":[{\"value\":\""+inum+"\",\"display\":\"Micheal Schwartz\"}]}";
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks,
+			@Optional final String umaAatClientKeyId) throws IOException {
 		String umaAatClientJwksData = FileUtils.readFileToString(new File(umaAatClientJwks));
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwksData, umaAatClientKeyId);
-		response = null;
-		group = null;
 	}
 
-	@Test(groups = "a")
-	public void createGroupTest() throws Exception {
+	@Test
+	@Parameters({ "scim2.group.create_json" })
+	public void createGroupTest(String createJson) throws Exception {
+		System.out.println("createGroupTest createJson: " + createJson);
 
-		response = client.createGroupString(CREATEJSON, MediaType.APPLICATION_JSON);
+		ScimResponse response = client.createGroupString(createJson, MediaType.APPLICATION_JSON);
+		System.out.println("createGroupTest response json: " + response.getResponseBodyString());
 
 		assertEquals(response.getStatusCode(), 201, "cold not Add the group, status != 201");
 		String responseStr = response.getResponseBodyString();
-		System.out.println("createGroupTest + responseStr"  + response.getResponseBodyString());
-		group = (Group) jsonToObject(responseStr, Group.class);
+		System.out.println("createGroupTest + responseStr" + response.getResponseBodyString());
+		Group group = (Group) jsonToObject(responseStr, Group.class);
 		this.id = group.getId();
 
 	}
 
-	@Test(groups = "a")
-	public void updateGroupTest() throws Exception {
-		response = client.updateGroupString(UPDATEJSON, this.id, MediaType.APPLICATION_JSON);
+	@Test(dependsOnMethods = "createGroupTest")
+	@Parameters({ "scim2.group.update_json", "groupjson.updateddisplayname" })
+	public void updateGroupTest(String updateJson, String updatedDisplayName) throws Exception {
+		System.out.println("updateGroupTest updateJson: " + updateJson);
+		ScimResponse response = client.updateGroupString(updateJson, this.id, MediaType.APPLICATION_JSON);
+
 		System.out.println("updateGroupTest + responseStr" + response.getResponseBodyString());
+
 		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
 		String responseStr = response.getResponseBodyString();
-		group = (Group) jsonToObject(responseStr, Group.class);
+		Group group = (Group) jsonToObject(responseStr, Group.class);
 		assertEquals(group.getDisplayName(), updatedDisplayName, "could not update the group");
 	}
 
-	@Test(dependsOnGroups = "a")
+	@Test(dependsOnMethods = "updateGroupTest")
 	public void deleteGroupTest() throws Exception {
-
-		response = client.deleteGroup(this.id);
+		ScimResponse response = client.deleteGroup(this.id);
 		System.out.println("deleteGroupTest + responseStr" + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not delete the Group, status != 200");
 
 	}
 
 	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-
 		ObjectMapper mapper = new ObjectMapper();
 		Object clazzObject = mapper.readValue(json, clazz);
 		return clazzObject;
 	}
+
 }

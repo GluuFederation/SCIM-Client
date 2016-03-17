@@ -2,7 +2,6 @@ package gluu.scim2.client;
 
 import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimClient;
 import gluu.scim.client.ScimResponse;
 
 import java.io.File;
@@ -36,7 +35,6 @@ public class ScimClientRetreivingEntitiesTest  extends BaseScimTest {
 	@Parameters({ "userInum" })
 	@Test
 	public void retrievePersonTest(final String uid) throws HttpException, IOException {
-
 		response = client.retrievePerson(uid, MediaType.APPLICATION_JSON);
 		System.out.println("retrievePersonTest + responseStr"  + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not get the person, status != 200");
@@ -44,7 +42,6 @@ public class ScimClientRetreivingEntitiesTest  extends BaseScimTest {
 
 	@Test
 	public void retrieveAllPersonsTest() throws HttpException, IOException {
-
 		response = client.retrieveAllPersons(MediaType.APPLICATION_JSON);
 		System.out.println("retrieveAllPersonsTest + responseStr"  + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not get a list of all persons, status != 200");
@@ -53,7 +50,6 @@ public class ScimClientRetreivingEntitiesTest  extends BaseScimTest {
 	@Parameters({ "group1Inum" })
 	@Test
 	public void retrieveGroupTest(final String group1Inum) throws HttpException, IOException {
-
 		response = client.retrieveGroup(group1Inum, MediaType.APPLICATION_JSON);
 		System.out.println("retrieveGroupTest + responseStr"  + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not get the group, status != 200");
@@ -61,7 +57,6 @@ public class ScimClientRetreivingEntitiesTest  extends BaseScimTest {
 
 	@Test
 	public void retrieveAllGroupsTest() throws HttpException, IOException {
-
 		response = client.retrieveAllGroups(MediaType.APPLICATION_JSON);
 		System.out.println("retrieveAllGroupsTest + responseStr"  + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not get a list of all groups, status != 200");

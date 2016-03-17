@@ -19,21 +19,23 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 /**
- * @author Shekhar Laad 
+ * @author Shekhar Laad
  */
-public class GroupWebServiceTestCase  extends BaseScimTest{
-	
+public class GroupWebServiceTestCase extends BaseScimTest {
+
 	Group groupToAdd;
 	Group groupToUpdate;
 	String id;
 	Scim2Client client;
 	ScimResponse response;
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" , "groupwebservice.add.displayname" , "groupwebservice.update.displayname" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks", "umaAatClientKeyId",
+			"groupwebservice.add.displayname", "groupwebservice.update.displayname" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId ,final String displayName ,final String updateDisplayName) throws IOException {
-		System.out.println(" displayName : "+ displayName + "   updateDisplayName : "+ updateDisplayName);
-		String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));;
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks,
+			@Optional final String umaAatClientKeyId, final String displayName, final String updateDisplayName) throws IOException {
+		System.out.println(" displayName : " + displayName + "   updateDisplayName : " + updateDisplayName);
+		String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
 		response = null;
 		groupToAdd = new Group();
@@ -43,9 +45,8 @@ public class GroupWebServiceTestCase  extends BaseScimTest{
 		groupToUpdate.setDisplayName(updateDisplayName);
 	}
 
-@Test(groups = "a")
+	@Test
 	public void createGroupTest() throws Exception {
-
 		response = client.createGroup(groupToAdd, MediaType.APPLICATION_JSON);
 		System.out.println("GroupWebServiceTestCase :  createGroupTest :  response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 201, "cold not Add the group, status != 201");
@@ -56,7 +57,7 @@ public class GroupWebServiceTestCase  extends BaseScimTest{
 		assertEquals(group.getDisplayName(), groupToAdd.getDisplayName(), "Username MisMatch");
 	}
 
-	@Test(groups = "a")
+	@Test(dependsOnMethods = "createGroupTest")
 	public void updateGroupTest() throws Exception {
 		response = client.updateGroup(groupToUpdate, this.id, MediaType.APPLICATION_JSON);
 		System.out.println("GroupWebServiceTestCase updateGroupTest :response : " + response.getResponseBodyString());
@@ -66,35 +67,31 @@ public class GroupWebServiceTestCase  extends BaseScimTest{
 		assertEquals(group.getDisplayName(), groupToUpdate.getDisplayName(), "could not update the user");
 	}
 
-	@Test(dependsOnGroups = "a")
+	@Test(dependsOnMethods = "updateGroupTest")
 	public void deleteGroupTest() throws Exception {
-
 		response = client.deleteGroup(this.id);
 		System.out.println("GroupWebServiceTestCase deleteGroupTest :response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not delete the Group, status != 200");
 	}
-	
+
 	@Parameters({ "group1Inum" })
 	@Test
 	public void retrieveGroupTest(final String group1Inum) throws HttpException, IOException {
-
 		response = client.retrieveGroup(group1Inum, MediaType.APPLICATION_JSON);
 		System.out.println("GroupWebServiceTestCase retrieveGroupTest :response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not get the group, status != 200");
-		
+
 	}
 
 	@Test
 	public void retrieveAllGroupsTest() throws HttpException, IOException {
-
 		response = client.retrieveAllGroups(MediaType.APPLICATION_JSON);
 		System.out.println("GroupWebServiceTestCase retrieveAllGroupsTest :response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not get a list of all groups, status != 200");
-		
+
 	}
 
 	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-
 		ObjectMapper mapper = new ObjectMapper();
 		Object clazzObject = mapper.readValue(json, clazz);
 		return clazzObject;
