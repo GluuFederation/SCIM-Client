@@ -10,9 +10,9 @@
 		</classes>
 	</test>
 
-	<test name="ScimClientPersonWriteOperations UMA test" enabled="true">
+	<test name="ScimClientPersonWriteOperations test" enabled="true">
 		<classes>
-			<class name="gluu.scim.client.ScimClientPersonWriteOperationsUmaTest" />
+			<class name="gluu.scim.client.ScimClientPersonWriteOperationsTest" />
 		</classes>
 	</test>
 
