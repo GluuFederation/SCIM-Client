@@ -36,11 +36,8 @@ import static org.testng.Assert.assertEquals;
 /**
  * README:
  *
- * Before running this test, you first need to manually add three custom attributes in oxTrust:
- * 1. customFirst - Text, not multi-valued
- * 2. customSecond - Date, multi-valued
- * 3. customThird - Numeric, not multi-valued
- * You also need to set them as "SCIM Attribute = True".
+ * Check first if /install/community-edition-setup/templates/test/scim-client/data/scim-test-data.ldif
+ * has been loaded to LDAP.
  *
  * @author Val Pecaoco
  */
@@ -52,8 +49,8 @@ public class UserExtensionsPersonTest extends BaseScimTest {
     User personToAdd;
     User personToUpdate;
 
-    String username = "userjson.add.username";
-    String updateDisplayName = "update.Scim2DisplayName";
+    String username = "userjson.add2.username";
+    String updateDisplayName = "update2.Scim2DisplayName";
 
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks", "umaAatClientKeyId"})
@@ -68,7 +65,7 @@ public class UserExtensionsPersonTest extends BaseScimTest {
 
         personToAdd.setUserName(username);
         personToAdd.setPassword("test");
-        personToAdd.setDisplayName("Scim2DisplayName");
+        personToAdd.setDisplayName("Scim2DisplayName2");
 
         Email email = new Email();
         email.setValue("scim@gluu.org");
@@ -102,9 +99,9 @@ public class UserExtensionsPersonTest extends BaseScimTest {
 
         // User Extensions
         Extension.Builder extensionBuilder = new Extension.Builder(Constants.USER_EXT_SCHEMA_ID);
-        extensionBuilder.setField("customFirst", "valueOne");
-        extensionBuilder.setFieldAsList("customSecond", Arrays.asList(new String[]{"2016-02-23T03:35:22Z", "2016-02-24T01:52:05Z"}));
-        extensionBuilder.setField("customThird", new BigDecimal(3000));
+        extensionBuilder.setField("scimCustomFirst", "valueOne");
+        extensionBuilder.setFieldAsList("scimCustomSecond", Arrays.asList(new String[]{"2016-02-23T03:35:22Z", "2016-02-24T01:52:05Z"}));
+        extensionBuilder.setField("scimCustomThird", new BigDecimal(3000));
         personToAdd.addExtension(extensionBuilder.build());
     }
 
@@ -131,28 +128,28 @@ public class UserExtensionsPersonTest extends BaseScimTest {
         boolean customThirdExists = false;
         for (AttributeHolder attributeHolder : userExtensionSchema.getAttributes()) {
 
-            if (attributeHolder.getName().equals("customFirst")) {
+            if (attributeHolder.getName().equals("scimCustomFirst")) {
 
                 customFirstExists = true;
                 assert(attributeHolder.getType().equals("string"));
                 assert(attributeHolder.getMultiValued().equals(Boolean.FALSE));
 
-            } else if (attributeHolder.getName().equals("customSecond")) {
+            } else if (attributeHolder.getName().equals("scimCustomSecond")) {
 
                 customSecondExists = true;
                 assert(attributeHolder.getType().equals("dateTime"));
                 assert(attributeHolder.getMultiValued().equals(Boolean.TRUE));
 
-            } else if (attributeHolder.getName().equals("customThird")) {
+            } else if (attributeHolder.getName().equals("scimCustomThird")) {
 
                 customThirdExists = true;
                 assert(attributeHolder.getType().equals("decimal"));
                 assert(attributeHolder.getMultiValued().equals(Boolean.FALSE));
             }
         }
-        assertEquals(customFirstExists, true, "Custom attribute \"customFirst\" not found.");
-        assertEquals(customSecondExists, true, "Custom attribute \"customSecond\" not found.");
-        assertEquals(customThirdExists, true, "Custom attribute \"customThird\" not found.");
+        assertEquals(customFirstExists, true, "Custom attribute \"scimCustomFirst\" not found.");
+        assertEquals(customSecondExists, true, "Custom attribute \"scimCustomSecond\" not found.");
+        assertEquals(customThirdExists, true, "Custom attribute \"scimCustomThird\" not found.");
     }
 
     @Test(groups = "b", dependsOnGroups = "a")
@@ -179,10 +176,10 @@ public class UserExtensionsPersonTest extends BaseScimTest {
 
         // User Extensions
         Extension.Builder extensionBuilder = new Extension.Builder(Constants.USER_EXT_SCHEMA_ID);
-        extensionBuilder.setField("customFirst", "valueUpdated");
-        // extensionBuilder.setFieldAsList("customSecond", Arrays.asList(new String[]{"1969-02-23T03:35:22Z"}));
-        extensionBuilder.setFieldAsList("customSecond", Arrays.asList(new Date[]{(new DateTime("1969-01-02")).toDate(), (new DateTime("1970-02-27")).toDate()}));
-        extensionBuilder.setField("customThird", new BigDecimal(5000));
+        extensionBuilder.setField("scimCustomFirst", "valueUpdated");
+        // extensionBuilder.setFieldAsList("scimCustomSecond", Arrays.asList(new String[]{"1969-02-23T03:35:22Z"}));
+        extensionBuilder.setFieldAsList("scimCustomSecond", Arrays.asList(new Date[]{(new DateTime("1969-01-02")).toDate(), (new DateTime("1970-02-27")).toDate()}));
+        extensionBuilder.setField("scimCustomThird", new BigDecimal(6000));
         personToUpdate.addExtension(extensionBuilder.build());
 
         ScimResponse response = client.updatePerson(personToUpdate, this.uid, MediaType.APPLICATION_JSON);
