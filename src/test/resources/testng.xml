@@ -86,4 +86,16 @@
 		</classes>
 	</test>
 
+	<test name="SCIM 2 UserExtensionsJsonTest test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.UserExtensionsJsonTest" />
+		</classes>
+	</test>
+
+	<test name="SCIM 2 UserExtensionsPersonTest test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.UserExtensionsPersonTest" />
+		</classes>
+	</test>
+		
 </suite>
