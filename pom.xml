@@ -97,6 +97,13 @@
           <artifactId>oxtrust-scim</artifactId>
           <version>2.4.3-SNAPSHOT</version>
       </dependency>
+      
+  		<dependency>
+			<groupId>org.xdi</groupId>
+    		<artifactId>oxtrust-server</artifactId>
+			<version>2.4.3-SNAPSHOT</version>
+    		<classifier>classes</classifier>
+  		</dependency>
         <dependency>
             <groupId>org.xdi</groupId>
             <artifactId>oxauth-client</artifactId>
