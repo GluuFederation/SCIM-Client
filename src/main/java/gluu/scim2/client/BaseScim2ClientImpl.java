@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -33,6 +34,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
@@ -1045,11 +1047,66 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		return null;
 	}
 
+	/**
+	 * User search via a filter with pagination and sorting
+	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+     * @throws IOException
+     */
+	@Override
+	public ScimResponse searchUsers(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
+		init();
+
+		HttpClient httpClient = new HttpClient();
+		GetMethod get = new GetMethod(this.domain + "/scim/v2/Users/");
+
+		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		get.setQueryString(new NameValuePair[] {
+		    new NameValuePair("filter", filter),
+			new NameValuePair("startIndex", String.valueOf(startIndex)),
+			new NameValuePair("count", String.valueOf(count)),
+			new NameValuePair("sortBy", sortBy),
+			new NameValuePair("sortOrder", sortOrder),
+			new NameValuePair("attributes", ((attributesArray != null) ? new ObjectMapper().writeValueAsString(attributesArray) : null))
+		});
+
+		addAuthenticationHeader(get);
+
+		// SCIM 2.0 uses JSON only
+		get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+
+		try {
+
+			httpClient.executeMethod(get);
+
+			ScimResponse response = ResponseMapper.map(get, null);
+
+			return response;
+
+		} catch (Exception ex) {
+
+			log.error(" An error occured : ", ex);
+
+		} finally {
+			get.releaseConnection();
+		}
+
+		return null;
+	}
+
 	/*
-	 * (non-Javadoc)
-	 * @see
-	 * gluu.scim.client.ScimClientService#retrieveAllGroups(java.lang.String)
-	 */
+     * (non-Javadoc)
+     * @see
+     * gluu.scim.client.ScimClientService#retrieveAllGroups(java.lang.String)
+     */
 	@Override
 	public ScimResponse retrieveAllGroups(String mediaType) throws HttpException, IOException {
 		init();

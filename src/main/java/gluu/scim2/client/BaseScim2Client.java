@@ -86,4 +86,13 @@ public interface BaseScim2Client extends BaseScimClient {
 	
 	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws JsonGenerationException,
 	JsonMappingException, IOException, JAXBException;
+
+	/**
+	 * User search via a filter with pagination and sorting
+	 *
+	 * @return
+	 * @throws HttpException
+	 * @throws IOException
+     */
+	public ScimResponse searchUsers(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
 }
