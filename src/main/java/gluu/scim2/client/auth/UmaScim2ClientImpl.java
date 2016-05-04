@@ -395,6 +395,8 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	 * @param startIndex
 	 * @param count
 	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
 	 * @return
      * @throws IOException
      */

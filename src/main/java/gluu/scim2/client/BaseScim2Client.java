@@ -90,9 +90,14 @@ public interface BaseScim2Client extends BaseScimClient {
 	/**
 	 * User search via a filter with pagination and sorting
 	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
 	 * @return
-	 * @throws HttpException
-	 * @throws IOException
+     * @throws IOException
      */
 	public ScimResponse searchUsers(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
 }
