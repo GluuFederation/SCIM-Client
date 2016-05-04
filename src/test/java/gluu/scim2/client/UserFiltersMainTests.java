@@ -179,6 +179,8 @@ public class UserFiltersMainTests extends BaseScimTest {
                 startIndex = diff;
             }
         }
+
+        System.out.println(" Paging done! ");
     }
 
     private Object jsonToObject(String json, Class<?> clazz) throws Exception {
