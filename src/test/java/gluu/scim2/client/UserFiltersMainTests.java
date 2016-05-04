@@ -46,7 +46,7 @@ public class UserFiltersMainTests extends BaseScimTest {
     public void testSearchUsers1() throws Exception {
 
         String[] filters = new String[] {
-            "memberOf sw \"inum=@\"",
+            "groups sw \"inum=@\"",
             "oxTrustExternalId sw \"1\"",
             "oxTrustExternalId ew \"3000\"",
             "birthdate ge \"2014-01-01\" and oxTrustExternalId co \"2\"",
