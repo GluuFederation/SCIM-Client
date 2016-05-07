@@ -1143,6 +1143,61 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		return null;
 	}
 
+	/**
+	 * Group search via a filter with pagination and sorting
+	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
+		init();
+
+		HttpClient httpClient = new HttpClient();
+		GetMethod get = new GetMethod(this.domain + "/scim/v2/Groups/");
+
+		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		get.setQueryString(new NameValuePair[] {
+			new NameValuePair("filter", filter),
+			new NameValuePair("startIndex", String.valueOf(startIndex)),
+			new NameValuePair("count", String.valueOf(count)),
+			new NameValuePair("sortBy", sortBy),
+			new NameValuePair("sortOrder", sortOrder),
+			new NameValuePair("attributes", ((attributesArray != null) ? new ObjectMapper().writeValueAsString(attributesArray) : null))
+		});
+
+		addAuthenticationHeader(get);
+
+		// SCIM 2.0 uses JSON only
+		get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+
+		try {
+
+			httpClient.executeMethod(get);
+
+			ScimResponse response = ResponseMapper.map(get, null);
+
+			return response;
+
+		} catch (Exception ex) {
+
+			log.error(" An error occured : ", ex);
+
+		} finally {
+			get.releaseConnection();
+		}
+
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see gluu.scim.client.ScimClientService#personSearch(java.lang.String,

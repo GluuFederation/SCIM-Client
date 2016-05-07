@@ -422,6 +422,30 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 		return scimResponse;
 	}
 
+	/**
+	 * Group search via a filter with pagination and sorting
+	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+
+		if (autorizeRpt(scimResponse)) {
+			scimResponse = super.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+		}
+
+		return scimResponse;
+	}
+
 	@Override
 	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.personSearch(attribute, value, mediaType);

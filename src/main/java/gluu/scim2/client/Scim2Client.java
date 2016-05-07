@@ -261,6 +261,23 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 		return scimClient.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributesArray);
 	}
 
+	/**
+	 * Group search via a filter with pagination and sorting
+	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+		return scimClient.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+	}
+
 	/*
      * @see
      * gluu.scim.client.ScimClientService#retrieveAllGroups(java.lang.String)

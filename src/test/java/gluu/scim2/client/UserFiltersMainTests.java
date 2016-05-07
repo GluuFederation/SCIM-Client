@@ -46,10 +46,11 @@ public class UserFiltersMainTests extends BaseScimTest {
     public void testSearchUsers1() throws Exception {
 
         String[] filters = new String[] {
+            "id sw \"@\"",
             "groups sw \"inum=@\"",
-            "oxTrustExternalId sw \"1\"",
-            "oxTrustExternalId ew \"3000\"",
-            "birthdate ge \"2014-01-01\" and oxTrustExternalId co \"2\"",
+            "externalId sw \"1\"",
+            "externalId ew \"3000\"",
+            "birthdate ge \"2014-01-01\" and externalId co \"2\"",
             "userName sw \"aaaa\"",
             "(name.givenName sw \"aaaa 1111\" and name.familyName ew \"test\")",
             "emails.type pr",
@@ -142,7 +143,7 @@ public class UserFiltersMainTests extends BaseScimTest {
     @Test
     public void testSearchUsersPaging() throws Exception {
 
-        String filter = "oxTrustExternalId pr";
+        String filter = "externalId pr";
         int startIndex = 1;
         int count = 5;
         String sortBy = "displayName";
@@ -154,7 +155,7 @@ public class UserFiltersMainTests extends BaseScimTest {
 
             ScimResponse response = client.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes);
 
-            System.out.println(" testSearchUsers2 response = " + response.getResponseBodyString());
+            System.out.println(" testSearchUsersPaging response = " + response.getResponseBodyString());
 
             assertEquals(response.getStatusCode(), 200, "Status != 200");
 

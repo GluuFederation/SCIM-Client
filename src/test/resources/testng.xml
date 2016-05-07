@@ -105,4 +105,11 @@
 		</classes>
 	</test>
 
+	<test name="SCIM 2 GroupFiltersTests test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.GroupFiltersMainTests"/>
+			<class name="gluu.scim2.client.GroupFiltersNegativeTests"/>
+		</classes>
+	</test>
+
 </suite>

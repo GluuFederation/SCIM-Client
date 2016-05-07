@@ -100,4 +100,18 @@ public interface BaseScim2Client extends BaseScimClient {
      * @throws IOException
      */
 	public ScimResponse searchUsers(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
+
+	/**
+	 * Group search via a filter with pagination and sorting
+	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+     * @throws IOException
+     */
+	public ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
 }
