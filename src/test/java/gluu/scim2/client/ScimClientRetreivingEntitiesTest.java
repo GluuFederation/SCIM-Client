@@ -32,9 +32,8 @@ public class ScimClientRetreivingEntitiesTest  extends BaseScimTest {
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId) throws IOException {
-		String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));;
-		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
-		response = null;
+		String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));
+		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);		response = null;
 	}
 
 	@Parameters({ "userInum" })

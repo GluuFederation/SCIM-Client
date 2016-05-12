@@ -20,6 +20,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -268,11 +269,12 @@ public class Converter implements Serializable {
 		 }
 	 
 	 private static Object jsonToObject(String json, Class<?> clazz) throws Exception {
-	    	
-	    	ObjectMapper mapper = new ObjectMapper();
-	    	Object clazzObject = mapper.readValue(json, clazz);
-	    	return clazzObject;
-	    }
+
+		 ObjectMapper mapper = new ObjectMapper();
+		 mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+		 Object clazzObject = mapper.readValue(json, clazz);
+		 return clazzObject;
+	 }
 	 
 	 private static String getXMLString(Object entity,Class<?> clazz) throws JAXBException {
 		 StringWriter sw = new StringWriter();
