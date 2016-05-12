@@ -19,6 +19,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.util.Map;
 
+import static org.gluu.oxtrust.model.scim2.Constants.USER_CORE_SCHEMA_ID;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -46,6 +47,8 @@ public class UserFiltersMainTests extends BaseScimTest {
     public void testSearchUsers1() throws Exception {
 
         String[] filters = new String[] {
+            "name[givenName co \"aaaa\" and name[familyName ew \"test\"]]",
+            "name[name[givenName sw \"aaaa\"]]",
             "id sw \"@\"",
             "groups sw \"inum=@\"",
             "externalId sw \"1\"",
@@ -98,16 +101,16 @@ public class UserFiltersMainTests extends BaseScimTest {
     public void testSearchUsers2() throws Exception {
 
         String[] filters = new String[] {
-            "urn:ietf:params:scim:schemas:core:2.0:User:name.userName sw \"aaaa1111\"",
-            "urn:ietf:params:scim:schemas:core:2.0:User:name.userName ew \"1111\" and emails.type eq \"work\"",
-            "urn:ietf:params:scim:schemas:core:2.0:User:name.givenName co \"2222\" and addresses.type eq \"work\"",
-            "urn:ietf:params:scim:schemas:core:2.0:User:addresses.primary pr",
-            "urn:ietf:params:scim:schemas:core:2.0:User:addresses pr",
+            USER_CORE_SCHEMA_ID + ":name.userName sw \"aaaa1111\"",
+            USER_CORE_SCHEMA_ID + ":name.userName ew \"1111\" and emails.type eq \"work\"",
+            USER_CORE_SCHEMA_ID + ":name.givenName co \"2222\" and addresses.type eq \"work\"",
+            USER_CORE_SCHEMA_ID + ":addresses.primary pr",
+            USER_CORE_SCHEMA_ID + ":addresses pr",
             "emails.type pr",
             "emails pr",
             "addresses.primary eq \"true\"",
             "not emails.display pr",
-            "not urn:ietf:params:scim:schemas:core:2.0:User:emails.primary eq \"true\""
+            "not " + USER_CORE_SCHEMA_ID + ":emails.primary eq \"true\""
         };
 
         int startIndex = 1;

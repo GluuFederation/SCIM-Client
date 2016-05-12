@@ -112,4 +112,16 @@
 		</classes>
 	</test>
 
+	<test name="SCIM 2 UserObjectTests test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.UserObjectTests"/>
+		</classes>
+	</test>
+
+	<test name="SCIM 2 GroupObjectTests test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.GroupObjectTests"/>
+		</classes>
+	</test>
+
 </suite>

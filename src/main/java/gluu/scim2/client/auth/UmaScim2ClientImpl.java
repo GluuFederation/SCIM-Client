@@ -237,10 +237,10 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse retrievePerson(String uid, String mediaType) throws IOException {
-		ScimResponse scimResponse = super.retrievePerson(uid, mediaType);
+	public ScimResponse retrievePerson(String id, String mediaType) throws IOException {
+		ScimResponse scimResponse = super.retrievePerson(id, mediaType);
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.retrievePerson(uid, mediaType);
+            scimResponse = super.retrievePerson(id, mediaType);
 		}
 		
 		return scimResponse;
@@ -257,10 +257,10 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse updatePerson(User person, String uid, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.updatePerson(person, uid, mediaType);
+	public ScimResponse updatePerson(User person, String id, String mediaType) throws IOException, JAXBException {
+		ScimResponse scimResponse = super.updatePerson(person, id, mediaType);
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.updatePerson(person, uid, mediaType);
+            scimResponse = super.updatePerson(person, id, mediaType);
 		}
 
 		return scimResponse;
@@ -328,11 +328,11 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse updatePersonString(String person, String uid, String mediaType) throws JsonGenerationException,
+	public ScimResponse updatePersonString(String person, String id, String mediaType) throws JsonGenerationException,
 			JsonMappingException, UnsupportedEncodingException, IOException, JAXBException {
-		ScimResponse scimResponse = super.updatePersonString(person, uid, mediaType);
+		ScimResponse scimResponse = super.updatePersonString(person, id, mediaType);
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.updatePersonString(person, uid, mediaType);
+            scimResponse = super.updatePersonString(person, id, mediaType);
 		}
 
 		return scimResponse;

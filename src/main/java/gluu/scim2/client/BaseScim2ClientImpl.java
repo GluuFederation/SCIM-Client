@@ -159,10 +159,10 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * java.lang.String)
 	 */
 	@Override
-	public ScimResponse retrievePerson(String uid, String mediaType) throws HttpException, IOException {
+	public ScimResponse retrievePerson(String id, String mediaType) throws HttpException, IOException {
 		init();
 		HttpClient httpClient = new HttpClient();
-		GetMethod get = new GetMethod(this.domain + "/scim/v2/Users/" + uid);
+		GetMethod get = new GetMethod(this.domain + "/scim/v2/Users/" + id);
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
@@ -299,14 +299,14 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * .ScimPerson, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse updatePerson(ScimPerson person, String uid, String mediaType) throws JsonGenerationException, JsonMappingException,
+	public ScimResponse updatePerson(ScimPerson person, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
 			UnsupportedEncodingException, IOException, JAXBException {
 
 		init();
 
 		HttpClient httpClient = new HttpClient();
 
-		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/" + uid);
+		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/" + id);
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
@@ -345,14 +345,14 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * .User, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse updatePerson(User person, String uid, String mediaType) throws JsonGenerationException, JsonMappingException,
+	public ScimResponse updatePerson(User person, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
 			UnsupportedEncodingException, IOException, JAXBException {
 
 		init();
 
 		HttpClient httpClient = new HttpClient();
 
-		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/" + uid);
+		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/" + id);
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
@@ -390,13 +390,13 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * @see gluu.scim.client.ScimClientService#deletePerson(java.lang.String)
 	 */
 	@Override
-	public ScimResponse deletePerson(String uid) throws HttpException, IOException {
+	public ScimResponse deletePerson(String id) throws HttpException, IOException {
 
 		init();
 
 		HttpClient httpClient = new HttpClient();
 
-		DeleteMethod delete = new DeleteMethod(this.domain + "/scim/v2/Users/" + uid);
+		DeleteMethod delete = new DeleteMethod(this.domain + "/scim/v2/Users/" + id);
 		delete.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(delete);
@@ -735,14 +735,14 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse updatePersonString(String person, String uid, String mediaType) throws JsonGenerationException,
+	public ScimResponse updatePersonString(String person, String id, String mediaType) throws JsonGenerationException,
 			JsonMappingException, UnsupportedEncodingException, IOException, JAXBException {
 
 		init();
 
 		HttpClient httpClient = new HttpClient();
 
-		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/" + uid);
+		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/" + id);
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
@@ -1070,7 +1070,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		get.setQueryString(new NameValuePair[] {
-		    new NameValuePair("filter", filter),
+			new NameValuePair("filter", filter),
 			new NameValuePair("startIndex", String.valueOf(startIndex)),
 			new NameValuePair("count", String.valueOf(count)),
 			new NameValuePair("sortBy", sortBy),

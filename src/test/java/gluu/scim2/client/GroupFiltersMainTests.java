@@ -19,6 +19,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.util.Map;
 
+import static org.gluu.oxtrust.model.scim2.Constants.GROUP_CORE_SCHEMA_ID;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -46,7 +47,8 @@ public class GroupFiltersMainTests extends BaseScimTest {
             "(id co \"!\" and displayName pr)",
             "displayName pr",
             "displayName ew \"group\"",
-            "displayName co \"group\""
+            "displayName co \"group\"",
+            GROUP_CORE_SCHEMA_ID + ":member co \"@\""
         };
 
         int startIndex = 1;
