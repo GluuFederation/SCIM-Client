@@ -103,7 +103,7 @@ public class Util {
 
         String response = getResponseString(scimResponse);
 
-        ListResponse listResponse = (ListResponse) jsonToListResponseUser(response, userExtensionSchema);
+        ListResponse listResponse = jsonToListResponseUser(response, userExtensionSchema);
 
         return listResponse;
     }
@@ -113,7 +113,7 @@ public class Util {
         byte[] bytes = scimResponse.getResponseBody();
         String response = new String(bytes);
 
-        ListResponse listResponse = (ListResponse) jsonToListResponseGroup(response);
+        ListResponse listResponse = jsonToListResponseGroup(response);
 
         return listResponse;
     }

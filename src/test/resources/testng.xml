@@ -92,9 +92,9 @@
 		</classes>
 	</test>
 
-	<test name="SCIM 2 UserExtensionsPersonTest test" enabled="true">
+	<test name="SCIM 2 UserExtensionsObjectTest test" enabled="true">
 		<classes>
-			<class name="gluu.scim2.client.UserExtensionsPersonTest" />
+			<class name="gluu.scim2.client.UserExtensionsObjectTest" />
 		</classes>
 	</test>
 

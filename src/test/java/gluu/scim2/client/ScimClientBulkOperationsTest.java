@@ -49,7 +49,7 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
 		ScimResponse response = client.bulkOperationString(requestJson, MediaType.APPLICATION_JSON);
 		System.out.println("reponse: " + response.getResponseBodyString());
 
-		assertEquals(response.getStatusCode(), 200, "cold not Add the person, status != 200");
+		assertEquals(response.getStatusCode(), 200, "cold not Add the user, status != 200");
 		byte[] bytes = response.getResponseBody();
 		String responseStr = new String(bytes);
 		BulkResponse  bulkResponse = (BulkResponse) Util.jsonToObject(responseStr, BulkResponse.class);
@@ -62,7 +62,7 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
 	public void cleanUp() throws Exception {
 		System.out.println("delete: " + this.uid);
 		ScimResponse response = client.deletePerson(this.uid);
-		assertEquals(response.getStatusCode(), 200, "cold not delete the person, status != 200");
+		assertEquals(response.getStatusCode(), 200, "cold not delete the user, status != 200");
 		System.out.println("reponse : " + response.getResponseBodyString());
 	}
 

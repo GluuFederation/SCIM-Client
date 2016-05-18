@@ -41,7 +41,7 @@ public class ScimClientRetreivingEntitiesTest  extends BaseScimTest {
 	public void retrievePersonTest(final String uid) throws HttpException, IOException {
 		response = client.retrievePerson(uid, MediaType.APPLICATION_JSON);
 		System.out.println("retrievePersonTest + responseStr"  + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not get the person, status != 200");
+		assertEquals(response.getStatusCode(), 200, "cold not get the user, status != 200");
 	}
 
 	@Test

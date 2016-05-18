@@ -10,10 +10,14 @@ import gluu.scim.client.ScimResponse;
 
 import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Constants;
+import org.gluu.oxtrust.model.scim2.Extension;
 import org.gluu.oxtrust.model.scim2.User;
 import org.gluu.oxtrust.model.scim2.schema.AttributeHolder;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
+import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
@@ -22,6 +26,10 @@ import org.testng.annotations.Test;
 import javax.ws.rs.core.MediaType;
 
 import java.io.File;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
@@ -38,7 +46,7 @@ public class UserExtensionsJsonTest extends BaseScimTest {
     String domainURL;
     String uid;
     Scim2Client client;
-    User person;
+    User user;
 
     String updateGivenName = "userjson.update.givenname";
 
@@ -89,47 +97,68 @@ public class UserExtensionsJsonTest extends BaseScimTest {
 
     @Test(groups = "b", dependsOnGroups = "a")
     @Parameters({ "scim2.userext.create_json" })
-    public void createPersonTest(String createJson) throws Exception {
+    public void createUserTest(String createJson) throws Exception {
 
         ScimResponse response = client.createPersonString(createJson, MediaType.APPLICATION_JSON);
 
-        System.out.println(" createPersonTest() RESPONSE = " + response.getResponseBodyString());
+        System.out.println(" createUserTest() RESPONSE = " + response.getResponseBodyString());
+        assertEquals(response.getStatusCode(), 201, "Could not add the user, status != 201");
 
-        assertEquals(response.getStatusCode(), 201, "Could not Add the person, status != 201");
-
-        person = (User) Util.toUser(response, client.getUserExtensionSchema());
-        this.uid = person.getId();
+        user = Util.toUser(response, client.getUserExtensionSchema());
+        this.uid = user.getId();
     }
 
     @Test(groups = "c", dependsOnGroups = "b")
     @Parameters({ "scim2.userext.update_json" })
-    public void updatePersonTest(String updateJson) throws Exception {
+    public void updateUserTest(String updateJson) throws Exception {
 
         ScimResponse response = client.updatePersonString(updateJson, this.uid, MediaType.APPLICATION_JSON);
 
-        System.out.println(" updatePersonTest() RESPONSE = " + response.getResponseBodyString());
+        System.out.println(" updateUserTest() RESPONSE = " + response.getResponseBodyString());
+        assertEquals(response.getStatusCode(), 200, "Could not update the user, status != 200");
 
-        assertEquals(response.getStatusCode(), 200, "Could not update the person, status != 200");
-
-        person = (User) Util.toUser(response, client.getUserExtensionSchema());
-        assertEquals(person.getName().getGivenName(), updateGivenName, "could not update the user");
+        user = Util.toUser(response, client.getUserExtensionSchema());
+        assertEquals(user.getName().getGivenName(), updateGivenName, "Could not update the user");
     }
 
     @Test(groups = "d", dependsOnGroups = "c")
-    public void retrievePersonTest() throws Exception {
+    public void retrieveUserTest() throws Exception {
+
         ScimResponse response = client.retrievePerson(this.uid, MediaType.APPLICATION_JSON);
-        System.out.println(" retrievePersonTest() RESPONSE = "  + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "Could not get the person, status != 200");
+
+        System.out.println(" retrieveUserTest() RESPONSE = "  + response.getResponseBodyString());
+        assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");
+
+        User user = Util.toUser(response, client.getUserExtensionSchema());
+
+        Extension extension = user.getExtension(Constants.USER_EXT_SCHEMA_ID);
+        Assert.assertNotNull("(Deserialization) Custom extension not deserialized.", extension);
+
+        Extension.Field customFirstField = extension.getFields().get("scimCustomFirst");
+        Assert.assertNotNull("(Deserialization) \"scimCustomFirst\" field not deserialized.", customFirstField);
+        System.out.println("##### (Deserialization) customFirstField.getValue() = " + customFirstField.getValue());
+        Assert.assertEquals("4000", customFirstField.getValue());
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        Extension.Field customSecondField = extension.getFields().get("scimCustomSecond");
+        Assert.assertNotNull("(Deserialization) \"scimCustomSecond\" field not deserialized.", customSecondField);
+        List<Date> dateList = Arrays.asList(mapper.readValue(customSecondField.getValue(), Date[].class));
+        Assert.assertEquals(2, dateList.size());
+        System.out.println("##### (Deserialization) dateList.get(0) = " + dateList.get(0));
+        System.out.println("##### (Deserialization) dateList.get(1) = " + dateList.get(1));
+
+        Extension.Field customThirdField = extension.getFields().get("scimCustomThird");
+        Assert.assertNotNull("(Deserialization) \"scimCustomThird\" field not deserialized.", customThirdField);
+        System.out.println("##### (Deserialization) customThirdField.getValue() = " + customThirdField.getValue());
+        Assert.assertEquals(new BigDecimal(5000), new BigDecimal(customThirdField.getValue()));
     }
 
-	@Test(dependsOnGroups = "d")
-	public void deletePersonTest() throws Exception {
+	@Test(dependsOnGroups = "d", alwaysRun = true)
+	public void deleteUserTest() throws Exception {
         ScimResponse response = client.deletePerson(this.uid);
-		System.out.println(" deletePersonTest() RESPONSE = " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not delete the person, status != 200");
+		System.out.println(" deleteUserTest() RESPONSE = " + response.getResponseBodyString());
+		assertEquals(response.getStatusCode(), 200, "Could not delete the user, status != 200");
 	}
-
-    public UserExtensionsJsonTest() {
-        super();
-    }
 }

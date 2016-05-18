@@ -101,7 +101,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 
 		response = client.retrievePerson(uid, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases : retrievePersonTest : response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not get the person, status != 200");
+		assertEquals(response.getStatusCode(), 200, "cold not get the user, status != 200");
 		
 	}
 	
@@ -109,8 +109,8 @@ public class UserWebServiceTestCases extends BaseScimTest {
 	public void createPersonTest() throws Exception {
 		response = client.createPerson(userAdd, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases createPersonTest :response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 201, "cold not Add the person, status != 201");
-		User user = (User) Util.toUser(response, client.getUserExtensionSchema());
+		assertEquals(response.getStatusCode(), 201, "cold not Add the user, status != 201");
+		User user = Util.toUser(response, client.getUserExtensionSchema());
 		this.uid = user.getId();
 		System.out.println("create uid  " + uid);
 
@@ -121,8 +121,8 @@ public class UserWebServiceTestCases extends BaseScimTest {
 
 		response = client.updatePerson(userToUpdate, uid, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases :updatePersonTest: response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not update the person, status != 200");
-		User user = (User) Util.toUser(response, client.getUserExtensionSchema());
+		assertEquals(response.getStatusCode(), 200, "cold not update the user, status != 200");
+		User user = Util.toUser(response, client.getUserExtensionSchema());
 		assertEquals(user.getDisplayName(), userToUpdate.getDisplayName(), "could not update the user");
 	}
 
@@ -131,7 +131,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 
 		response = client.deletePerson(this.uid);
 		System.out.println("UserWebServiceTestCases :deletePersonTest :response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not delete the person, status != 200");
+		assertEquals(response.getStatusCode(), 200, "cold not delete the user, status != 200");
 
 	}
 	
@@ -141,7 +141,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 
 		response = client.personSearch("mail", "abc123@cc.com", MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases :response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "unable to retrive person, status != 200");
+		assertEquals(response.getStatusCode(), 200, "unable to retrive user, status != 200");
 	}
 	
 	@Test
@@ -149,6 +149,6 @@ public class UserWebServiceTestCases extends BaseScimTest {
 
 		response = client.searchPersons("mail", "abc123@cc.com", MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases :personSearchListByAttribute :response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "unable to retrive person, status != 200");
+		assertEquals(response.getStatusCode(), 200, "unable to retrive user, status != 200");
 	}*/
 }

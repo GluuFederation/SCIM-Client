@@ -34,8 +34,7 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks", "umaAatClientKeyId" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks,
-			@Optional final String umaAatClientKeyId) throws IOException {
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId) throws IOException {
 		String umaAatClientJwksData = FileUtils.readFileToString(new File(umaAatClientJwks));
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwksData, umaAatClientKeyId);
 	}
@@ -43,28 +42,30 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 	@Test
 	@Parameters({ "scim2.person.create_json" })
 	public void createPersonTest(String createJson) throws Exception {
+
 		System.out.println("createPersonTest createJson: " + createJson);
 
 		ScimResponse response = client.createPersonString(createJson, MediaType.APPLICATION_JSON);
 		System.out.println("createPersonTest response json: " + response.getResponseBodyString());
 
-		assertEquals(response.getStatusCode(), 201, "cold not Add the person, status != 201");
+		assertEquals(response.getStatusCode(), 201, "cold not Add the user, status != 201");
 
-		User user = (User) Util.toUser(response, client.getUserExtensionSchema());
+		User user = Util.toUser(response, client.getUserExtensionSchema());
 		this.uid = user.getId();
 	}
 
 	@Test(dependsOnMethods = "createPersonTest")
 	@Parameters({ "scim2.person.update_json", "userjson.update.givenname" })
 	public void updatePersonTest(String updateJson, String updateGivenName) throws Exception {
+
 		System.out.println("updatePersonTest updateJson: " + updateJson);
 
 		ScimResponse response = client.updatePersonString(updateJson, this.uid, MediaType.APPLICATION_JSON);
 		System.out.println("updatePersonTest response json: " + response.getResponseBodyString());
 
-		assertEquals(response.getStatusCode(), 200, "cold not update the person, status != 200");
+		assertEquals(response.getStatusCode(), 200, "cold not update the user, status != 200");
 
-		User user = (User) Util.toUser(response, client.getUserExtensionSchema());
+		User user = Util.toUser(response, client.getUserExtensionSchema());
 		assertEquals(user.getName().getGivenName(), updateGivenName, "Could not update the user");
 	}
 
@@ -72,6 +73,6 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 	public void deletePersonTest() throws Exception {
 		ScimResponse response = client.deletePerson(this.uid);
 		System.out.println("deletePersonTest response json: " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not delete the person, status != 200");
+		assertEquals(response.getStatusCode(), 200, "cold not delete the user, status != 200");
 	}
 }

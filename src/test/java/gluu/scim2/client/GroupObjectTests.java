@@ -57,7 +57,7 @@ public class GroupObjectTests extends BaseScimTest {
 
         Assert.assertEquals(201, response.getStatusCode());
 
-        Group groupCreated = (Group) Util.toGroup(response);
+        Group groupCreated = Util.toGroup(response);
         assertEquals(groupCreated.getDisplayName(), displayName, "Group not added or retrieved");
 
         this.id = groupCreated.getId();
@@ -78,7 +78,7 @@ public class GroupObjectTests extends BaseScimTest {
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        Group groupRetrieved = (Group) Util.toGroup(response);
+        Group groupRetrieved = Util.toGroup(response);
         assertEquals(groupRetrieved.getId(), this.id, "Group could not be retrieved");
 
         System.out.println("response body = " + response.getResponseBodyString());
@@ -100,7 +100,7 @@ public class GroupObjectTests extends BaseScimTest {
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        Group groupRetrieved = (Group) Util.toGroup(response);
+        Group groupRetrieved = Util.toGroup(response);
 
         groupRetrieved.setDisplayName(groupRetrieved.getDisplayName() + " UPDATED");
 
@@ -108,7 +108,7 @@ public class GroupObjectTests extends BaseScimTest {
 
         Assert.assertEquals(200, responseUpdated.getStatusCode());
 
-        Group groupUpdated = (Group) Util.toGroup(responseUpdated);
+        Group groupUpdated = Util.toGroup(responseUpdated);
 
         assertEquals(groupUpdated.getId(), this.id, "Group could not be retrieved");
         assert(groupUpdated.getMeta().getLastModified().getTime() > groupUpdated.getMeta().getCreated().getTime());
@@ -142,7 +142,7 @@ public class GroupObjectTests extends BaseScimTest {
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        User userRetrieved = (User) Util.toUser(response, client.getUserExtensionSchema());
+        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
 
         assertEquals(userRetrieved.getUserName(), "admin", "User could not be retrieved");
 
@@ -164,7 +164,7 @@ public class GroupObjectTests extends BaseScimTest {
 
                 Assert.assertEquals(200, groupRetrievedResponse.getStatusCode());
 
-                Group adminGroup = (Group) Util.toGroup(groupRetrievedResponse);
+                Group adminGroup = Util.toGroup(groupRetrievedResponse);
 
                 Set<MemberRef> members = adminGroup.getMembers();
                 for (MemberRef member : members) {

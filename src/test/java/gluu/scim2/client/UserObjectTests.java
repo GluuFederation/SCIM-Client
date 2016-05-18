@@ -53,7 +53,7 @@ public class UserObjectTests extends BaseScimTest {
 
         assertEquals(response.getStatusCode(), 201, "Could not add user, status != 201");
 
-        User userCreated = (User) Util.toUser(response, client.getUserExtensionSchema());
+        User userCreated = Util.toUser(response, client.getUserExtensionSchema());
         this.id = userCreated.getId();
 
         System.out.println("response body = " + response.getResponseBodyString());
@@ -72,7 +72,7 @@ public class UserObjectTests extends BaseScimTest {
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        User userRetrieved = (User) Util.toUser(response, client.getUserExtensionSchema());
+        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
         assertEquals(userRetrieved.getId(), this.id, "User could not be retrieved");
 
         System.out.println("response body = " + response.getResponseBodyString());
@@ -94,7 +94,7 @@ public class UserObjectTests extends BaseScimTest {
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        User userRetrieved = (User) Util.toUser(response, client.getUserExtensionSchema());
+        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
 
         userRetrieved.setDisplayName(userRetrieved.getDisplayName() + " UPDATED");
         userRetrieved.setPassword(null);
@@ -103,7 +103,7 @@ public class UserObjectTests extends BaseScimTest {
 
         Assert.assertEquals(200, responseUpdated.getStatusCode());
 
-        User userUpdated = (User) Util.toUser(responseUpdated, client.getUserExtensionSchema());
+        User userUpdated = Util.toUser(responseUpdated, client.getUserExtensionSchema());
 
         assertEquals(userUpdated.getId(), this.id, "User could not be retrieved");
         assert(userUpdated.getMeta().getLastModified().getTime() > userUpdated.getMeta().getCreated().getTime());
@@ -137,7 +137,7 @@ public class UserObjectTests extends BaseScimTest {
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        User userRetrieved = (User) Util.toUser(response, client.getUserExtensionSchema());
+        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
 
         assertEquals(userRetrieved.getUserName(), "admin", "User could not be retrieved");
 
