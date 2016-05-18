@@ -10,7 +10,6 @@ import gluu.scim.client.model.ScimBulkOperation;
 import gluu.scim.client.model.ScimGroup;
 import gluu.scim.client.model.ScimPerson;
 import gluu.scim.client.model.ScimPersonSearch;
-import gluu.scim.client.util.Converter;
 import gluu.scim.client.util.ResponseMapper;
 import gluu.scim.client.util.Util;
 
@@ -1361,5 +1360,4 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	protected abstract void init();
 
 	protected abstract void addAuthenticationHeader(HttpMethodBase httpMethod);
-
 }

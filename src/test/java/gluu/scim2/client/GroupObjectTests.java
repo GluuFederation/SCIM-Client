@@ -54,19 +54,15 @@ public class GroupObjectTests extends BaseScimTest {
         group.setDisplayName(displayName);
 
         ScimResponse response = client.createGroup(group, MediaType.APPLICATION_JSON);
-        System.out.println("body string = " + response.getResponseBodyString());
 
         Assert.assertEquals(201, response.getStatusCode());
 
-        byte[] bytes = response.getResponseBody();
-        String responseStr = new String(bytes);
-
-        Group groupCreated = (Group) Util.jsonToGroup(responseStr);
+        Group groupCreated = (Group) Util.toGroup(response);
         assertEquals(groupCreated.getDisplayName(), displayName, "Group not added or retrieved");
 
         this.id = groupCreated.getId();
 
-        System.out.println("responseStr = " + responseStr);
+        System.out.println("response body = " + response.getResponseBodyString());
         System.out.println("groupCreated.getId() = " + groupCreated.getId());
         System.out.println("groupCreated.getDisplayName() = " + groupCreated.getDisplayName());
 
@@ -79,17 +75,13 @@ public class GroupObjectTests extends BaseScimTest {
         System.out.println("IN testRetrieveNewGroup...");
 
         ScimResponse response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
-        System.out.println("body string = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        byte[] bytes = response.getResponseBody();
-        String responseStr = new String(bytes);
-
-        Group groupRetrieved = (Group) Util.jsonToGroup(responseStr);
+        Group groupRetrieved = (Group) Util.toGroup(response);
         assertEquals(groupRetrieved.getId(), this.id, "Group could not be retrieved");
 
-        System.out.println("responseStr = " + responseStr);
+        System.out.println("response body = " + response.getResponseBodyString());
         System.out.println("groupRetrieved.getId() = " + groupRetrieved.getId());
         System.out.println("groupRetrieved.getDisplayName() = " + groupRetrieved.getDisplayName());
 
@@ -104,14 +96,11 @@ public class GroupObjectTests extends BaseScimTest {
         Thread.sleep(5000);  // Sleep for 5 seconds
 
         ScimResponse response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
-        System.out.println("body string = " + response.getResponseBodyString());
+        System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        byte[] bytes = response.getResponseBody();
-        String responseStr = new String(bytes);
-
-        Group groupRetrieved = (Group) Util.jsonToGroup(responseStr);
+        Group groupRetrieved = (Group) Util.toGroup(response);
 
         groupRetrieved.setDisplayName(groupRetrieved.getDisplayName() + " UPDATED");
 
@@ -119,15 +108,12 @@ public class GroupObjectTests extends BaseScimTest {
 
         Assert.assertEquals(200, responseUpdated.getStatusCode());
 
-        bytes = responseUpdated.getResponseBody();
-        responseStr = new String(bytes);
-
-        Group groupUpdated = (Group) Util.jsonToGroup(responseStr);
+        Group groupUpdated = (Group) Util.toGroup(responseUpdated);
 
         assertEquals(groupUpdated.getId(), this.id, "Group could not be retrieved");
         assert(groupUpdated.getMeta().getLastModified().getTime() > groupUpdated.getMeta().getCreated().getTime());
 
-        System.out.println("UPDATED responseStr = " + responseStr);
+        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
         System.out.println("groupUpdated.getId() = " + groupUpdated.getId());
         System.out.println("groupUpdated.getDisplayName() = " + groupUpdated.getDisplayName());
         System.out.println("groupUpdated.getMeta().getLastModified().getTime() = " + groupUpdated.getMeta().getLastModified().getTime());
@@ -154,18 +140,13 @@ public class GroupObjectTests extends BaseScimTest {
 
         ScimResponse response = client.personSearch("uid", "admin", MediaType.APPLICATION_JSON);
 
-        System.out.println("body string = " + response.getResponseBodyString());
-
         Assert.assertEquals(200, response.getStatusCode());
 
-        byte[] bytes = response.getResponseBody();
-        String responseStr = new String(bytes);
-
-        User userRetrieved = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+        User userRetrieved = (User) Util.toUser(response, client.getUserExtensionSchema());
 
         assertEquals(userRetrieved.getUserName(), "admin", "User could not be retrieved");
 
-        System.out.println("responseStr = " + responseStr);
+        System.out.println("response body = " + response.getResponseBodyString());
         System.out.println("userRetrieved.getId() = " + userRetrieved.getId());
         System.out.println("userRetrieved.getDisplayName() = " + userRetrieved.getDisplayName());
 
@@ -183,10 +164,7 @@ public class GroupObjectTests extends BaseScimTest {
 
                 Assert.assertEquals(200, groupRetrievedResponse.getStatusCode());
 
-                byte[] groupRetrievedBytes = groupRetrievedResponse.getResponseBody();
-                String groupRetrievedResponseStr = new String(groupRetrievedBytes);
-
-                Group adminGroup = (Group) Util.jsonToGroup(groupRetrievedResponseStr);
+                Group adminGroup = (Group) Util.toGroup(groupRetrievedResponse);
 
                 Set<MemberRef> members = adminGroup.getMembers();
                 for (MemberRef member : members) {

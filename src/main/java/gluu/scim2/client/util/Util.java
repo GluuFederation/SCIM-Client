@@ -38,11 +38,11 @@ public class Util {
     /**
      * For an SCIM 2.0 User class with extensions.
      *
-     * @param person
+     * @param user
      * @return
      * @throws IOException
      */
-    public static String getJSONStringUser(User person) throws IOException {
+    public static String getJSONStringUser(User user) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -53,12 +53,14 @@ public class Util {
         simpleModule.addSerializer(User.class, new UserSerializer());
         mapper.registerModule(simpleModule);
 
-        String value = mapper.writeValueAsString(person);
+        String value = mapper.writeValueAsString(user);
 
         return value;
     }
 
-    public static User jsonToUser(String json, UserExtensionSchema userExtensionSchema) throws Exception {
+    public static User toUser(ScimResponse scimResponse, UserExtensionSchema userExtensionSchema) throws Exception {
+
+        String response = getResponseString(scimResponse);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -72,12 +74,14 @@ public class Util {
         simpleModule.addDeserializer(User.class, userDeserializer);
         mapper.registerModule(simpleModule);
 
-        User user = mapper.readValue(json, User.class);
+        User user = mapper.readValue(response, User.class);
 
         return user;
     }
 
-    public static Group jsonToGroup(String json) throws Exception {
+    public static Group toGroup(ScimResponse scimResponse) throws Exception {
+
+        String response = getResponseString(scimResponse);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -90,17 +94,16 @@ public class Util {
         simpleModule.addDeserializer(Group.class, groupDeserializer);
         mapper.registerModule(simpleModule);
 
-        Group group = mapper.readValue(json, Group.class);
+        Group group = mapper.readValue(response, Group.class);
 
         return group;
     }
 
     public static ListResponse toListResponseUser(ScimResponse scimResponse, UserExtensionSchema userExtensionSchema) throws Exception {
 
-        byte[] bytes = scimResponse.getResponseBody();
-        String responseStr = new String(bytes);
+        String response = getResponseString(scimResponse);
 
-        ListResponse listResponse = (ListResponse) jsonToListResponseUser(responseStr, userExtensionSchema);
+        ListResponse listResponse = (ListResponse) jsonToListResponseUser(response, userExtensionSchema);
 
         return listResponse;
     }
@@ -108,14 +111,14 @@ public class Util {
     public static ListResponse toListResponseGroup(ScimResponse scimResponse) throws Exception {
 
         byte[] bytes = scimResponse.getResponseBody();
-        String responseStr = new String(bytes);
+        String response = new String(bytes);
 
-        ListResponse listResponse = (ListResponse) jsonToListResponseGroup(responseStr);
+        ListResponse listResponse = (ListResponse) jsonToListResponseGroup(response);
 
         return listResponse;
     }
 
-    public static ListResponse jsonToListResponseUser(String json, UserExtensionSchema userExtensionSchema) throws Exception {
+    private static ListResponse jsonToListResponseUser(String json, UserExtensionSchema userExtensionSchema) throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -150,5 +153,13 @@ public class Util {
         ListResponse listResponseGroup = mapper.readValue(json, ListResponse.class);
 
         return listResponseGroup;
+    }
+
+    private static String getResponseString(ScimResponse scimResponse) {
+
+        byte[] bytes = scimResponse.getResponseBody();
+        String response = new String(bytes);
+
+        return response;
     }
 }

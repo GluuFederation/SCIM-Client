@@ -51,17 +51,12 @@ public class UserObjectTests extends BaseScimTest {
 
         ScimResponse response = client.createPerson(user, MediaType.APPLICATION_JSON);
 
-        System.out.println("body string = " + response.getResponseBodyString());
-
         assertEquals(response.getStatusCode(), 201, "Could not add user, status != 201");
 
-        byte[] bytes = response.getResponseBody();
-        String responseStr = new String(bytes);
-
-        User userCreated = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+        User userCreated = (User) Util.toUser(response, client.getUserExtensionSchema());
         this.id = userCreated.getId();
 
-        System.out.println("responseStr = " + responseStr);
+        System.out.println("response body = " + response.getResponseBodyString());
         System.out.println("userCreated.getId() = " + userCreated.getId());
         System.out.println("userCreated.getDisplayName() = " + userCreated.getDisplayName());
 
@@ -75,17 +70,12 @@ public class UserObjectTests extends BaseScimTest {
 
         ScimResponse response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
 
-        System.out.println("body string = " + response.getResponseBodyString());
-
         Assert.assertEquals(200, response.getStatusCode());
 
-        byte[] bytes = response.getResponseBody();
-        String responseStr = new String(bytes);
-
-        User userRetrieved = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+        User userRetrieved = (User) Util.toUser(response, client.getUserExtensionSchema());
         assertEquals(userRetrieved.getId(), this.id, "User could not be retrieved");
 
-        System.out.println("responseStr = " + responseStr);
+        System.out.println("response body = " + response.getResponseBodyString());
         System.out.println("userRetrieved.getId() = " + userRetrieved.getId());
         System.out.println("userRetrieved.getDisplayName() = " + userRetrieved.getDisplayName());
 
@@ -100,14 +90,11 @@ public class UserObjectTests extends BaseScimTest {
         Thread.sleep(5000);  // Sleep for 5 seconds
 
         ScimResponse response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
-        System.out.println("body string = " + response.getResponseBodyString());
+        System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        byte[] bytes = response.getResponseBody();
-        String responseStr = new String(bytes);
-
-        User userRetrieved = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+        User userRetrieved = (User) Util.toUser(response, client.getUserExtensionSchema());
 
         userRetrieved.setDisplayName(userRetrieved.getDisplayName() + " UPDATED");
         userRetrieved.setPassword(null);
@@ -116,15 +103,12 @@ public class UserObjectTests extends BaseScimTest {
 
         Assert.assertEquals(200, responseUpdated.getStatusCode());
 
-        bytes = responseUpdated.getResponseBody();
-        responseStr = new String(bytes);
-
-        User userUpdated = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+        User userUpdated = (User) Util.toUser(responseUpdated, client.getUserExtensionSchema());
 
         assertEquals(userUpdated.getId(), this.id, "User could not be retrieved");
         assert(userUpdated.getMeta().getLastModified().getTime() > userUpdated.getMeta().getCreated().getTime());
 
-        System.out.println("UPDATED responseStr = " + responseStr);
+        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
         System.out.println("userUpdated.getId() = " + userUpdated.getId());
         System.out.println("userUpdated.getDisplayName() = " + userUpdated.getDisplayName());
         System.out.println("userUpdated.getMeta().getLastModified().getTime() = " + userUpdated.getMeta().getLastModified().getTime());
@@ -151,18 +135,13 @@ public class UserObjectTests extends BaseScimTest {
 
         ScimResponse response = client.personSearch("uid", "admin", MediaType.APPLICATION_JSON);
 
-        System.out.println("body string = " + response.getResponseBodyString());
-
         Assert.assertEquals(200, response.getStatusCode());
 
-        byte[] bytes = response.getResponseBody();
-        String responseStr = new String(bytes);
-
-        User userRetrieved = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+        User userRetrieved = (User) Util.toUser(response, client.getUserExtensionSchema());
 
         assertEquals(userRetrieved.getUserName(), "admin", "User could not be retrieved");
 
-        System.out.println("responseStr = " + responseStr);
+        System.out.println("response body = " + response.getResponseBodyString());
         System.out.println("userRetrieved.getId() = " + userRetrieved.getId());
         System.out.println("userRetrieved.getDisplayName() = " + userRetrieved.getDisplayName());
 

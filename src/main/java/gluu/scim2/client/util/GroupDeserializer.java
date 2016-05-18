@@ -77,6 +77,8 @@ public class GroupDeserializer extends JsonDeserializer<Group> {
                                 }
                             } else if (entry.getKey() != null && entry.getKey().equalsIgnoreCase("$ref")) {
                                 member.setReference(entry.getValue().asText());
+                            } else if (entry.getKey() != null && entry.getKey().equalsIgnoreCase("operation")) {
+                                member.setOperation(entry.getValue().asText());
                             }
                         }
                     }

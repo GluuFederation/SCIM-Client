@@ -8,12 +8,9 @@ package gluu.scim2.client;
 import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
-import gluu.scim.client.model.ScimPerson;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
@@ -113,10 +110,8 @@ public class UserWebServiceTestCases extends BaseScimTest {
 		response = client.createPerson(userAdd, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases createPersonTest :response " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 201, "cold not Add the person, status != 201");
-		byte[] bytes = response.getResponseBody();
-		String responseStr = new String(bytes);
-		User person = (User) Util.jsonToObject(responseStr, User.class);
-		this.uid = person.getId();
+		User user = (User) Util.toUser(response, client.getUserExtensionSchema());
+		this.uid = user.getId();
 		System.out.println("create uid  " + uid);
 
 	}
@@ -127,10 +122,8 @@ public class UserWebServiceTestCases extends BaseScimTest {
 		response = client.updatePerson(userToUpdate, uid, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases :updatePersonTest: response " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not update the person, status != 200");
-		byte[] bytes = response.getResponseBody();
-		String responseStr = new String(bytes);
-		User person = (User) Util.jsonToObject(responseStr, User.class);
-		assertEquals(person.getDisplayName(), userToUpdate.getDisplayName(), "could not update the user");
+		User user = (User) Util.toUser(response, client.getUserExtensionSchema());
+		assertEquals(user.getDisplayName(), userToUpdate.getDisplayName(), "could not update the user");
 	}
 
 	@Test

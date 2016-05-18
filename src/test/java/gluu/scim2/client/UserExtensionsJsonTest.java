@@ -97,10 +97,7 @@ public class UserExtensionsJsonTest extends BaseScimTest {
 
         assertEquals(response.getStatusCode(), 201, "Could not Add the person, status != 201");
 
-        byte[] bytes = response.getResponseBody();
-        String responseStr = new String(bytes);
-
-        person = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+        person = (User) Util.toUser(response, client.getUserExtensionSchema());
         this.uid = person.getId();
     }
 
@@ -114,10 +111,7 @@ public class UserExtensionsJsonTest extends BaseScimTest {
 
         assertEquals(response.getStatusCode(), 200, "Could not update the person, status != 200");
 
-        byte[] bytes = response.getResponseBody();
-        String responseStr = new String(bytes);
-
-        person = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+        person = (User) Util.toUser(response, client.getUserExtensionSchema());
         assertEquals(person.getName().getGivenName(), updateGivenName, "could not update the user");
     }
 

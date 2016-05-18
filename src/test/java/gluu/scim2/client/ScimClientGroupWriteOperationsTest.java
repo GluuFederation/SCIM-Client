@@ -48,9 +48,8 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 		System.out.println("createGroupTest response json: " + response.getResponseBodyString());
 
 		assertEquals(response.getStatusCode(), 201, "cold not Add the group, status != 201");
-		String responseStr = response.getResponseBodyString();
-		System.out.println("createGroupTest + responseStr" + response.getResponseBodyString());
-		Group group = (Group) Util.jsonToGroup(responseStr);
+
+		Group group = (Group) Util.toGroup(response);
 		this.id = group.getId();
 
 	}
@@ -64,8 +63,8 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 		System.out.println("updateGroupTest + responseStr" + response.getResponseBodyString());
 
 		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
-		String responseStr = response.getResponseBodyString();
-		Group group = (Group) Util.jsonToGroup(responseStr);
+
+		Group group = (Group) Util.toGroup(response);
 		assertEquals(group.getDisplayName(), updatedDisplayName, "could not update the group");
 	}
 
@@ -74,6 +73,5 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 		ScimResponse response = client.deleteGroup(this.id);
 		System.out.println("deleteGroupTest + responseStr" + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not delete the Group, status != 200");
-
 	}
 }

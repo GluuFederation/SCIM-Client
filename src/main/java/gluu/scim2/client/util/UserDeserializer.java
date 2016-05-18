@@ -118,6 +118,8 @@ public class UserDeserializer extends JsonDeserializer<User> {
                                 }
                             } else if (entry.getKey() != null && entry.getKey().equalsIgnoreCase("$ref")) {
                                 group.setReference(entry.getValue().asText());
+                            } else if (entry.getKey() != null && entry.getKey().equalsIgnoreCase("operation")) {
+                                group.setOperation(entry.getValue().asText());
                             }
                         }
                     }

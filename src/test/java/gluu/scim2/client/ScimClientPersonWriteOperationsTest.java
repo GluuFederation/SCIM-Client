@@ -49,10 +49,9 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 		System.out.println("createPersonTest response json: " + response.getResponseBodyString());
 
 		assertEquals(response.getStatusCode(), 201, "cold not Add the person, status != 201");
-		byte[] bytes = response.getResponseBody();
-		String responseStr = new String(bytes);
-		User person = (User) Util.jsonToObject(responseStr, User.class);
-		this.uid = person.getId();
+
+		User user = (User) Util.toUser(response, client.getUserExtensionSchema());
+		this.uid = user.getId();
 	}
 
 	@Test(dependsOnMethods = "createPersonTest")
@@ -64,10 +63,9 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 		System.out.println("updatePersonTest response json: " + response.getResponseBodyString());
 
 		assertEquals(response.getStatusCode(), 200, "cold not update the person, status != 200");
-		byte[] bytes = response.getResponseBody();
-		String responseStr = new String(bytes);
-		User person = (User) Util.jsonToObject(responseStr, User.class);
-		assertEquals(person.getName().getGivenName(), updateGivenName, "could not update the user");
+
+		User user = (User) Util.toUser(response, client.getUserExtensionSchema());
+		assertEquals(user.getName().getGivenName(), updateGivenName, "Could not update the user");
 	}
 
 	@Test(dependsOnMethods = "updatePersonTest")
