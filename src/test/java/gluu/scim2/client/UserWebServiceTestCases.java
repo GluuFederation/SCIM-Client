@@ -17,11 +17,9 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import gluu.scim2.client.util.Util;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Email;
 import org.gluu.oxtrust.model.scim2.PhoneNumber;
@@ -117,7 +115,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 		assertEquals(response.getStatusCode(), 201, "cold not Add the person, status != 201");
 		byte[] bytes = response.getResponseBody();
 		String responseStr = new String(bytes);
-		User person = (User) jsonToObject(responseStr, User.class);
+		User person = (User) Util.jsonToObject(responseStr, User.class);
 		this.uid = person.getId();
 		System.out.println("create uid  " + uid);
 
@@ -131,7 +129,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 		assertEquals(response.getStatusCode(), 200, "cold not update the person, status != 200");
 		byte[] bytes = response.getResponseBody();
 		String responseStr = new String(bytes);
-		User person = (User) jsonToObject(responseStr, User.class);
+		User person = (User) Util.jsonToObject(responseStr, User.class);
 		assertEquals(person.getDisplayName(), userToUpdate.getDisplayName(), "could not update the user");
 	}
 
@@ -160,12 +158,4 @@ public class UserWebServiceTestCases extends BaseScimTest {
 		System.out.println("UserWebServiceTestCases :personSearchListByAttribute :response " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "unable to retrive person, status != 200");
 	}*/
-	
-	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-		Object clazzObject = mapper.readValue(json, clazz);
-		return clazzObject;
-	}
 }

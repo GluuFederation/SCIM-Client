@@ -39,7 +39,7 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest{
 	}
 
 	@Test
-	@Parameters({ "scim1.person.update_json" })
+	@Parameters({ "scim1.person.create_json" })
 	public void createPersonTest(String CREATEJSON) throws Exception {
 		ScimResponse response = client.createPersonString(CREATEJSON, MediaType.APPLICATION_JSON);
 

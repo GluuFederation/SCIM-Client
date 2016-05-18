@@ -19,10 +19,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 
 /**
  * SCIM format converter
@@ -261,16 +260,17 @@ public class Converter implements Serializable {
 		         
 		     }
 	 
-	 private static String getJSONString(Object entity) throws  JsonGenerationException, JsonMappingException, IOException {
-		 	StringWriter sw = new StringWriter();
-		 	ObjectMapper mapper = new ObjectMapper();
-		 	mapper.writeValue(sw, entity);
-		     return sw.toString();
-		 }
+	 private static String getJSONString(Object entity) throws IOException {
+		StringWriter sw = new StringWriter();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writeValue(sw, entity);
+		return sw.toString();
+	}
 	 
 	 private static Object jsonToObject(String json, Class<?> clazz) throws Exception {
 
 		 ObjectMapper mapper = new ObjectMapper();
+		 mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
 		 mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 		 Object clazzObject = mapper.readValue(json, clazz);
 		 return clazzObject;

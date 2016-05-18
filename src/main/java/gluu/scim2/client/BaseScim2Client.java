@@ -13,12 +13,12 @@ import java.io.UnsupportedEncodingException;
 
 import javax.xml.bind.JAXBException;
 
-import org.apache.commons.httpclient.HttpException;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
+import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
 
 /**
  * BaseClient
@@ -34,7 +34,7 @@ public interface BaseScim2Client extends BaseScimClient {
      * @return ScimResponse
      * @throws Exception
      */
-	public ScimResponse createPerson(User person,String mediaType) throws JsonGenerationException, JsonMappingException, IOException, JAXBException;
+	ScimResponse createPerson(User person,String mediaType) throws IOException, JAXBException;
 	
 	/**
      * Updates a person with User as input
@@ -43,7 +43,7 @@ public interface BaseScim2Client extends BaseScimClient {
      * @return ScimResponse
      * @throws Exception
      */
-	public ScimResponse updatePerson(User person,String uid,String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
+	ScimResponse updatePerson(User person,String uid,String mediaType) throws IOException, JAXBException;
 	
 	/**
      * Creates a Group with Group as input
@@ -52,7 +52,7 @@ public interface BaseScim2Client extends BaseScimClient {
      * @return ScimResponse
      * @throws Exception
      */
-	public ScimResponse createGroup(Group group,String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
+	ScimResponse createGroup(Group group,String mediaType) throws IOException, JAXBException;
 	
 	/**
      * Updates a Group with Group as input
@@ -61,7 +61,7 @@ public interface BaseScim2Client extends BaseScimClient {
      * @return ScimResponse
      * @throws Exception
      */
-	public ScimResponse updateGroup(Group group,String id, String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
+	ScimResponse updateGroup(Group group,String id, String mediaType) throws IOException, JAXBException;
 	
 	/**
      * Bulk operation with BulkOperation as input
@@ -75,17 +75,13 @@ public interface BaseScim2Client extends BaseScimClient {
 	 * @throws JAXBException 
      * @throws Exception
      */
-	public ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws JsonGenerationException, JsonMappingException,
-	UnsupportedEncodingException, IOException, JAXBException ;
+	ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws IOException, JAXBException ;
 
-	ScimResponse retrieveServiceProviderConfig(String mediaType)
-			throws HttpException, IOException;
+	ScimResponse retrieveServiceProviderConfig(String mediaType) throws IOException;
 
-	ScimResponse retrieveResourceTypes(String mediaType) throws HttpException,
-			IOException;
+	ScimResponse retrieveResourceTypes(String mediaType) throws	IOException;
 	
-	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws JsonGenerationException,
-	JsonMappingException, IOException, JAXBException;
+	ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException;
 
 	/**
 	 * User search via a filter with pagination and sorting
@@ -99,7 +95,7 @@ public interface BaseScim2Client extends BaseScimClient {
 	 * @return
      * @throws IOException
      */
-	public ScimResponse searchUsers(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
+	ScimResponse searchUsers(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
 
 	/**
 	 * Group search via a filter with pagination and sorting
@@ -113,5 +109,13 @@ public interface BaseScim2Client extends BaseScimClient {
 	 * @return
      * @throws IOException
      */
-	public ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
+	ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
+
+	/**
+	 * Retrieves the User Extension Schema
+	 *
+	 * @return
+	 * @throws Exception
+     */
+	UserExtensionSchema getUserExtensionSchema() throws Exception;
 }

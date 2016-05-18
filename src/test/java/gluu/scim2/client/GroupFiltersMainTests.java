@@ -7,9 +7,9 @@ package gluu.scim2.client;
 
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
+import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -17,7 +17,6 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.util.Map;
 
 import static org.gluu.oxtrust.model.scim2.Constants.GROUP_CORE_SCHEMA_ID;
 import static org.testng.Assert.assertEquals;
@@ -65,22 +64,10 @@ public class GroupFiltersMainTests extends BaseScimTest {
 
             assertEquals(response.getStatusCode(), 200, "Status != 200");
 
-            byte[] bytes = response.getResponseBody();
-            String responseStr = new String(bytes);
+            ListResponse listResponse = Util.toListResponseGroup(response);
 
-            Map<String, Object> objectMap = (Map<String, Object>)jsonToObject(responseStr, Map.class);
-
-            int totalResults = ((Integer)objectMap.get("totalResults")).intValue();
-
-            Assert.assertTrue(totalResults > 0);
-            System.out.println(" filter = " + filters[i] + ", totalResults = " + totalResults + "\n");
+            System.out.println(" filter = " + filters[i] + ", totalResults = " + listResponse.getTotalResults() + "\n");
+            Assert.assertTrue(listResponse.getTotalResults() > 0);
         }
-    }
-
-    private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-        Object clazzObject = mapper.readValue(json, clazz);
-        return clazzObject;
     }
 }

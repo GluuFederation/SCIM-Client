@@ -14,10 +14,8 @@ import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.httpclient.HttpException;
+import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -57,7 +55,7 @@ public class GroupWebServiceTestCase extends BaseScimTest {
 		System.out.println("GroupWebServiceTestCase :  createGroupTest :  response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 201, "cold not Add the group, status != 201");
 		String responseStr = response.getResponseBodyString();
-		Group group = (Group) jsonToObject(responseStr, Group.class);
+		Group group = (Group) Util.jsonToGroup(responseStr);
 		this.id = group.getId();
 		System.out.println("response : " + response.getResponseBodyString());
 		assertEquals(group.getDisplayName(), groupToAdd.getDisplayName(), "Username MisMatch");
@@ -69,7 +67,7 @@ public class GroupWebServiceTestCase extends BaseScimTest {
 		System.out.println("GroupWebServiceTestCase updateGroupTest :response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
 		String responseStr = response.getResponseBodyString();
-		Group group = (Group) jsonToObject(responseStr, Group.class);
+		Group group = (Group) Util.jsonToGroup(responseStr);
 		assertEquals(group.getDisplayName(), groupToUpdate.getDisplayName(), "could not update the user");
 	}
 
@@ -82,7 +80,7 @@ public class GroupWebServiceTestCase extends BaseScimTest {
 
 	@Parameters({ "group1Inum" })
 	@Test
-	public void retrieveGroupTest(final String group1Inum) throws HttpException, IOException {
+	public void retrieveGroupTest(final String group1Inum) throws IOException {
 		response = client.retrieveGroup(group1Inum, MediaType.APPLICATION_JSON);
 		System.out.println("GroupWebServiceTestCase retrieveGroupTest :response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not get the group, status != 200");
@@ -90,17 +88,10 @@ public class GroupWebServiceTestCase extends BaseScimTest {
 	}
 
 	@Test
-	public void retrieveAllGroupsTest() throws HttpException, IOException {
+	public void retrieveAllGroupsTest() throws IOException {
 		response = client.retrieveAllGroups(MediaType.APPLICATION_JSON);
 		System.out.println("GroupWebServiceTestCase retrieveAllGroupsTest :response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not get a list of all groups, status != 200");
 
-	}
-
-	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-		Object clazzObject = mapper.readValue(json, clazz);
-		return clazzObject;
 	}
 }

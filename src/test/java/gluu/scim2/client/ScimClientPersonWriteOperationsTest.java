@@ -14,9 +14,8 @@ import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
+import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.User;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -52,7 +51,7 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 		assertEquals(response.getStatusCode(), 201, "cold not Add the person, status != 201");
 		byte[] bytes = response.getResponseBody();
 		String responseStr = new String(bytes);
-		User person = (User) jsonToObject(responseStr, User.class);
+		User person = (User) Util.jsonToObject(responseStr, User.class);
 		this.uid = person.getId();
 	}
 
@@ -67,7 +66,7 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 		assertEquals(response.getStatusCode(), 200, "cold not update the person, status != 200");
 		byte[] bytes = response.getResponseBody();
 		String responseStr = new String(bytes);
-		User person = (User) jsonToObject(responseStr, User.class);
+		User person = (User) Util.jsonToObject(responseStr, User.class);
 		assertEquals(person.getName().getGivenName(), updateGivenName, "could not update the user");
 	}
 
@@ -77,12 +76,4 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 		System.out.println("deletePersonTest response json: " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not delete the person, status != 200");
 	}
-
-	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-		Object clazzObject = mapper.readValue(json, clazz);
-		return clazzObject;
-	}
-
 }

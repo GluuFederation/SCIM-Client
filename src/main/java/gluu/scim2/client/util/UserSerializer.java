@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, Gluu
  */
-package gluu.scim.client.util;
+package gluu.scim2.client.util;
 
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;

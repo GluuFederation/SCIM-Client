@@ -1,10 +1,14 @@
+/*
+ * SCIM-Client is available under the MIT License (2008). See http://opensource.org/licenses/MIT for full text.
+ *
+ * Copyright (c) 2014, Gluu
+ */
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
+import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.*;
 import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
@@ -24,7 +28,7 @@ import static org.testng.Assert.assertEquals;
  * @author Val Pecaoco
  */
 public class UserObjectTests extends BaseScimTest {
-
+    
     String domainURL;
     Scim2Client client;
 
@@ -54,7 +58,7 @@ public class UserObjectTests extends BaseScimTest {
         byte[] bytes = response.getResponseBody();
         String responseStr = new String(bytes);
 
-        User userCreated = (User)jsonToObject(responseStr, User.class);
+        User userCreated = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
         this.id = userCreated.getId();
 
         System.out.println("responseStr = " + responseStr);
@@ -78,7 +82,7 @@ public class UserObjectTests extends BaseScimTest {
         byte[] bytes = response.getResponseBody();
         String responseStr = new String(bytes);
 
-        User userRetrieved = (User)jsonToObject(responseStr, User.class);
+        User userRetrieved = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
         assertEquals(userRetrieved.getId(), this.id, "User could not be retrieved");
 
         System.out.println("responseStr = " + responseStr);
@@ -103,7 +107,7 @@ public class UserObjectTests extends BaseScimTest {
         byte[] bytes = response.getResponseBody();
         String responseStr = new String(bytes);
 
-        User userRetrieved = (User)jsonToObject(responseStr, User.class);
+        User userRetrieved = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
 
         userRetrieved.setDisplayName(userRetrieved.getDisplayName() + " UPDATED");
         userRetrieved.setPassword(null);
@@ -115,7 +119,7 @@ public class UserObjectTests extends BaseScimTest {
         bytes = responseUpdated.getResponseBody();
         responseStr = new String(bytes);
 
-        User userUpdated = (User)jsonToObject(responseStr, User.class);
+        User userUpdated = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
 
         assertEquals(userUpdated.getId(), this.id, "User could not be retrieved");
         assert(userUpdated.getMeta().getLastModified().getTime() > userUpdated.getMeta().getCreated().getTime());
@@ -138,6 +142,38 @@ public class UserObjectTests extends BaseScimTest {
         assertEquals(response.getStatusCode(), 200, "User could not be deleted, status != 200");
 
         System.out.println("LEAVING testDeleteUser..." + "\n");
+    }
+
+    @Test(groups = "e", dependsOnGroups = "d", alwaysRun = true)
+    public void testUserDeserializerGroups() throws Exception {
+
+        System.out.println("IN testUserDeserializerGroups...");
+
+        ScimResponse response = client.personSearch("uid", "admin", MediaType.APPLICATION_JSON);
+
+        System.out.println("body string = " + response.getResponseBodyString());
+
+        Assert.assertEquals(200, response.getStatusCode());
+
+        byte[] bytes = response.getResponseBody();
+        String responseStr = new String(bytes);
+
+        User userRetrieved = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+
+        assertEquals(userRetrieved.getUserName(), "admin", "User could not be retrieved");
+
+        System.out.println("responseStr = " + responseStr);
+        System.out.println("userRetrieved.getId() = " + userRetrieved.getId());
+        System.out.println("userRetrieved.getDisplayName() = " + userRetrieved.getDisplayName());
+
+        List<GroupRef> groups = userRetrieved.getGroups();
+        for (GroupRef group : groups) {
+            System.out.println("group inum = " + group.getValue());
+            System.out.println("group $ref = " + group.getReference());
+            Assert.assertNotNull(group.getReference());
+        }
+
+        System.out.println("LEAVING testUserDeserializerGroups..." + "\n");
     }
 
     private User createDummyUser() {
@@ -201,12 +237,5 @@ public class UserObjectTests extends BaseScimTest {
         user.setAddresses(addresses);
 
         return user;
-    }
-
-    private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-        Object clazzObject = mapper.readValue(json, clazz);
-        return clazzObject;
     }
 }

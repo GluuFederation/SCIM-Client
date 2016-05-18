@@ -14,9 +14,8 @@ import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
+import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.BulkResponse;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -53,7 +52,7 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
 		assertEquals(response.getStatusCode(), 200, "cold not Add the person, status != 200");
 		byte[] bytes = response.getResponseBody();
 		String responseStr = new String(bytes);
-		BulkResponse  bulkResponse = (BulkResponse) jsonToObject(responseStr, BulkResponse.class);
+		BulkResponse  bulkResponse = (BulkResponse) Util.jsonToObject(responseStr, BulkResponse.class);
 		String location = bulkResponse.getOperations().get(0).getLocation();
 		this.uid = getUID(location.split("/"));
 
@@ -75,12 +74,5 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
 		}
 
 		return null;
-	}
-
-	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-		Object clazzObject = mapper.readValue(json, clazz);
-		return clazzObject;
 	}
 }

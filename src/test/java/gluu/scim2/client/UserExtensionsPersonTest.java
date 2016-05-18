@@ -7,14 +7,9 @@ package gluu.scim2.client;
 
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
-import gluu.scim.client.util.ResponseMapper;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.*;
 import org.gluu.oxtrust.model.scim2.schema.AttributeHolder;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
@@ -66,6 +61,7 @@ public class UserExtensionsPersonTest extends BaseScimTest {
         personToAdd.setUserName(username);
         personToAdd.setPassword("test");
         personToAdd.setDisplayName("Scim2DisplayName2");
+        personToAdd.setActive(true);
 
         Email email = new Email();
         email.setValue("scim@gluu.org");
@@ -93,8 +89,10 @@ public class UserExtensionsPersonTest extends BaseScimTest {
         personToAdd.setPreferredLanguage("US_en");
 
         org.gluu.oxtrust.model.scim2.Name name = new  org.gluu.oxtrust.model.scim2.Name();
-        name.setFamilyName("SCIM");
         name.setGivenName("SCIM");
+        name.setMiddleName("Test");
+        name.setFamilyName("SCIM");
+        name.setFormatted("SCIM Test SCIM");
         personToAdd.setName(name);
 
         // User Extensions
@@ -108,19 +106,8 @@ public class UserExtensionsPersonTest extends BaseScimTest {
     @Test(groups = "a")
     public void checkIfExtensionsExist() throws Exception {
 
-        GetMethod get = new GetMethod(this.domainURL + "/scim/v2/Schemas/" + Constants.USER_EXT_SCHEMA_ID);
-        get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
-        get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+        UserExtensionSchema userExtensionSchema = client.getUserExtensionSchema();
 
-        HttpClient httpClient = new HttpClient();
-        httpClient.executeMethod(get);
-
-        ScimResponse response = ResponseMapper.map(get, null);
-
-        byte[] bytes = response.getResponseBody();
-        String json = new String(bytes);
-
-        UserExtensionSchema userExtensionSchema = (UserExtensionSchema)jsonToObject(json, UserExtensionSchema.class);
         assertEquals(userExtensionSchema.getId(), Constants.USER_EXT_SCHEMA_ID);
 
         boolean customFirstExists = false;
@@ -159,12 +146,13 @@ public class UserExtensionsPersonTest extends BaseScimTest {
 
         System.out.println(" createPersonTest() RESPONSE = " + response.getResponseBodyString());
 
-        assertEquals(response.getStatusCode(), 201, "cold not Add the person, status != 201");
+        assertEquals(response.getStatusCode(), 201, "Could not Add the person, status != 201");
 
         byte[] bytes = response.getResponseBody();
         String responseStr = new String(bytes);
 
-        User person = (User) jsonToObject(responseStr, User.class);
+        User person = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+        
         this.uid = person.getId();
     }
 
@@ -186,12 +174,13 @@ public class UserExtensionsPersonTest extends BaseScimTest {
 
         System.out.println(" updatePersonTest() RESPONSE = " + response.getResponseBodyString());
 
-        assertEquals(response.getStatusCode(), 200, "cold not update the person, status != 200");
+        assertEquals(response.getStatusCode(), 200, "Could not update the person, status != 200");
 
         byte[] bytes = response.getResponseBody();
         String responseStr = new String(bytes);
 
-        User person = (User)jsonToObject(responseStr, User.class);
+        User person = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+        
         assertEquals(person.getDisplayName(), updateDisplayName, "could not update the user");
     }
 
@@ -199,21 +188,14 @@ public class UserExtensionsPersonTest extends BaseScimTest {
     public void retrievePersonTest() throws Exception {
         ScimResponse response = client.retrievePerson(this.uid, MediaType.APPLICATION_JSON);
         System.out.println(" retrievePersonTest() RESPONSE = "  + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "cold not get the person, status != 200");
+        assertEquals(response.getStatusCode(), 200, "Could not get the person, status != 200");
     }
 
     @Test(dependsOnGroups = "d")
     public void deletePersonTest() throws Exception {
         ScimResponse response = client.deletePerson(this.uid);
         System.out.println(" deletePersonTest() RESPONSE = " + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "cold not delete the person, status != 200");
-    }
-
-    private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-        Object clazzObject = mapper.readValue(json, clazz);
-        return clazzObject;
+        assertEquals(response.getStatusCode(), 200, "Could not delete the person, status != 200");
     }
 
     public UserExtensionsPersonTest() {

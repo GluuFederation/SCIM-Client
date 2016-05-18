@@ -14,9 +14,8 @@ import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
+import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -51,7 +50,7 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 		assertEquals(response.getStatusCode(), 201, "cold not Add the group, status != 201");
 		String responseStr = response.getResponseBodyString();
 		System.out.println("createGroupTest + responseStr" + response.getResponseBodyString());
-		Group group = (Group) jsonToObject(responseStr, Group.class);
+		Group group = (Group) Util.jsonToGroup(responseStr);
 		this.id = group.getId();
 
 	}
@@ -66,7 +65,7 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 
 		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
 		String responseStr = response.getResponseBodyString();
-		Group group = (Group) jsonToObject(responseStr, Group.class);
+		Group group = (Group) Util.jsonToGroup(responseStr);
 		assertEquals(group.getDisplayName(), updatedDisplayName, "could not update the group");
 	}
 
@@ -76,12 +75,5 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 		System.out.println("deleteGroupTest + responseStr" + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not delete the Group, status != 200");
 
-	}
-
-	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-		Object clazzObject = mapper.readValue(json, clazz);
-		return clazzObject;
 	}
 }

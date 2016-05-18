@@ -1,12 +1,15 @@
+/*
+ * SCIM-Client is available under the MIT License (2008). See http://opensource.org/licenses/MIT for full text.
+ *
+ * Copyright (c) 2014, Gluu
+ */
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
+import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.gluu.oxtrust.model.scim2.Constants;
-import org.gluu.oxtrust.model.scim2.Group;
+import org.gluu.oxtrust.model.scim2.*;
 import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -16,6 +19,8 @@ import org.testng.annotations.Test;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 
@@ -56,7 +61,7 @@ public class GroupObjectTests extends BaseScimTest {
         byte[] bytes = response.getResponseBody();
         String responseStr = new String(bytes);
 
-        Group groupCreated = (Group)jsonToObject(responseStr, Group.class);
+        Group groupCreated = (Group) Util.jsonToGroup(responseStr);
         assertEquals(groupCreated.getDisplayName(), displayName, "Group not added or retrieved");
 
         this.id = groupCreated.getId();
@@ -81,7 +86,7 @@ public class GroupObjectTests extends BaseScimTest {
         byte[] bytes = response.getResponseBody();
         String responseStr = new String(bytes);
 
-        Group groupRetrieved = (Group)jsonToObject(responseStr, Group.class);
+        Group groupRetrieved = (Group) Util.jsonToGroup(responseStr);
         assertEquals(groupRetrieved.getId(), this.id, "Group could not be retrieved");
 
         System.out.println("responseStr = " + responseStr);
@@ -106,7 +111,7 @@ public class GroupObjectTests extends BaseScimTest {
         byte[] bytes = response.getResponseBody();
         String responseStr = new String(bytes);
 
-        Group groupRetrieved = (Group)jsonToObject(responseStr, Group.class);
+        Group groupRetrieved = (Group) Util.jsonToGroup(responseStr);
 
         groupRetrieved.setDisplayName(groupRetrieved.getDisplayName() + " UPDATED");
 
@@ -117,7 +122,7 @@ public class GroupObjectTests extends BaseScimTest {
         bytes = responseUpdated.getResponseBody();
         responseStr = new String(bytes);
 
-        Group groupUpdated = (Group)jsonToObject(responseStr, Group.class);
+        Group groupUpdated = (Group) Util.jsonToGroup(responseStr);
 
         assertEquals(groupUpdated.getId(), this.id, "Group could not be retrieved");
         assert(groupUpdated.getMeta().getLastModified().getTime() > groupUpdated.getMeta().getCreated().getTime());
@@ -142,10 +147,58 @@ public class GroupObjectTests extends BaseScimTest {
         System.out.println("LEAVING testDeleteGroup..." + "\n");
     }
 
-    private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-        Object clazzObject = mapper.readValue(json, clazz);
-        return clazzObject;
+    @Test(groups = "e", dependsOnGroups = "d", alwaysRun = true)
+    public void testGroupDeserializerUsers() throws Exception {
+
+        System.out.println("IN testGroupDeserializerUsers...");
+
+        ScimResponse response = client.personSearch("uid", "admin", MediaType.APPLICATION_JSON);
+
+        System.out.println("body string = " + response.getResponseBodyString());
+
+        Assert.assertEquals(200, response.getStatusCode());
+
+        byte[] bytes = response.getResponseBody();
+        String responseStr = new String(bytes);
+
+        User userRetrieved = (User) Util.jsonToUser(responseStr, client.getUserExtensionSchema());
+
+        assertEquals(userRetrieved.getUserName(), "admin", "User could not be retrieved");
+
+        System.out.println("responseStr = " + responseStr);
+        System.out.println("userRetrieved.getId() = " + userRetrieved.getId());
+        System.out.println("userRetrieved.getDisplayName() = " + userRetrieved.getDisplayName());
+
+        List<GroupRef> groups = userRetrieved.getGroups();
+        for (GroupRef group : groups) {
+
+            if (group.getDisplay().startsWith("Gluu")) {
+
+                System.out.println("group display = " + group.getDisplay());
+                System.out.println("group inum = " + group.getValue());
+                System.out.println("group $ref = " + group.getReference());
+                Assert.assertNotNull(group.getReference());
+
+                ScimResponse groupRetrievedResponse = client.retrieveGroup(group.getValue(), MediaType.APPLICATION_JSON);
+
+                Assert.assertEquals(200, groupRetrievedResponse.getStatusCode());
+
+                byte[] groupRetrievedBytes = groupRetrievedResponse.getResponseBody();
+                String groupRetrievedResponseStr = new String(groupRetrievedBytes);
+
+                Group adminGroup = (Group) Util.jsonToGroup(groupRetrievedResponseStr);
+
+                Set<MemberRef> members = adminGroup.getMembers();
+                for (MemberRef member : members) {
+                    System.out.println("member inum = " + member.getValue());
+                    System.out.println("member $ref = " + member.getReference());
+                    Assert.assertNotNull(member.getReference());
+                }
+
+                break;
+            }
+        }
+
+        System.out.println("LEAVING testGroupDeserializerUsers..." + "\n");
     }
 }

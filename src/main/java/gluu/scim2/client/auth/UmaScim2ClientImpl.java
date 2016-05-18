@@ -28,6 +28,7 @@ import org.xdi.oxauth.model.crypto.signature.ECDSAPrivateKey;
 import org.xdi.oxauth.model.crypto.signature.RSAPrivateKey;
 import org.xdi.oxauth.model.uma.*;
 import org.xdi.oxauth.model.uma.wrapper.Token;
+import org.xdi.oxauth.model.util.JwksUtil;
 import org.xdi.oxauth.model.util.JwtUtil;
 import org.xdi.util.StringHelper;
 
@@ -131,7 +132,8 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 		// Get AAT
 		org.xdi.oxauth.model.crypto.PrivateKey privateKey = null;
 		try {
-			privateKey = JwtUtil.getPrivateKey(null, umaAatClientJwks, umaAatClientKeyId);		
+			// privateKey = JwtUtil.getPrivateKey(null, umaAatClientJwks, umaAatClientKeyId);
+			privateKey = JwksUtil.getPrivateKey(null, umaAatClientJwks, umaAatClientKeyId);
 			if (privateKey == null) {
 				throw new ScimInitializationException("There is no keyId in JWKS");
 			}
