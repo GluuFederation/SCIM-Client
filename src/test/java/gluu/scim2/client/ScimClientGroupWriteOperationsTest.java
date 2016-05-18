@@ -33,8 +33,7 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks", "umaAatClientKeyId" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks,
-			@Optional final String umaAatClientKeyId) throws IOException {
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId) throws IOException {
 		String umaAatClientJwksData = FileUtils.readFileToString(new File(umaAatClientJwks));
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwksData, umaAatClientKeyId);
 	}
@@ -42,6 +41,7 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 	@Test
 	@Parameters({ "scim2.group.create_json" })
 	public void createGroupTest(String createJson) throws Exception {
+
 		System.out.println("createGroupTest createJson: " + createJson);
 
 		ScimResponse response = client.createGroupString(createJson, MediaType.APPLICATION_JSON);
@@ -49,7 +49,7 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 
 		assertEquals(response.getStatusCode(), 201, "cold not Add the group, status != 201");
 
-		Group group = (Group) Util.toGroup(response);
+		Group group = Util.toGroup(response);
 		this.id = group.getId();
 
 	}
@@ -57,14 +57,14 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 	@Test(dependsOnMethods = "createGroupTest")
 	@Parameters({ "scim2.group.update_json", "groupjson.updateddisplayname" })
 	public void updateGroupTest(String updateJson, String updatedDisplayName) throws Exception {
+
 		System.out.println("updateGroupTest updateJson: " + updateJson);
 		ScimResponse response = client.updateGroupString(updateJson, this.id, MediaType.APPLICATION_JSON);
 
 		System.out.println("updateGroupTest + responseStr" + response.getResponseBodyString());
-
 		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
 
-		Group group = (Group) Util.toGroup(response);
+		Group group = Util.toGroup(response);
 		assertEquals(group.getDisplayName(), updatedDisplayName, "could not update the group");
 	}
 

@@ -61,7 +61,6 @@ public class GroupFiltersMainTests extends BaseScimTest {
             ScimResponse response = client.searchGroups(filters[i], startIndex, count, sortBy, sortOrder, attributes);
 
             System.out.println(" testSearchGroups response (" + i + ") = " + response.getResponseBodyString());
-
             assertEquals(response.getStatusCode(), 200, "Status != 200");
 
             ListResponse listResponse = Util.toListResponseGroup(response);

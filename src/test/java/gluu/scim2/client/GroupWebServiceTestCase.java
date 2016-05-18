@@ -54,7 +54,7 @@ public class GroupWebServiceTestCase extends BaseScimTest {
 		response = client.createGroup(groupToAdd, MediaType.APPLICATION_JSON);
 		System.out.println("GroupWebServiceTestCase :  createGroupTest :  response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 201, "cold not Add the group, status != 201");
-		Group group = (Group) Util.toGroup(response);
+		Group group = Util.toGroup(response);
 		this.id = group.getId();
 		System.out.println("response : " + response.getResponseBodyString());
 		assertEquals(group.getDisplayName(), groupToAdd.getDisplayName(), "Username MisMatch");
@@ -65,7 +65,7 @@ public class GroupWebServiceTestCase extends BaseScimTest {
 		response = client.updateGroup(groupToUpdate, this.id, MediaType.APPLICATION_JSON);
 		System.out.println("GroupWebServiceTestCase updateGroupTest :response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
-		Group group = (Group) Util.toGroup(response);
+		Group group = Util.toGroup(response);
 		assertEquals(group.getDisplayName(), groupToUpdate.getDisplayName(), "could not update the user");
 	}
 

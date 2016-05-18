@@ -32,7 +32,7 @@ public class ListResponseGroupDeserializer extends JsonDeserializer<ListResponse
     @Override
     public ListResponse deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
 
-        System.out.println(" IN ListResponseGroupDeserializer.toListResponseUser()... ");
+        System.out.println(" IN ListResponseGroupDeserializer.deserialize()... ");
 
         try {
 
@@ -79,7 +79,7 @@ public class ListResponseGroupDeserializer extends JsonDeserializer<ListResponse
             }
             listResponseGroup.setResources(resources);
 
-            System.out.println(" LEAVING ListResponseGroupDeserializer.toListResponseUser()... ");
+            System.out.println(" LEAVING ListResponseGroupDeserializer.deserialize()... ");
 
             return listResponseGroup;
 

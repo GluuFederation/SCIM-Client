@@ -32,6 +32,8 @@ public class UserSerializer extends JsonSerializer<User> {
     @Override
     public void serialize(User user, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
 
+        System.out.println(" IN UserSerializer.serialize()... ");
+
         try {
 
             jsonGenerator.writeStartObject();
@@ -93,6 +95,8 @@ public class UserSerializer extends JsonSerializer<User> {
             }
 
             jsonGenerator.writeEndObject();
+
+            System.out.println(" LEAVING UserSerializer.serialize()... ");
 
         } catch (Exception e) {
             e.printStackTrace();

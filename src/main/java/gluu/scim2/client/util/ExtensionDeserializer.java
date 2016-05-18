@@ -36,7 +36,7 @@ public class ExtensionDeserializer extends JsonDeserializer<Extension> {
     @Override
     public Extension deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
 
-        System.out.println(" IN ExtensionDeserializer.toListResponseUser()... ");
+        System.out.println(" IN ExtensionDeserializer.deserialize()... ");
 
         try {
 
@@ -98,7 +98,7 @@ public class ExtensionDeserializer extends JsonDeserializer<Extension> {
                 }
             }
 
-            System.out.println(" LEAVING ExtensionDeserializer.toListResponseUser()... ");
+            System.out.println(" LEAVING ExtensionDeserializer.deserialize()... ");
 
             return extensionBuilder.build();
 

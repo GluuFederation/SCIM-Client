@@ -30,7 +30,7 @@ public class GroupDeserializer extends JsonDeserializer<Group> {
     @Override
     public Group deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
 
-        System.out.println(" IN GroupDeserializer.toListResponseUser()... ");
+        System.out.println(" IN GroupDeserializer.deserialize()... ");
 
         try {
 
@@ -89,7 +89,7 @@ public class GroupDeserializer extends JsonDeserializer<Group> {
 
             group.setMembers(members);
 
-            System.out.println(" LEAVING GroupDeserializer.toListResponseUser()... ");
+            System.out.println(" LEAVING GroupDeserializer.deserialize()... ");
 
             return group;
 
