@@ -44,18 +44,18 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
 	@Test
 	@Parameters({ "scim2.builk.request_json" })
 	public void bulkOperationTest(String requestJson) throws Exception {
+
 		System.out.println("bulkOperationTest requestJson:" + requestJson);
 
 		ScimResponse response = client.bulkOperationString(requestJson, MediaType.APPLICATION_JSON);
 		System.out.println("reponse: " + response.getResponseBodyString());
 
 		assertEquals(response.getStatusCode(), 200, "cold not Add the user, status != 200");
-		byte[] bytes = response.getResponseBody();
-		String responseStr = new String(bytes);
-		BulkResponse  bulkResponse = (BulkResponse) Util.jsonToObject(responseStr, BulkResponse.class);
-		String location = bulkResponse.getOperations().get(0).getLocation();
-		this.uid = getUID(location.split("/"));
 
+		BulkResponse  bulkResponse = (BulkResponse) Util.jsonToObject(response, BulkResponse.class);
+		String location = bulkResponse.getOperations().get(0).getLocation();
+
+		this.uid = getUID(location.split("/"));
 	}
 
 	@Test(dependsOnMethods = "bulkOperationTest")

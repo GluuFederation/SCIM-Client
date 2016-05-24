@@ -124,4 +124,20 @@
 		</classes>
 	</test>
 
+	<test name="SCIM 1.1 EmailSyncTests test" enabled="true">
+		<classes>
+			<class name="gluu.scim.client.EmailSync1Tests"/>
+			<class name="gluu.scim.client.EmailSync2Tests"/>
+			<!--<class name="gluu.scim.client.EmailSyncRetrieveTests"/>-->
+		</classes>
+	</test>
+
+	<test name="SCIM 2 EmailSyncTests test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.EmailSync1Tests"/>
+			<class name="gluu.scim2.client.EmailSync2Tests"/>
+			<!--<class name="gluu.scim2.client.EmailSyncRetrieveTests"/>-->
+		</classes>
+	</test>
+
 </suite>

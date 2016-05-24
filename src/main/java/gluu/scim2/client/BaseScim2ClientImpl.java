@@ -1349,10 +1349,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 
 		ScimResponse response = ResponseMapper.map(get, null);
 
-		byte[] bytes = response.getResponseBody();
-		String json = new String(bytes);
-
-		UserExtensionSchema userExtensionSchema = (UserExtensionSchema) gluu.scim2.client.util.Util.jsonToObject(json, UserExtensionSchema.class);
+		UserExtensionSchema userExtensionSchema = (UserExtensionSchema) gluu.scim2.client.util.Util.jsonToObject(response, UserExtensionSchema.class);
 
 		return userExtensionSchema;
 	}

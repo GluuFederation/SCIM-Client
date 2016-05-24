@@ -23,7 +23,10 @@ import java.io.IOException;
  */
 public class Util {
 
-    public static Object jsonToObject(String json, Class<?> clazz) throws Exception {
+    public static Object jsonToObject(ScimResponse response, Class<?> clazz) throws Exception {
+
+        byte[] bytes = response.getResponseBody();
+        String json = new String(bytes);
 
         ObjectMapper mapper = new ObjectMapper();
 
