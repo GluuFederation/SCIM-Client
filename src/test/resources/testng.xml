@@ -140,4 +140,11 @@
 		</classes>
 	</test>
 
+	<test name="Person Required Params test" enabled="true">
+		<classes>
+			<class name="gluu.scim.client.PersonRequiredParamsTests"/>
+			<class name="gluu.scim2.client.PersonRequiredParamsTests"/>
+		</classes>
+	</test>
+
 </suite>
