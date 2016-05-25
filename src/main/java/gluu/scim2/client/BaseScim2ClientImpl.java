@@ -30,7 +30,8 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
+// import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Constants;
 import org.gluu.oxtrust.model.scim2.Group;
@@ -1059,7 +1060,8 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 			new NameValuePair("count", String.valueOf(count)),
 			new NameValuePair("sortBy", sortBy),
 			new NameValuePair("sortOrder", sortOrder),
-			new NameValuePair("attributes", ((attributesArray != null) ? new ObjectMapper().writeValueAsString(attributesArray) : null))
+			new NameValuePair("attributes", ((attributesArray != null) ? StringUtils.join(attributesArray, ',') : null))
+			// new NameValuePair("attributes", ((attributesArray != null) ? new ObjectMapper().writeValueAsString(attributesArray) : null))
 		});
 
 		addAuthenticationHeader(get);
@@ -1155,7 +1157,8 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 			new NameValuePair("count", String.valueOf(count)),
 			new NameValuePair("sortBy", sortBy),
 			new NameValuePair("sortOrder", sortOrder),
-			new NameValuePair("attributes", ((attributesArray != null) ? new ObjectMapper().writeValueAsString(attributesArray) : null))
+			new NameValuePair("attributes", ((attributesArray != null) ? StringUtils.join(attributesArray, ',') : null))
+			// new NameValuePair("attributes", ((attributesArray != null) ? new ObjectMapper().writeValueAsString(attributesArray) : null))
 		});
 
 		addAuthenticationHeader(get);
