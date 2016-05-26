@@ -47,6 +47,8 @@ public class UserFiltersMainTests extends BaseScimTest {
 
         String[] filters = new String[] {
             "name[givenName co \"aaaa\" and name[familyName ew \"test\"]]",
+            "name[givenName co \"aaaa\" and emails[value ew \"111@test.email\"]]",
+            "name[givenName co \"bbb\" and emails[value sw \"bbb\"]]",
             "name[name[givenName sw \"aaaa\"]]",
             "id sw \"@\"",
             "groups sw \"inum=@\"",
@@ -64,6 +66,8 @@ public class UserFiltersMainTests extends BaseScimTest {
             "emails.type co \"work\"",
             "emails[primary eq \"true\"]",
             "emails[type eq \"work\" and value co \"test\"]",
+            "emails[type eq \"home\" and value sw \"bbb\"]",
+            "emails[type ne \"home\" and value ew \"111@test.email\"]",
             "name[displayName co \"1111\"] and (name.familyName co \"filter\")",
             "name[givenName sw \"aaaa 1111\" and familyName ew \"test\"]"
         };
