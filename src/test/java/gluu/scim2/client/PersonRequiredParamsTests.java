@@ -38,14 +38,18 @@ public class PersonRequiredParamsTests extends BaseScimTest {
     @Test
     public void testPersonRequiredParams() throws Exception {
 
+        System.out.println("IN testPersonRequiredParams...");
+
         User user = new User();
 
         ScimResponse response = client.createPerson(user, MediaType.APPLICATION_JSON);
 
-        assertEquals(response.getStatusCode(), 500, "Status code is not equal to 500");
+        assertEquals(response.getStatusCode(), 400, "Status code is not equal to 400");
         assert response.getResponseBodyString().contains("There are missing required parameters");
 
         System.out.println("response.getStatusCode() = " + response.getStatusCode());
         System.out.println("response.getResponseBodyString() = " + response.getResponseBodyString());
+
+        System.out.println("LEAVING testPersonRequiredParams...");
     }
 }

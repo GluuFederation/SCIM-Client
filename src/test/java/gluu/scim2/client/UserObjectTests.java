@@ -25,6 +25,11 @@ import java.util.List;
 import static org.testng.Assert.assertEquals;
 
 /**
+ * README:
+ *
+ * Check first if /install/community-edition-setup/templates/test/scim-client/data/scim-test-data.ldif
+ * has been loaded to LDAP.
+ *
  * @author Val Pecaoco
  */
 public class UserObjectTests extends BaseScimTest {
@@ -117,7 +122,30 @@ public class UserObjectTests extends BaseScimTest {
         System.out.println("LEAVING testUpdateNewUser..." + "\n");
     }
 
-    @Test(groups = "d", dependsOnGroups = "c", alwaysRun = true)
+    @Test(groups = "d", dependsOnGroups = "c")
+    public void testUpdateUserNameDifferentId() throws Exception {
+
+        System.out.println("IN testUpdateUserNameDifferentId...");
+
+        ScimResponse response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
+        System.out.println("response body = " + response.getResponseBodyString());
+
+        Assert.assertEquals(200, response.getStatusCode());
+
+        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
+
+        userRetrieved.setUserName("aaaa1111");
+        userRetrieved.setPassword(null);
+
+        ScimResponse responseUpdated = client.updatePerson(userRetrieved, this.id, MediaType.APPLICATION_JSON);
+
+        Assert.assertEquals(400, responseUpdated.getStatusCode());
+        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
+
+        System.out.println("LEAVING testUpdateUserNameDifferentId..." + "\n");
+    }
+
+    @Test(groups = "e", dependsOnGroups = "d", alwaysRun = true)
     public void testDeleteUser() throws Exception {
 
         System.out.println("IN testDeleteUser...");
@@ -128,7 +156,7 @@ public class UserObjectTests extends BaseScimTest {
         System.out.println("LEAVING testDeleteUser..." + "\n");
     }
 
-    @Test(groups = "e", dependsOnGroups = "d", alwaysRun = true)
+    @Test(groups = "f", dependsOnGroups = "e", alwaysRun = true)
     public void testUserDeserializerGroups() throws Exception {
 
         System.out.println("IN testUserDeserializerGroups...");

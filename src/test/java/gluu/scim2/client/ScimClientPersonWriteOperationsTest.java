@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
  */
 public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 
-	private String uid;
+	private String id;
 	private Scim2Client client;
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks", "umaAatClientKeyId" })
@@ -48,10 +48,10 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 		ScimResponse response = client.createPersonString(createJson, MediaType.APPLICATION_JSON);
 		System.out.println("createPersonTest response json: " + response.getResponseBodyString());
 
-		assertEquals(response.getStatusCode(), 201, "cold not Add the user, status != 201");
+		assertEquals(response.getStatusCode(), 201, "Could not add user, status != 201");
 
 		User user = Util.toUser(response, client.getUserExtensionSchema());
-		this.uid = user.getId();
+		this.id = user.getId();
 	}
 
 	@Test(dependsOnMethods = "createPersonTest")
@@ -60,10 +60,10 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 
 		System.out.println("updatePersonTest updateJson: " + updateJson);
 
-		ScimResponse response = client.updatePersonString(updateJson, this.uid, MediaType.APPLICATION_JSON);
+		ScimResponse response = client.updatePersonString(updateJson, this.id, MediaType.APPLICATION_JSON);
 		System.out.println("updatePersonTest response json: " + response.getResponseBodyString());
 
-		assertEquals(response.getStatusCode(), 200, "cold not update the user, status != 200");
+		assertEquals(response.getStatusCode(), 200, "Could not update user, status != 200");
 
 		User user = Util.toUser(response, client.getUserExtensionSchema());
 		assertEquals(user.getName().getGivenName(), updateGivenName, "Could not update the user");
@@ -71,8 +71,8 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 
 	@Test(dependsOnMethods = "updatePersonTest")
 	public void deletePersonTest() throws Exception {
-		ScimResponse response = client.deletePerson(this.uid);
+		ScimResponse response = client.deletePerson(this.id);
 		System.out.println("deletePersonTest response json: " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not delete the user, status != 200");
+		assertEquals(response.getStatusCode(), 200, "Could not delete user, status != 200");
 	}
 }

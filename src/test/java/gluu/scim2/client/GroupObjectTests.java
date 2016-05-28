@@ -122,7 +122,29 @@ public class GroupObjectTests extends BaseScimTest {
         System.out.println("LEAVING testUpdateNewGroup..." + "\n");
     }
 
-    @Test(groups = "d", dependsOnGroups = "c", alwaysRun = true)
+    @Test(groups = "d", dependsOnGroups = "c")
+    public void testUpdateDisplayNameDifferentId() throws Exception {
+
+        System.out.println("IN testUpdateDisplayNameDifferentId...");
+
+        ScimResponse response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
+        System.out.println("response body = " + response.getResponseBodyString());
+
+        Assert.assertEquals(200, response.getStatusCode());
+
+        Group groupRetrieved = Util.toGroup(response);
+
+        groupRetrieved.setDisplayName("Gluu Manager Group");
+
+        ScimResponse responseUpdated = client.updateGroup(groupRetrieved, this.id, MediaType.APPLICATION_JSON);
+
+        Assert.assertEquals(400, responseUpdated.getStatusCode());
+        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
+
+        System.out.println("LEAVING testUpdateDisplayNameDifferentId..." + "\n");
+    }
+
+    @Test(groups = "e", dependsOnGroups = "d", alwaysRun = true)
     public void testDeleteGroup() throws Exception {
 
         System.out.println("IN testDeleteGroup...");
@@ -133,7 +155,7 @@ public class GroupObjectTests extends BaseScimTest {
         System.out.println("LEAVING testDeleteGroup..." + "\n");
     }
 
-    @Test(groups = "e", dependsOnGroups = "d", alwaysRun = true)
+    @Test(groups = "f", dependsOnGroups = "e", alwaysRun = true)
     public void testGroupDeserializerUsers() throws Exception {
 
         System.out.println("IN testGroupDeserializerUsers...");

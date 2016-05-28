@@ -47,7 +47,7 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 		ScimResponse response = client.createGroupString(createJson, MediaType.APPLICATION_JSON);
 		System.out.println("createGroupTest response json: " + response.getResponseBodyString());
 
-		assertEquals(response.getStatusCode(), 201, "cold not Add the group, status != 201");
+		assertEquals(response.getStatusCode(), 201, "Could not add group, status != 201");
 
 		Group group = Util.toGroup(response);
 		this.id = group.getId();
@@ -62,16 +62,16 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 		ScimResponse response = client.updateGroupString(updateJson, this.id, MediaType.APPLICATION_JSON);
 
 		System.out.println("updateGroupTest + responseStr" + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
+		assertEquals(response.getStatusCode(), 200, "Could not update group, status != 200");
 
 		Group group = Util.toGroup(response);
-		assertEquals(group.getDisplayName(), updatedDisplayName, "could not update the group");
+		assertEquals(group.getDisplayName(), updatedDisplayName, "Could not update the group");
 	}
 
 	@Test(dependsOnMethods = "updateGroupTest")
 	public void deleteGroupTest() throws Exception {
 		ScimResponse response = client.deleteGroup(this.id);
 		System.out.println("deleteGroupTest + responseStr" + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not delete the Group, status != 200");
+		assertEquals(response.getStatusCode(), 200, "Could not delete group, status != 200");
 	}
 }

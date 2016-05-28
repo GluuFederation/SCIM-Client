@@ -14,8 +14,12 @@ import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
+import gluu.scim.client.model.ScimPerson;
+import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.gluu.oxtrust.model.scim2.Group;
+import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
@@ -52,35 +56,47 @@ public class ScimClientGroupWriteObjectTest extends BaseScimTest {
 
 	@Test
 	public void createGroupTest() throws Exception {
+
 		ScimResponse response = client.createGroup(groupToAdd, MediaType.APPLICATION_JSON);
+		assertEquals(response.getStatusCode(), 201, "Could not add group, status != 201");
 
-		assertEquals(response.getStatusCode(), 201, "cold not Add the group, status != 201");
-		String responseStr = response.getResponseBodyString();
-		ScimGroup group = (ScimGroup) jsonToObject(responseStr, ScimGroup.class);
+		ScimGroup group = (ScimGroup) Util.jsonToObject(response, ScimGroup.class);
 		this.id = group.getId();
-
 	}
 
 	@Test(dependsOnMethods = "createGroupTest")
 	public void updateGroupTest() throws Exception {
+
 		ScimResponse response = client.updateGroup(groupToUpdate, this.id, MediaType.APPLICATION_JSON);
-
-		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
-
+		assertEquals(response.getStatusCode(), 200, "Could not update group, status != 200");
 	}
 
 	@Test(dependsOnMethods = "updateGroupTest")
+	public void testUpdateDisplayNameDifferentId() throws Exception {
+
+		System.out.println("IN testUpdateDisplayNameDifferentId...");
+
+		ScimResponse response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
+		System.out.println("response body = " + response.getResponseBodyString());
+
+		Assert.assertEquals(200, response.getStatusCode());
+
+		ScimGroup groupRetrieved = (ScimGroup) Util.jsonToObject(response, ScimGroup.class);
+
+		groupRetrieved.setDisplayName("Gluu Manager Group");
+
+		ScimResponse responseUpdated = client.updateGroup(groupRetrieved, this.id, MediaType.APPLICATION_JSON);
+
+		Assert.assertEquals(400, responseUpdated.getStatusCode());
+		System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
+
+		System.out.println("LEAVING testUpdateDisplayNameDifferentId..." + "\n");
+	}
+
+	@Test(dependsOnMethods = "testUpdateDisplayNameDifferentId", alwaysRun = true)
 	public void deleteGroupTest() throws Exception {
+
 		ScimResponse response = client.deleteGroup(this.id);
-
-		assertEquals(response.getStatusCode(), 200, "cold not delete the Group, status != 200");
-
+		assertEquals(response.getStatusCode(), 200, "Could not delete group, status != 200");
 	}
-
-	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		Object clazzObject = mapper.readValue(json, clazz);
-		return clazzObject;
-	}
-
 }

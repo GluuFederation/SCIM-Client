@@ -19,8 +19,9 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
@@ -72,8 +73,7 @@ public class ScimClientPersonWriteObjectTest extends BaseScimTest {
 		address.setRegion("TX");
 		address.setPrimary("true");
 		address.setType("Work");
-		address.setFormatted(address.getStreetAddress() + " " + address.getLocality() + " " + address.getPostalCode() + " " + address.getRegion() + " "
-				+ address.getCountry());
+		address.setFormatted(address.getStreetAddress() + " " + address.getLocality() + " " + address.getPostalCode() + " " + address.getRegion() + " " + address.getCountry());
 		personToAdd.getAddresses().add(address);
 		personToAdd.setPreferredLanguage("US_en");
 		personToAdd.getName().setFamilyName("SCIM");
@@ -85,33 +85,48 @@ public class ScimClientPersonWriteObjectTest extends BaseScimTest {
 
 	@Test
 	public void createPersonTest() throws Exception {
-		ScimResponse response = client.createPerson(personToAdd, MediaType.APPLICATION_JSON);
 
-		assertEquals(response.getStatusCode(), 201, "cold not Add the person, status != 201");
-		byte[] bytes = response.getResponseBody();
-		String responseStr = new String(bytes);
-		ScimPerson person = (ScimPerson) jsonToObject(responseStr, ScimPerson.class);
+		ScimResponse response = client.createPerson(personToAdd, MediaType.APPLICATION_JSON);
+		assertEquals(response.getStatusCode(), 201, "Could not add person, status != 201");
+
+		ScimPerson person = (ScimPerson) Util.jsonToObject(response, ScimPerson.class);
 		this.uid = person.getId();
 	}
 
 	@Test(dependsOnMethods = "createPersonTest")
 	public void updatePersonTest() throws Exception {
-		ScimResponse response = client.updatePerson(personToUpdate, this.uid, MediaType.APPLICATION_JSON);
 
-		assertEquals(response.getStatusCode(), 200, "cold not update the person, status != 200");
+		ScimResponse response = client.updatePerson(personToUpdate, this.uid, MediaType.APPLICATION_JSON);
+		assertEquals(response.getStatusCode(), 200, "Could not update person, status != 200");
 	}
 
 	@Test(dependsOnMethods = "updatePersonTest")
-	public void deletePersonTest() throws Exception {
-		ScimResponse response = client.deletePerson(this.uid);
+	public void testUpdateUserNameDifferentId() throws Exception {
 
-		assertEquals(response.getStatusCode(), 200, "cold not delete the person, status != 200");
+		System.out.println("IN testUpdateUserNameDifferentId...");
 
+		ScimResponse response = client.retrievePerson(this.uid, MediaType.APPLICATION_JSON);
+		System.out.println("response body = " + response.getResponseBodyString());
+
+		Assert.assertEquals(200, response.getStatusCode());
+
+		ScimPerson personRetrieved = (ScimPerson) Util.jsonToObject(response, ScimPerson.class);
+
+		personRetrieved.setUserName("admin");
+		personRetrieved.setPassword(null);
+
+		ScimResponse responseUpdated = client.updatePerson(personRetrieved, this.uid, MediaType.APPLICATION_JSON);
+
+		Assert.assertEquals(400, responseUpdated.getStatusCode());
+		System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
+
+		System.out.println("LEAVING testUpdateUserNameDifferentId..." + "\n");
 	}
 
-	private Object jsonToObject(String json, Class<?> clazz) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		Object clazzObject = mapper.readValue(json, clazz);
-		return clazzObject;
+	@Test(dependsOnMethods = "testUpdateUserNameDifferentId", alwaysRun = true)
+	public void deletePersonTest() throws Exception {
+
+		ScimResponse response = client.deletePerson(this.uid);
+		assertEquals(response.getStatusCode(), 200, "Could not delete person, status != 200");
 	}
 }

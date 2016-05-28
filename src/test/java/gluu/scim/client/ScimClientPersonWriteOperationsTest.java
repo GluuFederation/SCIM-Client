@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
 public class ScimClientPersonWriteOperationsTest extends BaseScimTest{
 
 	private ScimClient client;
-	private String uid;
+	private String id;
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId" })
 	@BeforeTest
@@ -47,7 +47,7 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest{
 		byte[] bytes = response.getResponseBody();
 		String responseStr = new String(bytes);
 		ScimPerson person = (ScimPerson) jsonToObject(responseStr, ScimPerson.class);
-		this.uid = person.getId();
+		this.id = person.getId();
 
 	}
 
@@ -55,14 +55,14 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest{
 	@Parameters({ "scim1.person.update_json" })
 	public void updatePersonTest(String UPDATEJSON) throws Exception {
 		System.out.println(UPDATEJSON);
-		ScimResponse response = client.updatePersonString(UPDATEJSON, this.uid, MediaType.APPLICATION_JSON);
+		ScimResponse response = client.updatePersonString(UPDATEJSON, this.id, MediaType.APPLICATION_JSON);
 
 		assertEquals(response.getStatusCode(), 200, "cold not update the person, status != 200");
 	}
 
 	@Test(dependsOnMethods = "updatePersonTest")
 	public void deletePersonTest() throws Exception {
-		ScimResponse response = client.deletePerson(this.uid);
+		ScimResponse response = client.deletePerson(this.id);
 
 		assertEquals(response.getStatusCode(), 200, "cold not delete the person, status != 200");
 	}
