@@ -50,6 +50,7 @@ public class EmailSync2Tests extends BaseScimTest {
         ScimPerson person = createDummyPerson();
 
         ScimResponse response = client.createPerson(person, MediaType.APPLICATION_JSON);
+        System.out.println("response body = " + response.getResponseBodyString());
 
         assertEquals(response.getStatusCode(), 201, "Could not add person, status != 201");
 
@@ -76,6 +77,7 @@ public class EmailSync2Tests extends BaseScimTest {
         personCreated.setEmails(emails);
 
         ScimResponse responseUpdated = client.updatePerson(personCreated, this.id, MediaType.APPLICATION_JSON);
+        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
 
         Assert.assertEquals(200, responseUpdated.getStatusCode());
 
@@ -89,7 +91,6 @@ public class EmailSync2Tests extends BaseScimTest {
         Assert.assertEquals(emails.get(0).getValue(), emailUpdated.getValue());
         System.out.println("emailUpdated.getValue() = " + emailUpdated.getValue());
 
-        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
         System.out.println("personUpdated.getId() = " + personUpdated.getId());
         System.out.println("personUpdated.getDisplayName() = " + personUpdated.getDisplayName());
 

@@ -27,7 +27,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * @author Val Pecaoco
  */
-public class GroupObjectTests extends BaseScimTest {
+public class GroupObjectAttributesFilterTests extends BaseScimTest {
 
     String domainURL;
     Scim2Client client;
@@ -52,7 +52,8 @@ public class GroupObjectTests extends BaseScimTest {
         Group group = new Group();
         group.setDisplayName(displayName);
 
-        ScimResponse response = client.createGroup(group, MediaType.APPLICATION_JSON);
+        String[] attributesArray = new String[]{"urn:ietf:params:scim:schemas:core:2.0:Group:displayName"};
+        ScimResponse response = client.createGroup(group, attributesArray);
         System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(201, response.getStatusCode());
@@ -73,7 +74,8 @@ public class GroupObjectTests extends BaseScimTest {
 
         System.out.println("IN testRetrieveNewGroup...");
 
-        ScimResponse response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
+        String[] attributesArray = new String[]{"displayName"};
+        ScimResponse response = client.retrieveGroup(this.id, attributesArray);
         System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
@@ -94,7 +96,8 @@ public class GroupObjectTests extends BaseScimTest {
 
         Thread.sleep(3000);  // Sleep for 3 seconds
 
-        ScimResponse response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
+        String[] attributesArray = new String[]{"displayName"};
+        ScimResponse response = client.retrieveGroup(this.id, attributesArray);
         System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
@@ -103,7 +106,7 @@ public class GroupObjectTests extends BaseScimTest {
 
         groupRetrieved.setDisplayName(groupRetrieved.getDisplayName() + " UPDATED");
 
-        ScimResponse responseUpdated = client.updateGroup(groupRetrieved, this.id, MediaType.APPLICATION_JSON);
+        ScimResponse responseUpdated = client.updateGroup(groupRetrieved, this.id, attributesArray);
         System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
 
         Assert.assertEquals(200, responseUpdated.getStatusCode());
@@ -126,7 +129,8 @@ public class GroupObjectTests extends BaseScimTest {
 
         System.out.println("IN testUpdateDisplayNameDifferentId...");
 
-        ScimResponse response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
+        String[] attributesArray = new String[]{"displayName"};
+        ScimResponse response = client.retrieveGroup(this.id, attributesArray);
         System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
@@ -135,7 +139,7 @@ public class GroupObjectTests extends BaseScimTest {
 
         groupRetrieved.setDisplayName("Gluu Manager Group");
 
-        ScimResponse responseUpdated = client.updateGroup(groupRetrieved, this.id, MediaType.APPLICATION_JSON);
+        ScimResponse responseUpdated = client.updateGroup(groupRetrieved, this.id, attributesArray);
         System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
 
         Assert.assertEquals(409, responseUpdated.getStatusCode());
@@ -154,18 +158,27 @@ public class GroupObjectTests extends BaseScimTest {
         System.out.println("LEAVING testDeleteGroup..." + "\n");
     }
 
-    @Test(groups = "f", dependsOnGroups = "e", alwaysRun = true)
+    @Test(dependsOnGroups = "e", alwaysRun = true)
     public void testGroupDeserializerUsers() throws Exception {
 
         System.out.println("IN testGroupDeserializerUsers...");
 
-        ScimResponse response = client.personSearch("uid", "admin", MediaType.APPLICATION_JSON);
+        String filter = "userName eq \"admin\"";
+        int startIndex = 1;
+        int count = 2;
+        String sortBy = "";
+        String sortOrder = "";
+        String[] attributes = null;
+
+        ScimResponse response = client.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes);
         System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
+        ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+        assertEquals(listResponse.getTotalResults(), 1);
 
+        User userRetrieved = (User) listResponse.getResources().get(0);
         assertEquals(userRetrieved.getUserName(), "admin", "User could not be retrieved");
 
         System.out.println("userRetrieved.getId() = " + userRetrieved.getId());
@@ -181,7 +194,9 @@ public class GroupObjectTests extends BaseScimTest {
                 System.out.println("group $ref = " + group.getReference());
                 Assert.assertNotNull(group.getReference());
 
-                ScimResponse groupRetrievedResponse = client.retrieveGroup(group.getValue(), MediaType.APPLICATION_JSON);
+                String[] attributesArray = new String[]{"displayName,members.value,urn:ietf:params:scim:schemas:core:2.0:Group:members.$ref"};
+                ScimResponse groupRetrievedResponse = client.retrieveGroup(group.getValue(), attributesArray);
+                System.out.println("groupRetrievedResponse response body = " + groupRetrievedResponse.getResponseBodyString());
 
                 Assert.assertEquals(200, groupRetrievedResponse.getStatusCode());
 

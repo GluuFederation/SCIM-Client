@@ -29,51 +29,104 @@ public interface BaseScim2Client extends BaseScimClient {
 	
 	/**
      * Creates a person with User as input
-     * @param User person
-     * @param String mediaType
+     * @param user
+     * @param mediaType
      * @return ScimResponse
      * @throws Exception
      */
-	ScimResponse createPerson(User person,String mediaType) throws IOException, JAXBException;
-	
+	@Deprecated
+	ScimResponse createPerson(User user, String mediaType) throws IOException, JAXBException;
+
+	/**
+	 * @param user
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+     */
+	ScimResponse createUser(User user, String[] attributesArray) throws IOException;
+
+	/**
+	 * @param id
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	ScimResponse retrieveUser(String id, String[] attributesArray) throws IOException;
+
 	/**
      * Updates a person with User as input
-     * @param User person
-     * @param String mediaType
+     * @param user
+	 * @param id
+     * @param mediaType
      * @return ScimResponse
      * @throws Exception
      */
-	ScimResponse updatePerson(User person,String uid,String mediaType) throws IOException, JAXBException;
-	
+	@Deprecated
+	ScimResponse updatePerson(User user, String id, String mediaType) throws IOException, JAXBException;
+
+	/**
+	 * @param user
+	 * @param id
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+     */
+	ScimResponse updateUser(User user, String id, String[] attributesArray) throws IOException;
+
 	/**
      * Creates a Group with Group as input
-     * @param ScimGroup group
-     * @param String mediaType
+     * @param group
+     * @param mediaType
      * @return ScimResponse
      * @throws Exception
      */
-	ScimResponse createGroup(Group group,String mediaType) throws IOException, JAXBException;
-	
+	@Deprecated
+	ScimResponse createGroup(Group group, String mediaType) throws IOException, JAXBException;
+
+	/**
+	 * @param group
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 * @throws JAXBException
+     */
+	ScimResponse createGroup(Group group, String[] attributesArray) throws IOException;
+
+	/**
+	 * @param id
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+     */
+	ScimResponse retrieveGroup(String id, String[] attributesArray) throws IOException;
+
 	/**
      * Updates a Group with Group as input
-     * @param ScimGroup group
-     * @param String mediaType
+     * @param group
+     * @param mediaType
      * @return ScimResponse
      * @throws Exception
      */
-	ScimResponse updateGroup(Group group,String id, String mediaType) throws IOException, JAXBException;
-	
+	@Deprecated
+	ScimResponse updateGroup(Group group, String id, String mediaType) throws IOException, JAXBException;
+
 	/**
-     * Bulk operation with BulkOperation as input
-     * @param ScimBulkOperation operation
-     * @param String mediaType
-     * @return ScimResponse
-	 * @throws IOException 
-	 * @throws UnsupportedEncodingException 
-	 * @throws JsonMappingException 
-	 * @throws JsonGenerationException 
-	 * @throws JAXBException 
-     * @throws Exception
+	 * @param group
+	 * @param id
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+     * @throws JAXBException
+     */
+	ScimResponse updateGroup(Group group, String id, String[] attributesArray) throws IOException;
+
+	/**
+	 * Bulk operation with BulkOperation as input
+	 * @param bulkRequest
+	 * @param mediaType
+	 * @return
+	 * @throws IOException
+	 * @throws JAXBException
      */
 	ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws IOException, JAXBException ;
 

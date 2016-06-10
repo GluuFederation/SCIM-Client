@@ -19,6 +19,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpException;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.gluu.oxtrust.model.scim2.User;
 import org.xdi.oxauth.model.util.SecurityProviderUtility;
 
 /**

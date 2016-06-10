@@ -32,7 +32,11 @@ public class EmailSyncRetrieveTests extends BaseScimTest {
     String domainURL;
     ScimClient client;
 
-    String id = "@!D58A.A2C6.9B5E.11DA!0001!C69B.EF8E!0000!33B1.C9E9";  // Supply record
+    // String id = "@!D58A.A2C6.9B5E.11DA!0001!C69B.EF8E!0000!33B1.C9E9";  // Supply record
+    // String id = "@!D58A.A2C6.9B5E.11DA!0001!C69B.EF8E!0000!F82A.8E7D";
+    // String id = "@!D58A.A2C6.9B5E.11DA!0001!C69B.EF8E!0000!33B1.C9E9";
+    // String id = "@!D58A.A2C6.9B5E.11DA!0001!C69B.EF8E!0000!8D5A.226C";
+    String id = "@!D58A.A2C6.9B5E.11DA!0001!C69B.EF8E!0000!07F5.DFC9";
 
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks", "umaAatClientKeyId"})
@@ -48,6 +52,7 @@ public class EmailSyncRetrieveTests extends BaseScimTest {
         System.out.println("IN testRetrieveEmail...");
 
         ScimResponse response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
+        System.out.println("response body = " + response.getResponseBodyString());
 
         assertEquals(response.getStatusCode(), 200, "Could not retrieve user, status != 200");
 

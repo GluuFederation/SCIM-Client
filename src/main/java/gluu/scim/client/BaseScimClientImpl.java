@@ -33,6 +33,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.gluu.oxtrust.model.scim2.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

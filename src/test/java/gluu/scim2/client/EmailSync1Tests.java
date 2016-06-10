@@ -16,7 +16,6 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,7 +48,8 @@ public class EmailSync1Tests extends BaseScimTest {
 
         User user = createDummyUser();
 
-        ScimResponse response = client.createPerson(user, MediaType.APPLICATION_JSON);
+        ScimResponse response = client.createUser(user, new String[]{});
+        System.out.println("response body = " + response.getResponseBodyString());
 
         assertEquals(response.getStatusCode(), 201, "Could not add user, status != 201");
 
@@ -79,7 +79,8 @@ public class EmailSync1Tests extends BaseScimTest {
         }
         userCreated.setEmails(emails);
 
-        ScimResponse responseUpdated = client.updatePerson(userCreated, this.id, MediaType.APPLICATION_JSON);
+        ScimResponse responseUpdated = client.updateUser(userCreated, this.id, new String[]{});
+        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
 
         Assert.assertEquals(200, responseUpdated.getStatusCode());
 
@@ -95,7 +96,6 @@ public class EmailSync1Tests extends BaseScimTest {
             System.out.println("emailUpdated.getValue() = " + emailUpdated.getValue());
         }
 
-        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
         System.out.println("userUpdated.getId() = " + userUpdated.getId());
         System.out.println("userUpdated.getDisplayName() = " + userUpdated.getDisplayName());
         System.out.println("userUpdated.getMeta().getLastModified().getTime() = " + userUpdated.getMeta().getLastModified().getTime());

@@ -14,7 +14,6 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.core.MediaType;
 import java.io.File;
 
 import static org.testng.Assert.assertEquals;
@@ -42,13 +41,13 @@ public class PersonRequiredParamsTests extends BaseScimTest {
 
         User user = new User();
 
-        ScimResponse response = client.createPerson(user, MediaType.APPLICATION_JSON);
+        ScimResponse response = client.createUser(user, new String[]{});
+        System.out.println("response body = " + response.getResponseBodyString());
 
         assertEquals(response.getStatusCode(), 400, "Status code is not equal to 400");
         assert response.getResponseBodyString().contains("There are missing required parameters");
 
         System.out.println("response.getStatusCode() = " + response.getStatusCode());
-        System.out.println("response.getResponseBodyString() = " + response.getResponseBodyString());
 
         System.out.println("LEAVING testPersonRequiredParams...");
     }

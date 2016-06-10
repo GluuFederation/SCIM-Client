@@ -124,7 +124,7 @@ public class UserExtensionsJsonTest extends BaseScimTest {
     @Test(groups = "d", dependsOnGroups = "c")
     public void retrieveUserTest() throws Exception {
 
-        ScimResponse response = client.retrievePerson(this.uid, MediaType.APPLICATION_JSON);
+        ScimResponse response = client.retrieveUser(this.uid, new String[]{});
 
         System.out.println(" retrieveUserTest() RESPONSE = "  + response.getResponseBodyString());
         assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");

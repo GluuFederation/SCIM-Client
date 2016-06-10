@@ -145,7 +145,7 @@ public class UserExtensionsObjectTest extends BaseScimTest {
     @Test(groups = "b", dependsOnGroups = "a")
     public void createUserTest() throws Exception {
 
-        ScimResponse response = client.createPerson(userToAdd, MediaType.APPLICATION_JSON);
+        ScimResponse response = client.createUser(userToAdd, new String[]{});
 
         System.out.println(" createUserTest() RESPONSE = " + response.getResponseBodyString());
         assertEquals(response.getStatusCode(), 201, "Could not add the user, status != 201");
@@ -169,7 +169,7 @@ public class UserExtensionsObjectTest extends BaseScimTest {
         extensionBuilder.setField("scimCustomThird", new BigDecimal(6000));
         userToUpdate.addExtension(extensionBuilder.build());
 
-        ScimResponse response = client.updatePerson(userToUpdate, this.uid, MediaType.APPLICATION_JSON);
+        ScimResponse response = client.updateUser(userToUpdate, this.uid, new String[]{});
 
         System.out.println(" updateUserTest() RESPONSE = " + response.getResponseBodyString());
         assertEquals(response.getStatusCode(), 200, "Could not update the user, status != 200");
@@ -182,7 +182,7 @@ public class UserExtensionsObjectTest extends BaseScimTest {
     @Test(groups = "d", dependsOnGroups = "c")
     public void retrieveUserTest() throws Exception {
 
-        ScimResponse response = client.retrievePerson(this.uid, MediaType.APPLICATION_JSON);
+        ScimResponse response = client.retrieveUser(this.uid, new String[]{});
 
         System.out.println(" retrieveUserTest() RESPONSE = "  + response.getResponseBodyString());
         assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");

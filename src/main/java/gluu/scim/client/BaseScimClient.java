@@ -34,7 +34,7 @@ public interface BaseScimClient extends Serializable {
      * @throws Exception
      */
 	public ScimResponse retrievePerson(String uid,String mediaType) throws HttpException, IOException;
-	
+
 	/**
      * Creates a person with ScimPerson as input
      * @param ScimPerson person

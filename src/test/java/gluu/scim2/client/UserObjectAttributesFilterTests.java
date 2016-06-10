@@ -9,6 +9,8 @@ import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.*;
 import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
@@ -18,11 +20,12 @@ import org.testng.annotations.Test;
 
 import javax.ws.rs.core.MediaType;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * README:
@@ -32,12 +35,16 @@ import static org.testng.Assert.assertEquals;
  *
  * @author Val Pecaoco
  */
-public class UserObjectTests extends BaseScimTest {
+public class UserObjectAttributesFilterTests extends BaseScimTest {
     
     String domainURL;
     Scim2Client client;
 
     String id;
+    User user;
+
+    String displayName = "Jose Raul Capablanca";
+    String formatted = "Jose Raul Graupera Capablanca";
 
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks", "umaAatClientKeyId"})
@@ -52,9 +59,10 @@ public class UserObjectTests extends BaseScimTest {
 
         System.out.println("IN testCreateUser...");
 
-        User user = createDummyUser();
+        user = createDummyUser();
 
-        ScimResponse response = client.createPerson(user, MediaType.APPLICATION_JSON);
+        String[] attributesArray = new String[]{};
+        ScimResponse response = client.createUser(user, attributesArray);
         System.out.println("response body = " + response.getResponseBodyString());
 
         assertEquals(response.getStatusCode(), 201, "Could not add user, status != 201");
@@ -73,16 +81,35 @@ public class UserObjectTests extends BaseScimTest {
 
         System.out.println("IN testRetrieveNewUser...");
 
-        ScimResponse response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
+        String[] attributesArray = new String[]{"displayName", "name.formatted", Constants.USER_EXT_SCHEMA_ID + ":" + "scimCustomSecond", "scimCustomThird"};  // With extensions
+        ScimResponse response = client.retrieveUser(this.id, attributesArray);
         System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
 
         User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
         assertEquals(userRetrieved.getId(), this.id, "User could not be retrieved");
+        assertEquals(this.formatted, userRetrieved.getName().getFormatted());
 
         System.out.println("userRetrieved.getId() = " + userRetrieved.getId());
         System.out.println("userRetrieved.getDisplayName() = " + userRetrieved.getDisplayName());
+
+        Set<String> schemas = userRetrieved.getSchemas();
+        assertTrue(schemas.contains(Constants.USER_EXT_SCHEMA_ID));
+
+        Extension extension = userRetrieved.getExtension(Constants.USER_EXT_SCHEMA_ID);
+        Assert.assertNotNull("(Deserialization) Custom extension not deserialized.", extension);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        Extension.Field customSecondField = extension.getFields().get("scimCustomSecond");
+        Assert.assertNotNull("(Deserialization) \"scimCustomSecond\" field not deserialized.", customSecondField);
+        List<Date> dateList = Arrays.asList(mapper.readValue(customSecondField.getValue(), Date[].class));
+        Assert.assertEquals(3, dateList.size());
+        System.out.println("##### (Deserialization) dateList.get(0) = " + dateList.get(0));
+        System.out.println("##### (Deserialization) dateList.get(1) = " + dateList.get(1));
+        System.out.println("##### (Deserialization) dateList.get(2) = " + dateList.get(2));
 
         System.out.println("LEAVING testRetrieveNewUser..." + "\n");
     }
@@ -94,7 +121,8 @@ public class UserObjectTests extends BaseScimTest {
 
         Thread.sleep(3000);  // Sleep for 3 seconds
 
-        ScimResponse response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
+        String[] attributesArray = new String[]{"urn:ietf:params:scim:schemas:core:2.0:User:name.formatted"};
+        ScimResponse response = client.retrieveUser(this.id, attributesArray);
         System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
@@ -104,7 +132,8 @@ public class UserObjectTests extends BaseScimTest {
         userRetrieved.setDisplayName(userRetrieved.getDisplayName() + " UPDATED");
         userRetrieved.setPassword(null);
 
-        ScimResponse responseUpdated = client.updatePerson(userRetrieved, this.id, MediaType.APPLICATION_JSON);
+        attributesArray = new String[]{"urn:ietf:params:scim:schemas:core:2.0:User:displayName", "urn:ietf:params:scim:schemas:core:2.0:User:name.formatted"};  // No extensions
+        ScimResponse responseUpdated = client.updateUser(userRetrieved, this.id, attributesArray);
         System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
 
         Assert.assertEquals(200, responseUpdated.getStatusCode());
@@ -112,7 +141,11 @@ public class UserObjectTests extends BaseScimTest {
         User userUpdated = Util.toUser(responseUpdated, client.getUserExtensionSchema());
 
         assertEquals(userUpdated.getId(), this.id, "User could not be retrieved");
+
         assert(userUpdated.getMeta().getLastModified().getTime() > userUpdated.getMeta().getCreated().getTime());
+
+        Set<String> schemas = userUpdated.getSchemas();
+        assertFalse(schemas.contains(Constants.USER_EXT_SCHEMA_ID));
 
         System.out.println("userUpdated.getId() = " + userUpdated.getId());
         System.out.println("userUpdated.getDisplayName() = " + userUpdated.getDisplayName());
@@ -127,7 +160,8 @@ public class UserObjectTests extends BaseScimTest {
 
         System.out.println("IN testUpdateUserNameDifferentId...");
 
-        ScimResponse response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
+        String[] attributesArray = new String[]{"displayName", "name.formatted"};
+        ScimResponse response = client.retrieveUser(this.id, attributesArray);
         System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
@@ -137,7 +171,7 @@ public class UserObjectTests extends BaseScimTest {
         userRetrieved.setUserName("aaaa1111");
         userRetrieved.setPassword(null);
 
-        ScimResponse responseUpdated = client.updatePerson(userRetrieved, this.id, MediaType.APPLICATION_JSON);
+        ScimResponse responseUpdated = client.updateUser(userRetrieved, this.id, attributesArray);
         System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
 
         Assert.assertEquals(409, responseUpdated.getStatusCode());
@@ -183,7 +217,7 @@ public class UserObjectTests extends BaseScimTest {
         System.out.println("LEAVING testUserDeserializerGroups..." + "\n");
     }
 
-    private User createDummyUser() {
+    private User createDummyUser() throws Exception {
 
         User user = new User();
 
@@ -197,7 +231,7 @@ public class UserObjectTests extends BaseScimTest {
 
         user.setUserName("chessMachine_" +  + new Date().getTime());
         user.setPassword("worldChampion");
-        user.setDisplayName("Jose Raul Capablanca");
+        user.setDisplayName(displayName);
         user.setNickName("Capa");
         user.setProfileUrl("");
         user.setLocale("en");
@@ -242,6 +276,13 @@ public class UserObjectTests extends BaseScimTest {
         address.setFormatted("Havana, Cuba");
         addresses.add(address);
         user.setAddresses(addresses);
+
+        // User Extensions
+        Extension.Builder extensionBuilder = new Extension.Builder(Constants.USER_EXT_SCHEMA_ID);
+        extensionBuilder.setField("scimCustomFirst", "Capa");
+        extensionBuilder.setFieldAsList("scimCustomSecond", Arrays.asList(new String[]{"1969-01-01T03:35:22Z", "1900-01-01T09:00:00Z", "2016-06-01T01:52:05Z"}));
+        extensionBuilder.setField("scimCustomThird", new BigDecimal(1000));
+        user.addExtension(extensionBuilder.build());
 
         return user;
     }
