@@ -11,13 +11,8 @@ import gluu.scim.client.model.ScimPerson;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 
 import javax.xml.bind.JAXBException;
-
-import org.apache.commons.httpclient.HttpException;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 
 /**
  * BaseClient
@@ -26,152 +21,178 @@ import org.codehaus.jackson.map.JsonMappingException;
  */
 public interface BaseScimClient extends Serializable {
 	
-	 /**
-     * Retrieves a person by his uid
-     * @param String uid
-     * @param String mediaType
-     * @return ScimResponse
-     * @throws Exception
+	/**
+	 * Retrieves a person by his uid
+	 *
+	 * @param uid
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
      */
-	public ScimResponse retrievePerson(String uid,String mediaType) throws HttpException, IOException;
+	ScimResponse retrievePerson(String uid, String mediaType) throws IOException;
 
 	/**
-     * Creates a person with ScimPerson as input
-     * @param ScimPerson person
-     * @param String mediaType
-     * @return ScimResponse
-     * @throws Exception
+	 * Creates a person with ScimPerson as input
+	 *
+	 * @param person
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 * @throws JAXBException
      */
-	public ScimResponse createPerson(ScimPerson person,String mediaType) throws JsonGenerationException, JsonMappingException, IOException, JAXBException;
+	ScimResponse createPerson(ScimPerson person, String mediaType) throws IOException, JAXBException;
+
 	/**
-     * Updates a person with ScimPerson as input
-     * @param ScimPerson person
-     * @param String mediaType
-     * @return ScimResponse
-     * @throws Exception
+	 * Updates a person with ScimPerson as input
+	 *
+	 * @param person
+	 * @param uid
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+     * @throws JAXBException
      */
-	public ScimResponse updatePerson(ScimPerson person,String uid,String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
-	 /**
-     * Deletes a person by his uid
-     * @param String uid
-     * @return ScimResponse
-     * @throws Exception
-     */
-	public ScimResponse deletePerson(String uid) throws HttpException, IOException;
-	 /**
-     * Retrieves a group by his id
-     * @param String id
-     * @param String mediaType
-     * @return ScimResponse
-     * @throws Exception
-     */
-	public ScimResponse retrieveGroup(String id,String mediaType) throws HttpException, IOException;
+	ScimResponse updatePerson(ScimPerson person, String uid, String mediaType) throws IOException, JAXBException;
+
 	/**
-     * Creates a Group with ScimGroup as input
-     * @param ScimGroup group
-     * @param String mediaType
-     * @return ScimResponse
-     * @throws Exception
+	 * Deletes a person by his uid
+	 *
+	 * @param uid
+	 * @return ScimResponse
+	 * @throws IOException
      */
-	public ScimResponse createGroup(ScimGroup group,String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
+	ScimResponse deletePerson(String uid) throws IOException;
+
 	/**
-     * Updates a Group with ScimGroup as input
-     * @param ScimGroup group
-     * @param String mediaType
-     * @return ScimResponse
-     * @throws Exception
+	 * Retrieves a group by his id
+	 *
+	 * @param id
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
      */
-	public ScimResponse updateGroup(ScimGroup group,String id, String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
-	 /**
-     * Deletes a group by his id
-     * @param String ui
-     * @return ScimResponse
-     * @throws Exception
-     */
-	public ScimResponse deleteGroup(String id) throws HttpException, IOException;
+	ScimResponse retrieveGroup(String id, String mediaType) throws IOException;
+
 	/**
-     * Creates a person with a String as input
-     * @param ScimPerson person
-     * @param String mediaType
-     * @return ScimResponse
-     * @throws Exception
+	 * Creates a Group with ScimGroup as input
+	 *
+	 * @param group
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 * @throws JAXBException
      */
-    public ScimResponse createPersonString(String person,String mediaType) throws JsonGenerationException, JsonMappingException, IOException, JAXBException;
-    /**
-     * Updates a person with a String as input
-     * @param ScimPerson person
-     * @param String mediaType
-     * @return ScimResponse
-     * @throws Exception
-     */
-	public ScimResponse updatePersonString(String person,String uid,String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
+	ScimResponse createGroup(ScimGroup group, String mediaType) throws IOException, JAXBException;
+
 	/**
-     * Creates a group with a String as input
-     * @param ScimGroup group
-     * @param String mediaType
-     * @return ScimResponse
-     * @throws Exception
+	 * Updates a Group with ScimGroup as input
+	 *
+	 * @param group
+	 * @param id
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+     * @throws JAXBException
      */
-	public ScimResponse createGroupString(String group,String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
+	ScimResponse updateGroup(ScimGroup group, String id, String mediaType) throws IOException, JAXBException;
+
 	/**
-     * Updates a group with a String as input
-     * @param ScimGroup group
-     * @param String mediaType
-     * @return ScimResponse
-     * @throws Exception
+	 * Deletes a group by his id
+	 *
+	 * @param id
+	 * @return ScimResponse
+	 * @throws IOException
      */
-	public ScimResponse updateGroupString(String group,String id, String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
+	ScimResponse deleteGroup(String id) throws IOException;
+
 	/**
-     * Bulk operation with ScimBulkOperation as input
-     * @param ScimBulkOperation operation
-     * @param String mediaType
-     * @return ScimResponse
-	 * @throws IOException 
-	 * @throws UnsupportedEncodingException 
-	 * @throws JsonMappingException 
-	 * @throws JsonGenerationException 
-	 * @throws JAXBException 
-     * @throws Exception
+	 * Creates a person with a String as input
+	 *
+	 * @param person
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 * @throws JAXBException
      */
-	public ScimResponse bulkOperation(ScimBulkOperation operation,String mediaType) throws JsonGenerationException, JsonMappingException, UnsupportedEncodingException, IOException, JAXBException;
+    ScimResponse createPersonString(String person, String mediaType) throws IOException, JAXBException;
+
+	/**
+	 * Updates a person with a String as input
+	 *
+	 * @param person
+	 * @param uid
+	 * @param mediaType
+	 * @return
+	 * @throws IOException
+     * @throws JAXBException
+     */
+	ScimResponse updatePersonString(String person, String uid, String mediaType) throws IOException, JAXBException;
+
+	/**
+	 * Creates a group with a String as input
+	 *
+	 * @param group
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 * @throws JAXBException
+     */
+	ScimResponse createGroupString(String group, String mediaType) throws IOException, JAXBException;
+
+	/**
+	 * Updates a group with a String as input
+	 *
+	 * @param group
+	 * @param id
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+     * @throws JAXBException
+     */
+	ScimResponse updateGroupString(String group, String id, String mediaType) throws IOException, JAXBException;
+
+	/**
+	 * Bulk operation with ScimBulkOperation as input
+	 *
+	 * @param operation
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 * @throws JAXBException
+     */
+	ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws IOException, JAXBException;
 	
 	/**
-     * Bulk operation with String as input
-     * @param String operation
-     * @param String mediaType
-     * @return ScimResponse
-	 * @throws UnsupportedEncodingException 
-	 * @throws IOException 
-	 * @throws HttpException 
-     * @throws Exception
+	 * Bulk operation with String as input
+	 *
+	 * @param operation
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
      */
-	public ScimResponse bulkOperationString(String operation,String mediaType) throws UnsupportedEncodingException, HttpException, IOException;
+	ScimResponse bulkOperationString(String operation,String mediaType) throws IOException;
+
 	/**
-     * Retrieves All persons
-     * @param String mediaType
-     * @return ScimResponse
-	 * @throws IOException 
-	 * @throws HttpException 
-     * @throws Exception
+	 * Retrieves All persons
+	 *
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
      */
-	public ScimResponse retrieveAllPersons(String mediaType) throws HttpException, IOException;
+	ScimResponse retrieveAllPersons(String mediaType) throws IOException;
+
 	/**
-     * Retrieves All groups
-     * @param String mediaType
-     * @return ScimResponse
-	 * @throws IOException 
-	 * @throws HttpException 
-     * @throws Exception
+	 * Retrieves All groups
+	 *
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
      */
-	public ScimResponse retrieveAllGroups(String mediaType) throws HttpException, IOException;
+	ScimResponse retrieveAllGroups(String mediaType) throws IOException;
 
-	public ScimResponse personSearch(String attribute, String value, String mediaType) throws JsonGenerationException,
-		JsonMappingException, IOException, JAXBException;
+	ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException;
 
-	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)
-			throws JsonGenerationException, JsonMappingException, IOException, JAXBException;
+	ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType) throws IOException, JAXBException;
 
-	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws JsonGenerationException,
-	JsonMappingException, IOException, JAXBException;
-
+	ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException;
 }

@@ -72,6 +72,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
          * .ScimPerson, java.lang.String)
          */
 	@Override
+	@Deprecated
 	public ScimResponse createPerson(ScimPerson person, String mediaType) throws IOException, JAXBException {
 		return scimClient.createPerson(person, mediaType);
 	}

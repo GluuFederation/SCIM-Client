@@ -204,13 +204,14 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * .ScimPerson, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse createPerson(ScimPerson person, String mediaType) throws IOException, JAXBException {
 
 		init();
 
 		HttpClient httpClient = new HttpClient();
 
-		PostMethod post = new PostMethod(this.domain + "/scim/v2/Users/");
+		PostMethod post = new PostMethod(this.domain + "/scim/v1/Users/");
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);

@@ -9,12 +9,9 @@ import gluu.scim.client.BaseScimClient;
 import gluu.scim.client.ScimResponse;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import javax.xml.bind.JAXBException;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
