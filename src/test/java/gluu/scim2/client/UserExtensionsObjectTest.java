@@ -22,8 +22,6 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.core.MediaType;
-
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;

@@ -10,8 +10,6 @@ import gluu.scim.client.exception.ScimInitializationException;
 import gluu.scim.client.model.ScimBulkOperation;
 import gluu.scim2.client.BaseScim2ClientImpl;
 import org.apache.commons.httpclient.HttpMethodBase;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
@@ -29,12 +27,11 @@ import org.xdi.oxauth.model.crypto.signature.RSAPrivateKey;
 import org.xdi.oxauth.model.uma.*;
 import org.xdi.oxauth.model.uma.wrapper.Token;
 import org.xdi.oxauth.model.util.JwksUtil;
-import org.xdi.oxauth.model.util.JwtUtil;
+// import org.xdi.oxauth.model.util.JwtUtil;
 import org.xdi.util.StringHelper;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -239,30 +236,54 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
+	@Deprecated
 	public ScimResponse retrievePerson(String id, String mediaType) throws IOException {
-		ScimResponse scimResponse = super.retrievePerson(id, mediaType);
-		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.retrievePerson(id, mediaType);
-		}
-		
-		return scimResponse;
+		return retrieveUser(id, new String[]{});
 	}
 
 	@Override
-	public ScimResponse createPerson(User person, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.createPerson(person, mediaType);
+	public ScimResponse retrieveUser(String id, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.retrieveUser(id, attributesArray);
+
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.createPerson(person, mediaType);
+			scimResponse = super.retrieveUser(id, attributesArray);
 		}
 
 		return scimResponse;
 	}
 
 	@Override
-	public ScimResponse updatePerson(User person, String id, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.updatePerson(person, id, mediaType);
+	@Deprecated
+	public ScimResponse createPerson(User user, String mediaType) throws IOException, JAXBException {
+		return createUser(user, new String[]{});
+	}
+
+	@Override
+	public ScimResponse createUser(User user, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.createUser(user, attributesArray);
+
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.updatePerson(person, id, mediaType);
+			scimResponse = super.createUser(user, attributesArray);
+		}
+
+		return scimResponse;
+	}
+
+	@Override
+	@Deprecated
+	public ScimResponse updatePerson(User user, String id, String mediaType) throws IOException, JAXBException {
+		return updateUser(user, id, new String[]{});
+	}
+
+	@Override
+	public ScimResponse updateUser(User user, String id, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.updateUser(user, id, attributesArray);
+
+		if (autorizeRpt(scimResponse)) {
+            scimResponse = super.updateUser(user, id, attributesArray);
 		}
 
 		return scimResponse;
@@ -279,31 +300,54 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
+	@Deprecated
 	public ScimResponse retrieveGroup(String id, String mediaType) throws IOException {
-		ScimResponse scimResponse = super.retrieveGroup(id, mediaType);
+		return retrieveGroup(id, new String[]{});
+	}
+
+	@Override
+	public ScimResponse retrieveGroup(String id, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.retrieveGroup(id, attributesArray);
+
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.retrieveGroup(id, mediaType);
+			scimResponse = super.retrieveGroup(id, attributesArray);
 		}
 
 		return scimResponse;
 	}
 
 	@Override
+	@Deprecated
 	public ScimResponse createGroup(Group group, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.createGroup(group, mediaType);
+		return createGroup(group, new String[]{});
+	}
+
+	@Override
+	public ScimResponse createGroup(Group group, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.createGroup(group, attributesArray);
+
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.createGroup(group, mediaType);
+			scimResponse = super.createGroup(group, attributesArray);
 		}
 
 		return scimResponse;
 	}
 
 	@Override
-	public ScimResponse updateGroup(Group group, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
-			UnsupportedEncodingException, IOException, JAXBException {
-		ScimResponse scimResponse = super.updateGroup(group, id, mediaType);
+	@Deprecated
+	public ScimResponse updateGroup(Group group, String id, String mediaType) throws IOException, JAXBException {
+		return updateGroup(group, id, new String[]{});
+	}
+
+	@Override
+	public ScimResponse updateGroup(Group group, String id, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.updateGroup(group, id, attributesArray);
+
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.updateGroup(group, id, mediaType);
+			scimResponse = super.updateGroup(group, id, attributesArray);
 		}
 
 		return scimResponse;
@@ -330,8 +374,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse updatePersonString(String person, String id, String mediaType) throws JsonGenerationException,
-			JsonMappingException, UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse updatePersonString(String person, String id, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.updatePersonString(person, id, mediaType);
 		if (autorizeRpt(scimResponse)) {
             scimResponse = super.updatePersonString(person, id, mediaType);

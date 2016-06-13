@@ -95,7 +95,6 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	@Override
 	public ScimResponse createUser(User user, String[] attributesArray) throws IOException {
 		return scimClient.createUser(user, attributesArray);
-		// return scimClient.createPerson(user, null);
 	}
 
 	/*
