@@ -6,9 +6,6 @@
 package gluu.scim2.client;
 
 import gluu.scim.client.ScimResponse;
-import gluu.scim.client.model.ScimBulkOperation;
-import gluu.scim.client.model.ScimGroup;
-import gluu.scim.client.model.ScimPerson;
 import gluu.scim.client.model.ScimPersonSearch;
 import gluu.scim.client.util.ResponseMapper;
 import gluu.scim.client.util.Util;
@@ -18,7 +15,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
 
-import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -39,6 +35,8 @@ import org.gluu.oxtrust.model.scim2.User;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
 
 /**
  * SCIM default client
@@ -83,37 +81,42 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * .lang.String)
 	 */
 	@Override
-	public ScimResponse retrieveServiceProviderConfig(String mediaType) throws IOException {
+	public ScimResponse retrieveServiceProviderConfig() throws IOException {
+
 		init();
+
 		HttpClient httpClient = new HttpClient();
+
 		GetMethod get = new GetMethod(this.domain + "/scim/v2/ServiceProviderConfig");
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
+		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-
 		}
 
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			get.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-
 		}
+		*/
 
 		try {
 
 			httpClient.executeMethod(get);
-			ScimResponse response = ResponseMapper.map(get, null);
+
+			ScimResponse response = ResponseMapper.map(get, new ScimResponse());
+
 			return response;
+
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			get.releaseConnection();
-
 		}
+
 		return null;
 	}
 
@@ -124,12 +127,19 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * .lang.String)
 	 */
 	@Override
-	public ScimResponse retrieveResourceTypes(String mediaType) throws IOException {
+	public ScimResponse retrieveResourceTypes() throws IOException {
+
 		init();
+
 		HttpClient httpClient = new HttpClient();
+
 		GetMethod get = new GetMethod(this.domain + "/scim/v2/ResourceTypes");
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
 		addAuthenticationHeader(get);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+
+		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
 		}
@@ -137,18 +147,22 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			get.setRequestHeader("Accept", MediaType.APPLICATION_XML);
 		}
+		*/
 
 		try {
-			httpClient.executeMethod(get);
-			ScimResponse response = ResponseMapper.map(get, null);
-			return response;
-		} catch (Exception ex) {
-			log.error(" an Error occured : ", ex);
 
+			httpClient.executeMethod(get);
+
+			ScimResponse response = ResponseMapper.map(get, new ScimResponse());
+
+			return response;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		} finally {
 			get.releaseConnection();
-
 		}
+
 		return null;
 	}
 
@@ -174,7 +188,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
-		get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
 		get.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
@@ -194,53 +208,6 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 			get.releaseConnection();
 		}
 
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * gluu.scim.client.ScimClientService#createPerson(gluu.scim.client.model
-	 * .ScimPerson, java.lang.String)
-	 */
-	@Override
-	@Deprecated
-	public ScimResponse createPerson(ScimPerson person, String mediaType) throws IOException, JAXBException {
-
-		init();
-
-		HttpClient httpClient = new HttpClient();
-
-		PostMethod post = new PostMethod(this.domain + "/scim/v1/Users/");
-		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
-
-		addAuthenticationHeader(post);
-
-		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(person), "application/json", "utf-8"));
-		}
-
-		if (mediaType.equals(MediaType.APPLICATION_XML)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(person, ScimPerson.class), "text/xml", "utf-8"));
-
-		}
-		try {
-			httpClient.executeMethod(post);
-
-			ScimResponse response = ResponseMapper.map(post, null);
-
-			return response;
-
-		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
-		} finally {
-			post.releaseConnection();
-
-		}
 		return null;
 	}
 
@@ -267,14 +234,14 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
 		post.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
 		});
 
 		// post.setRequestEntity(new StringRequestEntity(Util.getJSONString(person), "application/json", "utf-8"));
-		post.setRequestEntity(new StringRequestEntity(gluu.scim2.client.util.Util.getJSONStringUser(user), MediaType.APPLICATION_JSON, "utf-8"));
+		post.setRequestEntity(new StringRequestEntity(gluu.scim2.client.util.Util.getJSONStringUser(user), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
 		try {
 
@@ -290,51 +257,6 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 			post.releaseConnection();
 		}
 
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * gluu.scim.client.ScimClientService#updatePerson(gluu.scim.client.model
-	 * .ScimPerson, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public ScimResponse updatePerson(ScimPerson person, String id, String mediaType) throws IOException, JAXBException {
-
-		init();
-
-		HttpClient httpClient = new HttpClient();
-
-		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/" + id);
-		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
-
-		addAuthenticationHeader(put);
-
-		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
-			put.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			put.setRequestEntity(new StringRequestEntity(Util.getJSONString(person), "application/json", "utf-8"));
-		}
-
-		if (mediaType.equals(MediaType.APPLICATION_XML)) {
-			put.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			put.setRequestEntity(new StringRequestEntity(Util.getXMLString(person, ScimPerson.class), "text/xml", "utf-8"));
-
-		}
-		try {
-			httpClient.executeMethod(put);
-
-			ScimResponse response = ResponseMapper.map(put, null);
-
-			return response;
-		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
-		} finally {
-			put.releaseConnection();
-
-		}
 		return null;
 	}
 
@@ -361,14 +283,14 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
-		put.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
 		put.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
 		});
 
 		// put.setRequestEntity(new StringRequestEntity(Util.getJSONString(person), "application/json", "utf-8"));
-		put.setRequestEntity(new StringRequestEntity(gluu.scim2.client.util.Util.getJSONStringUser(user), MediaType.APPLICATION_JSON, "utf-8"));
+		put.setRequestEntity(new StringRequestEntity(gluu.scim2.client.util.Util.getJSONStringUser(user), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
 		try {
 
@@ -402,21 +324,22 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		delete.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(delete);
+		delete.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
 		try {
+
 			httpClient.executeMethod(delete);
 
-			ScimResponse response = ResponseMapper.map(delete, null);
+			ScimResponse response = ResponseMapper.map(delete, new ScimResponse());
 
 			return response;
+
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			delete.releaseConnection();
-
 		}
+
 		return null;
 	}
 
@@ -442,7 +365,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
-		get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
 		get.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
@@ -452,62 +375,16 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 
 			httpClient.executeMethod(get);
 
-			ScimResponse response = ResponseMapper.map(get, null);
+			ScimResponse response = ResponseMapper.map(get, new ScimResponse());
 
 			return response;
 
 		} catch (Exception ex) {
-			log.error(" An error occured : ", ex);
+			ex.printStackTrace();
 		} finally {
 			get.releaseConnection();
 		}
 
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * gluu.scim.client.ScimClientService#createGroup(gluu.scim.client.model
-	 * .ScimGroup, java.lang.String)
-	 */
-	@Override
-	public ScimResponse createGroup(ScimGroup group, String mediaType) throws IOException, JAXBException {
-
-		init();
-
-		HttpClient httpClient = new HttpClient();
-
-		PostMethod post = new PostMethod(this.domain + "/scim/v2/Groups/");
-		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
-
-		addAuthenticationHeader(post);
-
-		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(group), "application/json", "utf-8"));
-		}
-
-		if (mediaType.equals(MediaType.APPLICATION_XML)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(group, ScimGroup.class), "text/xml", "utf-8"));
-
-		}
-
-		try {
-			httpClient.executeMethod(post);
-
-			ScimResponse response = ResponseMapper.map(post, null);
-
-			return response;
-		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
-		} finally {
-			post.releaseConnection();
-
-		}
 		return null;
 	}
 
@@ -534,13 +411,13 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
 		post.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
 		});
 
-		post.setRequestEntity(new StringRequestEntity(Util.getJSONString(group), MediaType.APPLICATION_JSON, "utf-8"));
+		post.setRequestEntity(new StringRequestEntity(Util.getJSONString(group), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
 		try {
 
@@ -556,52 +433,6 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 			post.releaseConnection();
 		}
 
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * gluu.scim.client.ScimClientService#updateGroup(gluu.scim.client.model
-	 * .ScimGroup, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public ScimResponse updateGroup(ScimGroup group, String id, String mediaType) throws IOException, JAXBException {
-
-		init();
-
-		HttpClient httpClient = new HttpClient();
-
-		PutMethod put = new PutMethod(this.domain + "/scim/v2/Groups/" + id);
-		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
-
-		addAuthenticationHeader(put);
-
-		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
-			put.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			put.setRequestEntity(new StringRequestEntity(Util.getJSONString(group), "application/json", "utf-8"));
-		}
-
-		if (mediaType.equals(MediaType.APPLICATION_XML)) {
-			put.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			put.setRequestEntity(new StringRequestEntity(Util.getXMLString(group, ScimGroup.class), "text/xml", "utf-8"));
-
-		}
-
-		try {
-			httpClient.executeMethod(put);
-
-			ScimResponse response = ResponseMapper.map(put, null);
-
-			return response;
-		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
-		} finally {
-			put.releaseConnection();
-
-		}
 		return null;
 	}
 
@@ -628,13 +459,13 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
-		put.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
 		put.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
 		});
 
-		put.setRequestEntity(new StringRequestEntity(Util.getJSONString(group), MediaType.APPLICATION_JSON, "utf-8"));
+		put.setRequestEntity(new StringRequestEntity(Util.getJSONString(group), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
 		try {
 
@@ -668,21 +499,22 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		delete.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(delete);
+		delete.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
 		try {
+
 			httpClient.executeMethod(delete);
 
-			ScimResponse response = ResponseMapper.map(delete, null);
+			ScimResponse response = ResponseMapper.map(delete, new ScimResponse());
 
 			return response;
+
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			delete.releaseConnection();
-
 		}
+
 		return null;
 	}
 
@@ -693,6 +525,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse createPersonString(String person, String mediaType) throws IOException, JAXBException {
 
 		init();
@@ -703,7 +536,11 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
+		post.setRequestEntity(new StringRequestEntity(person, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
 			post.setRequestEntity(new StringRequestEntity(person, "application/json", "utf-8"));
@@ -712,24 +549,23 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
 			post.setRequestEntity(new StringRequestEntity(person, "text/xml", "utf-8"));
-
 		}
+		*/
 
 		try {
 
 			httpClient.executeMethod(post);
 
-			ScimResponse response = ResponseMapper.map(post, null);
+			ScimResponse response = ResponseMapper.map(post, new ScimResponse());
 
 			return response;
+
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			post.releaseConnection();
-
 		}
+
 		return null;
 	}
 
@@ -740,6 +576,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse updatePersonString(String person, String id, String mediaType) throws IOException, JAXBException {
 
 		init();
@@ -750,7 +587,11 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
+		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
+		put.setRequestEntity(new StringRequestEntity(person, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			put.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
 			put.setRequestEntity(new StringRequestEntity(person, "application/json", "utf-8"));
@@ -759,26 +600,24 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			put.setRequestHeader("Accept", MediaType.APPLICATION_XML);
 			put.setRequestEntity(new StringRequestEntity(person, "text/xml", "utf-8"));
-
 		}
+		*/
 
 		try {
+
 			httpClient.executeMethod(put);
 
-			ScimResponse response = ResponseMapper.map(put, null);
-			put.releaseConnection();
+			ScimResponse response = ResponseMapper.map(put, new ScimResponse());
 
 			return response;
+
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			put.releaseConnection();
-
 		}
-		return null;
 
+		return null;
 	}
 
 	/*
@@ -788,6 +627,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse createGroupString(String group, String mediaType) throws IOException, JAXBException {
 
 		init();
@@ -798,7 +638,11 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
+		post.setRequestEntity(new StringRequestEntity(group, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
 			post.setRequestEntity(new StringRequestEntity(group, "application/json", "utf-8"));
@@ -807,22 +651,23 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
 			post.setRequestEntity(new StringRequestEntity(group, "text/xml", "utf-8"));
-
 		}
+		*/
+
 		try {
+
 			httpClient.executeMethod(post);
 
-			ScimResponse response = ResponseMapper.map(post, null);
+			ScimResponse response = ResponseMapper.map(post, new ScimResponse());
 
 			return response;
+
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			post.releaseConnection();
-
 		}
+
 		return null;
 	}
 
@@ -833,6 +678,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse updateGroupString(String group, String id, String mediaType) throws IOException, JAXBException {
 
 		init();
@@ -843,7 +689,11 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
+		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
+		put.setRequestEntity(new StringRequestEntity(group, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			put.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
 			put.setRequestEntity(new StringRequestEntity(group, "application/json", "utf-8"));
@@ -852,68 +702,23 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			put.setRequestHeader("Accept", MediaType.APPLICATION_XML);
 			put.setRequestEntity(new StringRequestEntity(group, "text/xml", "utf-8"));
-
 		}
+		*/
 
 		try {
+
 			httpClient.executeMethod(put);
 
-			ScimResponse response = ResponseMapper.map(put, null);
-			put.releaseConnection();
+			ScimResponse response = ResponseMapper.map(put, new ScimResponse());
 
 			return response;
+
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			put.releaseConnection();
-
-		}
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * gluu.scim.client.ScimClientService#bulkOperation(gluu.scim.client.model
-	 * .ScimBulkOperation, java.lang.String)
-	 */
-	@Override
-	public ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws IOException, JAXBException {
-		init();
-
-		HttpClient httpClient = new HttpClient();
-
-		PostMethod post = new PostMethod(this.domain + "/scim/v2/Bulk/");
-		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
-
-		addAuthenticationHeader(post);
-
-		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(operation), "application/json", "utf-8"));
 		}
 
-		if (mediaType.equals(MediaType.APPLICATION_XML)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(operation, ScimGroup.class), "text/xml", "utf-8"));
-
-		}
-		try {
-			httpClient.executeMethod(post);
-
-			ScimResponse response = ResponseMapper.map(post, null);
-
-			return response;
-		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
-		} finally {
-			post.releaseConnection();
-
-		}
 		return null;
 	}
 
@@ -924,7 +729,9 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * .BulkOperation, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws IOException, JAXBException {
+
 		init();
 
 		HttpClient httpClient = new HttpClient();
@@ -933,7 +740,11 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
+		post.setRequestEntity(new StringRequestEntity(Util.getJSONString(bulkRequest), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
 			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(bulkRequest), "application/json", "utf-8"));
@@ -942,22 +753,23 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
 			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(bulkRequest, BulkRequest.class), "text/xml", "utf-8"));
-
 		}
+		*/
+
 		try {
+
 			httpClient.executeMethod(post);
 
-			ScimResponse response = ResponseMapper.map(post, null);
+			ScimResponse response = ResponseMapper.map(post, new ScimResponse());
 
 			return response;
+
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			post.releaseConnection();
-
 		}
+
 		return null;
 	}
 
@@ -968,7 +780,9 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse bulkOperationString(String operation, String mediaType) throws IOException {
+
 		init();
 
 		HttpClient httpClient = new HttpClient();
@@ -977,7 +791,11 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
+		post.setRequestEntity(new StringRequestEntity(operation, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
 			post.setRequestEntity(new StringRequestEntity(operation, "application/json", "utf-8"));
@@ -986,66 +804,35 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
 			post.setRequestEntity(new StringRequestEntity(operation, "text/xml", "utf-8"));
-
 		}
+		*/
 
 		try {
+
 			httpClient.executeMethod(post);
 
-			ScimResponse response = ResponseMapper.map(post, null);
+			ScimResponse response = ResponseMapper.map(post, new ScimResponse());
 
 			return response;
+
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			post.releaseConnection();
-
 		}
-		return null;
+
+		throw null;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * gluu.scim.client.ScimClientService#retrieveAllPersons(java.lang.String)
+	 * gluu.scim.client.ScimClientService#retrieveAllUsers(java.lang.String)
 	 */
 	@Override
-	@Deprecated
-	public ScimResponse retrieveAllPersons(String mediaType) throws IOException {
-		init();
-		HttpClient httpClient = new HttpClient();
-		GetMethod get = new GetMethod(this.domain + "/scim/v2/Users/");
-		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+	public ScimResponse retrieveAllUsers() throws IOException {
 
-		addAuthenticationHeader(get);
-
-		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
-			get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-
-		}
-
-		if (mediaType.equals(MediaType.APPLICATION_XML)) {
-			get.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-
-		}
-
-		try {
-			httpClient.executeMethod(get);
-
-			ScimResponse response = ResponseMapper.map(get, null);
-
-			return response;
-		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
-		} finally {
-			get.releaseConnection();
-
-		}
-		return null;
+		return searchUsers("", 1, MAX_COUNT, "", "", new String[]{});
 	}
 
 	/**
@@ -1083,20 +870,18 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		addAuthenticationHeader(get);
 
 		// SCIM 2.0 uses JSON only
-		get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
 		try {
 
 			httpClient.executeMethod(get);
 
-			ScimResponse response = ResponseMapper.map(get, null);
+			ScimResponse response = ResponseMapper.map(get, new ScimResponse());
 
 			return response;
 
 		} catch (Exception ex) {
-
-			log.error(" An error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			get.releaseConnection();
 		}
@@ -1110,40 +895,9 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
      * gluu.scim.client.ScimClientService#retrieveAllGroups(java.lang.String)
      */
 	@Override
-	@Deprecated
-	public ScimResponse retrieveAllGroups(String mediaType) throws IOException {
-		init();
-		HttpClient httpClient = new HttpClient();
-		GetMethod get = new GetMethod(this.domain + "/scim/v2/Groups/");
-		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+	public ScimResponse retrieveAllGroups() throws IOException {
 
-		addAuthenticationHeader(get);
-
-		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
-			get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-
-		}
-
-		if (mediaType.equals(MediaType.APPLICATION_XML)) {
-			get.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-
-		}
-
-		try {
-			httpClient.executeMethod(get);
-
-			ScimResponse response = ResponseMapper.map(get, null);
-
-			return response;
-		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
-		} finally {
-			get.releaseConnection();
-
-		}
-		return null;
+		return searchGroups("", 1, MAX_COUNT, "", "", new String[]{});
 	}
 
 	/**
@@ -1172,7 +926,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		addAuthenticationHeader(get);
 
 		// SCIM 2.0 uses JSON only
-		get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
 		get.setQueryString(new NameValuePair[] {
 			new NameValuePair("filter", filter),
@@ -1207,6 +961,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
 
 		init();
@@ -1221,7 +976,11 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		searchPattern.setValue(value);
 
 		addAuthenticationHeader(post);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
+		post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
 			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), "application/json", "utf-8"));
@@ -1230,23 +989,23 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
 			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(searchPattern, ScimPersonSearch.class), "text/xml", "utf-8"));
-
 		}
+		*/
+
 		try {
+
 			httpClient.executeMethod(post);
 
-			ScimResponse response = ResponseMapper.map(post, null);
+			ScimResponse response = ResponseMapper.map(post, new ScimResponse());
 
 			return response;
 
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			post.releaseConnection();
-
 		}
+
 		return null;
 	}
 
@@ -1257,6 +1016,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * java.lang.Object, java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType) throws IOException, JAXBException {
 
 		init();
@@ -1268,7 +1028,9 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 
 		ScimPersonSearch searchPattern = new ScimPersonSearch();
 		searchPattern.setAttribute(attribute);
-		String stringValue = new String();
+		String stringValue = Util.getJSONString(value);
+
+		/*
 		if (valueMediaType.equals(MediaType.APPLICATION_JSON)) {
 			stringValue = Util.getJSONString(value);
 		}
@@ -1276,11 +1038,17 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		if (valueMediaType.equals(MediaType.APPLICATION_XML)) {
 			stringValue = Util.getXMLString(value, value.getClass());
 		}
+		*/
+
 
 		searchPattern.setValue(stringValue);
 
 		addAuthenticationHeader(post);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
+		post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+		/*
 		if (outPutMediaType.equals(MediaType.APPLICATION_JSON)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
 			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), "application/json", "utf-8"));
@@ -1289,29 +1057,30 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		if (outPutMediaType.equals(MediaType.APPLICATION_XML)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
 			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(searchPattern, ScimPersonSearch.class), "text/xml", "utf-8"));
-
 		}
+		*/
+
 		try {
+
 			httpClient.executeMethod(post);
 
-			ScimResponse response = ResponseMapper.map(post, null);
+			ScimResponse response = ResponseMapper.map(post, new ScimResponse());
 
 			return response;
 
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			post.releaseConnection();
-
 		}
+
 		return null;
 	}
 	
 	/* (non-Javadoc)
 	 * @see gluu.scim.client.ScimClientService#personSearch(java.lang.String, java.lang.String, java.lang.String)
 	 */
+	/*
 	@Override
 	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException {
 
@@ -1336,9 +1105,10 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
 			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(searchPattern, ScimPersonSearch.class), "text/xml", "utf-8"));
-
 		}
+
 		try {
+
 			httpClient.executeMethod(post);
 
 			ScimResponse response = ResponseMapper.map(post, null);
@@ -1346,27 +1116,27 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 			return response;
 
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			post.releaseConnection();
-
 		}
+
 		return null;
 	}
+	*/
 
 	@Override
 	public UserExtensionSchema getUserExtensionSchema() throws Exception {
 
 		GetMethod get = new GetMethod(this.domain + "/scim/v2/Schemas/" + Constants.USER_EXT_SCHEMA_ID);
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
-		get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
 		HttpClient httpClient = new HttpClient();
 		httpClient.executeMethod(get);
 
-		ScimResponse response = ResponseMapper.map(get, null);
+		ScimResponse response = ResponseMapper.map(get, new ScimResponse());
 
 		UserExtensionSchema userExtensionSchema = (UserExtensionSchema) gluu.scim2.client.util.Util.jsonToObject(response, UserExtensionSchema.class);
 

@@ -16,7 +16,6 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.core.MediaType;
 import java.io.File;
 
 import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
@@ -44,12 +43,12 @@ public class UserFiltersNegativeTests extends BaseScimTest {
     }
 
     @Test
-    public void testRetrieveAllPersons() throws Exception {
+    public void testRetrieveAllUsers() throws Exception {
 
         // This is the old method
-        ScimResponse response = client.retrieveAllPersons(MediaType.APPLICATION_JSON);
+        ScimResponse response = client.retrieveAllUsers();
 
-        System.out.println(" testRetrieveAllPersons response = " + response.getResponseBodyString());
+        System.out.println(" testRetrieveAllUsers response = " + response.getResponseBodyString());
         assertEquals(response.getStatusCode(), 200, "Status != 200");
 
         ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());

@@ -30,7 +30,6 @@ public class Util {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
         mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         Object clazzObject = mapper.readValue(json, clazz);
@@ -50,7 +49,6 @@ public class Util {
         ObjectMapper mapper = new ObjectMapper();
 
         mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
         simpleModule.addSerializer(User.class, new UserSerializer());
@@ -67,7 +65,6 @@ public class Util {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
         mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         UserDeserializer userDeserializer = new UserDeserializer();
@@ -88,7 +85,6 @@ public class Util {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
         mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         GroupDeserializer groupDeserializer = new GroupDeserializer();
@@ -125,7 +121,6 @@ public class Util {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
         mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         ListResponseUserDeserializer listResponseUserDeserializer = new ListResponseUserDeserializer();
@@ -144,7 +139,6 @@ public class Util {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
         mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         ListResponseGroupDeserializer listResponseGroupDeserializer = new ListResponseGroupDeserializer();

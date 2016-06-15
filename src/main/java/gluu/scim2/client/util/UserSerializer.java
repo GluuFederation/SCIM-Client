@@ -7,10 +7,7 @@ package gluu.scim2.client.util;
 
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializerProvider;
+import org.codehaus.jackson.map.*;
 import org.gluu.oxtrust.model.scim2.Constants;
 import org.gluu.oxtrust.model.scim2.Extension;
 import org.gluu.oxtrust.model.scim2.ExtensionFieldType;
@@ -39,7 +36,7 @@ public class UserSerializer extends JsonSerializer<User> {
             jsonGenerator.writeStartObject();
 
             ObjectMapper mapper = new ObjectMapper();
-            mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+            mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
 
             JsonNode rootNode = mapper.convertValue(user, JsonNode.class);
 

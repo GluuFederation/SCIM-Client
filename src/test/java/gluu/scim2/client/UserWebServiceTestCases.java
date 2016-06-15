@@ -12,10 +12,7 @@ import gluu.scim.client.ScimResponse;
 import java.io.File;
 import java.io.IOException;
 
-import javax.ws.rs.core.MediaType;
-
-import gluu.scim2.client.util.Util;
-import org.apache.commons.httpclient.HttpException;
+// import gluu.scim2.client.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Email;
@@ -87,17 +84,16 @@ public class UserWebServiceTestCases extends BaseScimTest {
 	}
 	
 	@Test
-	public void retrieveAllPersonsTest() throws HttpException, IOException {
+	public void retrieveAllUsersTest() throws IOException {
 
-		response = client.retrieveAllPersons(MediaType.APPLICATION_JSON);
-		System.out.println("UserWebServiceTestCases : retrieveAllPersonsTest response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not get a list of all persons, status != 200");
-		
+		response = client.retrieveAllUsers();
+		System.out.println("UserWebServiceTestCases : retrieveAllUsersTest response = " + response.getResponseBodyString());
+		assertEquals(response.getStatusCode(), 200, "Could not get a list of all users, status != 200");
 	}
 	
 	/*@Parameters({ "userInum" })
 	@Test
-	public void retrievePersonTest(final String uid) throws HttpException, IOException {
+	public void retrievePersonTest(final String uid) throws Exception {
 
 		response = client.retrievePerson(uid, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases : retrievePersonTest : response " + response.getResponseBodyString());
@@ -107,6 +103,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 	
 	@Test
 	public void createPersonTest() throws Exception {
+
 		response = client.createPerson(userAdd, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases createPersonTest :response " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 201, "cold not Add the user, status != 201");

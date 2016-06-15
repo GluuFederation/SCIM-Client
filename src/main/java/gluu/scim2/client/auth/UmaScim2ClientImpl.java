@@ -7,7 +7,6 @@ package gluu.scim2.client.auth;
 
 import gluu.scim.client.ScimResponse;
 import gluu.scim.client.exception.ScimInitializationException;
-import gluu.scim.client.model.ScimBulkOperation;
 import gluu.scim2.client.BaseScim2ClientImpl;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -364,6 +363,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
+	@Deprecated
 	public ScimResponse createPersonString(String person, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.createPersonString(person, mediaType);
 		if (autorizeRpt(scimResponse)) {
@@ -374,6 +374,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
+	@Deprecated
 	public ScimResponse updatePersonString(String person, String id, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.updatePersonString(person, id, mediaType);
 		if (autorizeRpt(scimResponse)) {
@@ -384,6 +385,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
+	@Deprecated
 	public ScimResponse createGroupString(String group, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.createGroupString(group, mediaType);
 		if (autorizeRpt(scimResponse)) {
@@ -394,6 +396,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
+	@Deprecated
 	public ScimResponse updateGroupString(String group, String id, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.updateGroupString(group, id, mediaType);
 		if (autorizeRpt(scimResponse)) {
@@ -404,16 +407,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.bulkOperation(operation, mediaType);
-		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.bulkOperation(operation, mediaType);
-		}
-
-		return scimResponse;
-	}
-
-	@Override
+	@Deprecated
 	public ScimResponse bulkOperationString(String operation, String mediaType) throws IOException {
 		ScimResponse scimResponse = super.bulkOperationString(operation, mediaType);
 		if (autorizeRpt(scimResponse)) {
@@ -424,10 +418,10 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse retrieveAllPersons(String mediaType) throws IOException {
-		ScimResponse scimResponse = super.retrieveAllPersons(mediaType);
+	public ScimResponse retrieveAllUsers() throws IOException {
+		ScimResponse scimResponse = super.retrieveAllUsers();
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.retrieveAllPersons(mediaType);
+            scimResponse = super.retrieveAllUsers();
 		}
 
 		return scimResponse;
@@ -458,10 +452,10 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse retrieveAllGroups(String mediaType) throws IOException {
-		ScimResponse scimResponse = super.retrieveAllGroups(mediaType);
+	public ScimResponse retrieveAllGroups() throws IOException {
+		ScimResponse scimResponse = super.retrieveAllGroups();
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.retrieveAllGroups(mediaType);
+            scimResponse = super.retrieveAllGroups();
 		}
 
 		return scimResponse;
@@ -492,6 +486,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
+	@Deprecated
 	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.personSearch(attribute, value, mediaType);
 		if (autorizeRpt(scimResponse)) {
@@ -502,21 +497,12 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
+	@Deprecated
 	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)
 			throws IOException, JAXBException {
 		ScimResponse scimResponse = super.personSearchByObject(attribute, value, valueMediaType, outPutMediaType);
 		if (autorizeRpt(scimResponse)) {
             scimResponse = super.personSearchByObject(attribute, value, valueMediaType, outPutMediaType);
-		}
-
-		return scimResponse;
-	}
-	
-	@Override
-	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.personSearch(attribute, value, mediaType);
-		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.searchPersons(attribute, value, mediaType);
 		}
 
 		return scimResponse;
@@ -529,5 +515,4 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	public void setExecutor(ClientExecutor executor) {
 		this.executor = executor;
 	}
-
 }

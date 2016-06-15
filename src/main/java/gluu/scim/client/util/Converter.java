@@ -21,7 +21,6 @@ import javax.xml.bind.Unmarshaller;
 
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
 
 /**
  * SCIM format converter
@@ -270,7 +269,6 @@ public class Converter implements Serializable {
 	 private static Object jsonToObject(String json, Class<?> clazz) throws Exception {
 
 		 ObjectMapper mapper = new ObjectMapper();
-		 mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
 		 mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 		 Object clazzObject = mapper.readValue(json, clazz);
 		 return clazzObject;

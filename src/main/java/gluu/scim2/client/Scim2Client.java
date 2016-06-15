@@ -6,9 +6,6 @@
 package gluu.scim2.client;
 
 import gluu.scim.client.ScimResponse;
-import gluu.scim.client.model.ScimBulkOperation;
-import gluu.scim.client.model.ScimGroup;
-import gluu.scim.client.model.ScimPerson;
 import gluu.scim2.client.auth.UmaScim2ClientImpl;
 
 import java.io.IOException;
@@ -38,8 +35,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 		this.scimClient = baseClient;
 	}
 
-	public static Scim2Client umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJwks,
-			String umaAatClientKeyId) {
+	public static Scim2Client umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJwks, String umaAatClientKeyId) {
 		SecurityProviderUtility.installBCProvider();
 		BaseScim2Client baseClient = new UmaScim2ClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwks, umaAatClientKeyId);
 		return new Scim2Client(baseClient);
@@ -67,24 +63,13 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	}
 
 	/*
-         * @see
-         * gluu.scim.client.ScimClientService#createPerson(gluu.scim.client.model
-         * .ScimPerson, java.lang.String)
-         */
-	@Override
-	@Deprecated
-	public ScimResponse createPerson(ScimPerson person, String mediaType) throws IOException, JAXBException {
-		return scimClient.createPerson(person, mediaType);
-	}
-
-	/*
      * @see
      * gluu.scim.client.ScimClientService#createPerson(gluu.scim2.client.model.User, java.lang.String)
      */
 	@Override
 	@Deprecated
 	public ScimResponse createPerson(User user, String mediaType) throws IOException, JAXBException {
-		return scimClient.createPerson(user, mediaType);
+		return scimClient.createUser(user, new String[]{});
 	}
 
 	/**
@@ -99,22 +84,13 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	}
 
 	/*
-	 * @see
-	 * gluu.scim.client.ScimClientService#updatePerson(gluu.scim.client.model.ScimPerson, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public ScimResponse updatePerson(ScimPerson person, String id, String mediaType) throws IOException, JAXBException {
-		return scimClient.updatePerson(person, id, mediaType);
-	}
-
-	/*
      * @see
      * gluu.scim.client.ScimClientService#updatePerson(gluu.scim.client.model.User, java.lang.String, java.lang.String)
      */
 	@Override
 	@Deprecated
 	public ScimResponse updatePerson(User user, String id, String mediaType) throws IOException, JAXBException {
-		return scimClient.updatePerson(user, id, mediaType);
+		return scimClient.updateUser(user, id, new String[]{});
 	}
 
 	/**
@@ -144,16 +120,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	@Override
 	@Deprecated
 	public ScimResponse retrieveGroup(String id, String mediaType) throws IOException {
-		return scimClient.retrieveGroup(id, mediaType);
-	}
-
-	/*
-	 * @see
-	 * gluu.scim.client.ScimClientService#createGroup(gluu.scim.client.model.ScimGroup, java.lang.String)
-	 */
-	@Override
-	public ScimResponse createGroup(ScimGroup group, String mediaType) throws IOException, JAXBException {
-		return scimClient.createGroup(group, mediaType);
+		return scimClient.retrieveGroup(id, new String[]{});
 	}
 
 	/*
@@ -163,7 +130,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	@Override
 	@Deprecated
 	public ScimResponse createGroup(Group group, String mediaType) throws IOException, JAXBException {
-		return scimClient.createGroup(group, mediaType);
+		return scimClient.createGroup(group, new String[]{});
 	}
 
 	/**
@@ -191,22 +158,12 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 
 	/*
 	 * @see
-	 * gluu.scim.client.ScimClientService#updateGroup(gluu.scim.client.model.ScimGroup, java.lang.String, java.lang.String)
-	 */
-	@Override
-	@Deprecated
-	public ScimResponse updateGroup(ScimGroup group, String id, String mediaType) throws IOException, JAXBException {
-		return scimClient.updateGroup(group, id, mediaType);
-	}
-
-	/*
-	 * @see
 	 * gluu.scim.client.ScimClientService#updateGroup(gluu.scim.client.model.Group, java.lang.String, java.lang.String)
 	 */
 	@Override
 	@Deprecated
 	public ScimResponse updateGroup(Group group, String id, String mediaType) throws IOException, JAXBException {
-		return scimClient.updateGroup(group, id, mediaType);
+		return scimClient.updateGroup(group, id, new String[]{});
 	}
 
 	/**
@@ -235,6 +192,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * gluu.scim.client.ScimClientService#createPersonString(java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse createPersonString(String person, String mediaType) throws IOException, JAXBException {
 		return scimClient.createPersonString(person, mediaType);
 	}
@@ -244,6 +202,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * gluu.scim.client.ScimClientService#updatePersonString(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse updatePersonString(String person, String id, String mediaType) throws IOException, JAXBException {
 		return scimClient.updatePersonString(person, id, mediaType);
 	}
@@ -253,6 +212,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * gluu.scim.client.ScimClientService#createGroupString(java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse createGroupString(String group, String mediaType) throws IOException, JAXBException {
 		return scimClient.createGroupString(group, mediaType);
 	}
@@ -262,6 +222,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * gluu.scim.client.ScimClientService#updateGroupString(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse updateGroupString(String group, String id, String mediaType) throws IOException, JAXBException {
 		return scimClient.updateGroupString(group, id, mediaType);
 	}
@@ -271,6 +232,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * gluu.scim.client.ScimClientService#bulkOperation(gluu.scim.client.model.ScimBulkOperation, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws IOException, JAXBException {
 		return scimClient.bulkOperation(bulkRequest, mediaType);
 	}
@@ -280,18 +242,18 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * gluu.scim.client.ScimClientService#bulkOperationString(java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse bulkOperationString(String operation, String mediaType) throws IOException {
 		return scimClient.bulkOperationString(operation, mediaType);
 	}
 
 	/*
 	 * @see
-	 * gluu.scim.client.ScimClientService#retrieveAllPersons(java.lang.String)
+	 * gluu.scim.client.ScimClientService#retrieveAllUsers(java.lang.String)
 	 */
 	@Override
-	@Deprecated
-	public ScimResponse retrieveAllPersons(String mediaType) throws IOException {
-		return scimClient.retrieveAllPersons(mediaType);
+	public ScimResponse retrieveAllUsers() throws IOException {
+		return scimClient.retrieveAllUsers();
 	}
 
 	/**
@@ -333,15 +295,15 @@ public class Scim2Client implements BaseScim2Client, Serializable {
      * gluu.scim.client.ScimClientService#retrieveAllGroups(java.lang.String)
      */
 	@Override
-	@Deprecated
-	public ScimResponse retrieveAllGroups(String mediaType) throws IOException {
-		return scimClient.retrieveAllGroups(mediaType);
+	public ScimResponse retrieveAllGroups() throws IOException {
+		return scimClient.retrieveAllGroups();
 	}
 
 	/*
 	 * @see gluu.scim.client.ScimClientService#personSearch(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
 		return scimClient.personSearch(attribute, value, mediaType);
 	}
@@ -351,30 +313,19 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * gluu.scim.client.ScimClientService#personSearchByObject(java.lang.String, java.lang.Object, java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)	throws IOException, JAXBException {
 		return scimClient.personSearchByObject(attribute, value, valueMediaType, outPutMediaType);
 	}
 
 	@Override
-	public ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws IOException, JAXBException {
-
-		return scimClient.bulkOperation(operation, mediaType);
+	public ScimResponse retrieveServiceProviderConfig() throws IOException {
+		return scimClient.retrieveServiceProviderConfig();
 	}
 
 	@Override
-	public ScimResponse retrieveServiceProviderConfig(String mediaType) throws IOException {
-
-		return scimClient.retrieveServiceProviderConfig(mediaType);
-	}
-
-	@Override
-	public ScimResponse retrieveResourceTypes(String mediaType) throws IOException {
-		return scimClient.retrieveResourceTypes(mediaType);
-	}
-	
-	@Override
-	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException {
-		return scimClient.searchPersons( attribute, value, mediaType);
+	public ScimResponse retrieveResourceTypes() throws IOException {
+		return scimClient.retrieveResourceTypes();
 	}
 
 	@Override

@@ -33,36 +33,36 @@ public class ScimClientRetreivingEntitiesTest  extends BaseScimTest {
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks, @Optional final String umaAatClientKeyId) throws IOException {
 		String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));
-		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);		response = null;
+		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
 	}
 
 	@Parameters({ "userInum" })
 	@Test
-	public void retrievePersonTest(final String uid) throws HttpException, IOException {
+	public void retrievePersonTest(final String uid) throws IOException {
 		response = client.retrievePerson(uid, MediaType.APPLICATION_JSON);
-		System.out.println("retrievePersonTest + responseStr"  + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not get the user, status != 200");
+		System.out.println("retrievePersonTest + responseStr = "  + response.getResponseBodyString());
+		assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");
 	}
 
 	@Test
-	public void retrieveAllPersonsTest() throws HttpException, IOException {
-		response = client.retrieveAllPersons(MediaType.APPLICATION_JSON);
-		System.out.println("retrieveAllPersonsTest + responseStr"  + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not get a list of all persons, status != 200");
+	public void retrieveAllUsersTest() throws IOException {
+		response = client.retrieveAllUsers();
+		System.out.println("retrieveAllUsersTest + responseStr = "  + response.getResponseBodyString());
+		assertEquals(response.getStatusCode(), 200, "Could not get the list of all users, status != 200");
 	}
 
 	@Parameters({ "group1Inum" })
 	@Test
-	public void retrieveGroupTest(final String group1Inum) throws HttpException, IOException {
+	public void retrieveGroupTest(final String group1Inum) throws IOException {
 		response = client.retrieveGroup(group1Inum, MediaType.APPLICATION_JSON);
-		System.out.println("retrieveGroupTest + responseStr"  + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not get the group, status != 200");
+		System.out.println("retrieveGroupTest + responseStr = "  + response.getResponseBodyString());
+		assertEquals(response.getStatusCode(), 200, "Could not get the group, status != 200");
 	}
 
 	@Test
-	public void retrieveAllGroupsTest() throws HttpException, IOException {
-		response = client.retrieveAllGroups(MediaType.APPLICATION_JSON);
-		System.out.println("retrieveAllGroupsTest + responseStr"  + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not get a list of all groups, status != 200");
+	public void retrieveAllGroupsTest() throws IOException {
+		response = client.retrieveAllGroups();
+		System.out.println("retrieveAllGroupsTest + responseStr = "  + response.getResponseBodyString());
+		assertEquals(response.getStatusCode(), 200, "Could not get a list of all groups, status != 200");
 	}
 }

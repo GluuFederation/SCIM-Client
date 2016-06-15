@@ -86,7 +86,7 @@ public class GroupWebServiceTestCase extends BaseScimTest {
 
 	@Test
 	public void retrieveAllGroupsTest() throws IOException {
-		response = client.retrieveAllGroups(MediaType.APPLICATION_JSON);
+		response = client.retrieveAllGroups();
 		System.out.println("GroupWebServiceTestCase retrieveAllGroupsTest :response : " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "cold not get a list of all groups, status != 200");
 	}

@@ -5,10 +5,10 @@
  */
 package gluu.scim2.client;
 
-import gluu.scim.client.BaseScimClient;
 import gluu.scim.client.ScimResponse;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import javax.xml.bind.JAXBException;
 
@@ -22,8 +22,20 @@ import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
  *
  * @author Reda Zerrad Date: 05.28.2012
  */
-public interface BaseScim2Client extends BaseScimClient {
-	
+// public interface BaseScim2Client extends BaseScimClient {
+public interface BaseScim2Client extends Serializable {
+
+	/**
+	 * Retrieves a person by his uid
+	 *
+	 * @param uid
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Deprecated
+	ScimResponse retrievePerson(String uid, String mediaType) throws IOException;
+
 	/**
      * Creates a person with User as input
      * @param user
@@ -37,7 +49,7 @@ public interface BaseScim2Client extends BaseScimClient {
 	/**
 	 * @param user
 	 * @param attributesArray
-	 * @return
+	 * @return ScimResponse
 	 * @throws IOException
      */
 	ScimResponse createUser(User user, String[] attributesArray) throws IOException;
@@ -65,10 +77,30 @@ public interface BaseScim2Client extends BaseScimClient {
 	 * @param user
 	 * @param id
 	 * @param attributesArray
-	 * @return
+	 * @return ScimResponse
 	 * @throws IOException
      */
 	ScimResponse updateUser(User user, String id, String[] attributesArray) throws IOException;
+
+	/**
+	 * Deletes a person by his uid
+	 *
+	 * @param uid
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	ScimResponse deletePerson(String uid) throws IOException;
+
+	/**
+	 * Retrieves a group by his id
+	 *
+	 * @param id
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Deprecated
+	ScimResponse retrieveGroup(String id, String mediaType) throws IOException;
 
 	/**
      * Creates a Group with Group as input
@@ -83,7 +115,7 @@ public interface BaseScim2Client extends BaseScimClient {
 	/**
 	 * @param group
 	 * @param attributesArray
-	 * @return
+	 * @return ScimResponse
 	 * @throws IOException
 	 * @throws JAXBException
      */
@@ -92,13 +124,14 @@ public interface BaseScim2Client extends BaseScimClient {
 	/**
 	 * @param id
 	 * @param attributesArray
-	 * @return
+	 * @return ScimResponse
 	 * @throws IOException
      */
 	ScimResponse retrieveGroup(String id, String[] attributesArray) throws IOException;
 
 	/**
      * Updates a Group with Group as input
+	 *
      * @param group
      * @param mediaType
      * @return ScimResponse
@@ -108,30 +141,120 @@ public interface BaseScim2Client extends BaseScimClient {
 	ScimResponse updateGroup(Group group, String id, String mediaType) throws IOException, JAXBException;
 
 	/**
+	 * Deletes a group by his id
+	 *
+	 * @param id
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	ScimResponse deleteGroup(String id) throws IOException;
+
+	/**
 	 * @param group
 	 * @param id
 	 * @param attributesArray
-	 * @return
+	 * @return ScimResponse
 	 * @throws IOException
      * @throws JAXBException
      */
 	ScimResponse updateGroup(Group group, String id, String[] attributesArray) throws IOException;
 
 	/**
+	 * Creates a person with a String as input
+	 *
+	 * @param person
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 * @throws JAXBException
+	 */
+	@Deprecated
+	ScimResponse createPersonString(String person, String mediaType) throws IOException, JAXBException;
+
+	/**
+	 * Updates a person with a String as input
+	 *
+	 * @param person
+	 * @param uid
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 * @throws JAXBException
+	 */
+	@Deprecated
+	ScimResponse updatePersonString(String person, String uid, String mediaType) throws IOException, JAXBException;
+
+	/**
+	 * Creates a group with a String as input
+	 *
+	 * @param group
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 * @throws JAXBException
+	 */
+	@Deprecated
+	ScimResponse createGroupString(String group, String mediaType) throws IOException, JAXBException;
+
+	/**
+	 * Updates a group with a String as input
+	 *
+	 * @param group
+	 * @param id
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 * @throws JAXBException
+	 */
+	@Deprecated
+	ScimResponse updateGroupString(String group, String id, String mediaType) throws IOException, JAXBException;
+
+	/**
 	 * Bulk operation with BulkOperation as input
 	 * @param bulkRequest
 	 * @param mediaType
-	 * @return
+	 * @return ScimResponse
 	 * @throws IOException
 	 * @throws JAXBException
      */
-	ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws IOException, JAXBException ;
+	@Deprecated
+	ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws IOException, JAXBException;
 
-	ScimResponse retrieveServiceProviderConfig(String mediaType) throws IOException;
+	/**
+	 * Bulk operation with String as input
+	 *
+	 * @param operation
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Deprecated
+	ScimResponse bulkOperationString(String operation, String mediaType) throws IOException;
 
-	ScimResponse retrieveResourceTypes(String mediaType) throws	IOException;
+	/**
+	 * Retrieves all users
+	 *
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	ScimResponse retrieveAllUsers() throws IOException;
+
+	/**
+	 * Retrieves all groups
+	 *
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	ScimResponse retrieveAllGroups() throws IOException;
+
+	ScimResponse retrieveServiceProviderConfig() throws IOException;
+
+	ScimResponse retrieveResourceTypes() throws	IOException;
 	
-	ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException;
+	// ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException;
+
+	@Deprecated
+	ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException;
 
 	/**
 	 * User search via a filter with pagination and sorting
@@ -168,4 +291,7 @@ public interface BaseScim2Client extends BaseScimClient {
 	 * @throws Exception
      */
 	UserExtensionSchema getUserExtensionSchema() throws Exception;
+
+	@Deprecated
+	ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType) throws IOException, JAXBException;
 }
