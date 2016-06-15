@@ -48,7 +48,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	@Override
 	@Deprecated
 	public ScimResponse retrievePerson(String id, String mediaType) throws IOException {
-		return scimClient.retrievePerson(id, mediaType);
+		return scimClient.retrieveUser(id, new String[]{});
 	}
 
 	/**
