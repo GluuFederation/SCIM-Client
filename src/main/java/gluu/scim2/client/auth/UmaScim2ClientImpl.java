@@ -5,9 +5,13 @@
  */
 package gluu.scim2.client.auth;
 
-import gluu.scim.client.ScimResponse;
-import gluu.scim.client.exception.ScimInitializationException;
-import gluu.scim2.client.BaseScim2ClientImpl;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.xml.bind.JAXBException;
+
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Group;
@@ -21,18 +25,20 @@ import org.xdi.oxauth.client.uma.UmaClientFactory;
 import org.xdi.oxauth.client.uma.wrapper.UmaClient;
 import org.xdi.oxauth.model.common.AuthenticationMethod;
 import org.xdi.oxauth.model.common.GrantType;
-import org.xdi.oxauth.model.crypto.signature.ECDSAPrivateKey;
-import org.xdi.oxauth.model.crypto.signature.RSAPrivateKey;
-import org.xdi.oxauth.model.uma.*;
+import org.xdi.oxauth.model.crypto.OxAuthCryptoProvider;
+import org.xdi.oxauth.model.crypto.signature.SignatureAlgorithm;
+import org.xdi.oxauth.model.uma.PermissionTicket;
+import org.xdi.oxauth.model.uma.RPTResponse;
+import org.xdi.oxauth.model.uma.RptAuthorizationRequest;
+import org.xdi.oxauth.model.uma.RptAuthorizationResponse;
+import org.xdi.oxauth.model.uma.UmaConfiguration;
 import org.xdi.oxauth.model.uma.wrapper.Token;
-import org.xdi.oxauth.model.util.JwksUtil;
 // import org.xdi.oxauth.model.util.JwtUtil;
 import org.xdi.util.StringHelper;
 
-import javax.xml.bind.JAXBException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.concurrent.locks.ReentrantLock;
+import gluu.scim.client.ScimResponse;
+import gluu.scim.client.exception.ScimInitializationException;
+import gluu.scim2.client.BaseScim2ClientImpl;
 
 /**
  * SCIM UMA client
@@ -53,7 +59,8 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 
 	private String umaAatClientId;
 	private String umaAatClientKeyId;
-	private String umaAatClientJwks;
+	private String umaAatClientJksPath;
+	private String umaAatClientJksPassword;
 
     protected ClientExecutor executor;
 	
@@ -61,11 +68,12 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 
 	private final ReentrantLock lock = new ReentrantLock();
 
-	public UmaScim2ClientImpl(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJwks, String umaAatClientKeyId) {
+	public UmaScim2ClientImpl(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
 		super(domain);
 		this.umaMetaDataUrl = umaMetaDataUrl;
 		this.umaAatClientId = umaAatClientId;
-		this.umaAatClientJwks = umaAatClientJwks;
+		this.umaAatClientJksPath = umaAatClientJksPath;
+		this.umaAatClientJksPassword = umaAatClientJksPassword;
 		this.umaAatClientKeyId = umaAatClientKeyId;
 	}
 
@@ -117,7 +125,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 			this.metadataConfiguration = UmaClientFactory.instance().createMetaDataConfigurationService(umaMetaDataUrl)
 				.getMetadataConfiguration();
 		}else{
-			this.metadataConfiguration = UmaClientFactory.instance().createMetaDataConfigurationService(umaMetaDataUrl,executor)
+			this.metadataConfiguration = UmaClientFactory.instance().createMetaDataConfigurationService(umaMetaDataUrl, executor)
 					.getMetadataConfiguration();
 		}
 
@@ -126,25 +134,38 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 		}
 
 		// Get AAT
-		org.xdi.oxauth.model.crypto.PrivateKey privateKey = null;
 		try {
-			// privateKey = JwtUtil.getPrivateKey(null, umaAatClientJwks, umaAatClientKeyId);
-			privateKey = JwksUtil.getPrivateKey(null, umaAatClientJwks, umaAatClientKeyId);
-			if (privateKey == null) {
-				throw new ScimInitializationException("There is no keyId in JWKS");
+			if (StringHelper.isEmpty(umaAatClientJksPath) || StringHelper.isEmpty(umaAatClientJksPassword)) {
+				throw new ScimInitializationException("UMA JKS keystore path or password is empty");
+			}
+			OxAuthCryptoProvider cryptoProvider;
+			try {
+				cryptoProvider = new OxAuthCryptoProvider(umaAatClientJksPath, umaAatClientJksPassword, null);
+			} catch (Exception ex) {
+				throw new ScimInitializationException("Failed to initialize crypto provider");
 			}
 
-			TokenRequest tokenRequest = TokenRequest.builder().aat().grantType(GrantType.CLIENT_CREDENTIALS).build();
-			if (privateKey instanceof ECDSAPrivateKey) {
-				tokenRequest.setEcPrivateKey((ECDSAPrivateKey) privateKey);
-			} else if (privateKey instanceof RSAPrivateKey) {
-				tokenRequest.setRsaPrivateKey((RSAPrivateKey) privateKey);
+			String keyId = umaAatClientKeyId;
+	        if (StringHelper.isEmpty(keyId)) {
+	        	// Get first key
+	        	List<String> aliases = cryptoProvider.getKeyAliases();
+	        	if (aliases.size() > 0) {
+	        		keyId = aliases.get(0);
+	        	}
+	        }
+
+	        if (StringHelper.isEmpty(keyId)) {
+				throw new ScimInitializationException("UMA keyId is empty");
 			}
+	        
+	        SignatureAlgorithm algorithm = cryptoProvider.getSignatureAlgorithm(keyId);
+			TokenRequest tokenRequest = TokenRequest.builder().aat().grantType(GrantType.CLIENT_CREDENTIALS).build();
 
 			tokenRequest.setAuthenticationMethod(AuthenticationMethod.PRIVATE_KEY_JWT);
 	        tokenRequest.setAuthUsername(umaAatClientId);
-	        tokenRequest.setAlgorithm(privateKey.getSignatureAlgorithm());
-	        tokenRequest.setKeyId(privateKey.getKeyId());
+	        tokenRequest.setCryptoProvider(cryptoProvider);
+	        tokenRequest.setAlgorithm(algorithm);
+	        tokenRequest.setKeyId(umaAatClientKeyId);
 	        tokenRequest.setAudience(metadataConfiguration.getTokenEndpoint());
 
 			this.umaAat = UmaClient.request(metadataConfiguration.getTokenEndpoint(), tokenRequest);

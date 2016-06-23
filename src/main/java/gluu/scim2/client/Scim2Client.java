@@ -5,7 +5,9 @@
  */
 package gluu.scim2.client;
 
+import gluu.scim.client.BaseScimClient;
 import gluu.scim.client.ScimResponse;
+import gluu.scim.client.auth.UmaScimClientImpl;
 import gluu.scim2.client.auth.UmaScim2ClientImpl;
 
 import java.io.IOException;
@@ -35,9 +37,9 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 		this.scimClient = baseClient;
 	}
 
-	public static Scim2Client umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJwks, String umaAatClientKeyId) {
+	public static Scim2Client umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJwksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
 		SecurityProviderUtility.installBCProvider();
-		BaseScim2Client baseClient = new UmaScim2ClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwks, umaAatClientKeyId);
+		BaseScim2Client baseClient = new UmaScim2ClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwksPath, umaAatClientJksPassword, umaAatClientKeyId);
 		return new Scim2Client(baseClient);
 	}
 
