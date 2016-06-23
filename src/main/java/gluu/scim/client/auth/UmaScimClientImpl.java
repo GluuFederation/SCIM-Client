@@ -163,7 +163,7 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 	        tokenRequest.setAuthUsername(umaAatClientId);
 	        tokenRequest.setCryptoProvider(cryptoProvider);
 	        tokenRequest.setAlgorithm(algorithm);
-	        tokenRequest.setKeyId(umaAatClientKeyId);
+	        tokenRequest.setKeyId(keyId);
 	        tokenRequest.setAudience(metadataConfiguration.getTokenEndpoint());
 
 			this.umaAat = UmaClient.request(metadataConfiguration.getTokenEndpoint(), tokenRequest);
