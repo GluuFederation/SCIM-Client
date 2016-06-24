@@ -33,14 +33,14 @@ public class GroupWebServiceTestCase extends BaseScimTest {
 	Scim2Client client;
 	ScimResponse response;
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks", "umaAatClientKeyId",
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId",
 			"groupwebservice.add.displayname", "groupwebservice.update.displayname" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJwks,
+	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword,
 			@Optional final String umaAatClientKeyId, final String displayName, final String updateDisplayName) throws IOException {
 		System.out.println(" displayName : " + displayName + "   updateDisplayName : " + updateDisplayName);
-		String jwks = FileUtils.readFileToString(new File(umaAatClientJwks));
-		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, jwks, umaAatClientKeyId);
+		
+		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 		response = null;
 		groupToAdd = new Group();
 		groupToUpdate = new Group();
