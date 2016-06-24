@@ -37,9 +37,9 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 		this.scimClient = baseClient;
 	}
 
-	public static Scim2Client umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJwksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
+	public static Scim2Client umaInstance(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
 		SecurityProviderUtility.installBCProvider();
-		BaseScim2Client baseClient = new UmaScim2ClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJwksPath, umaAatClientJksPassword, umaAatClientKeyId);
+		BaseScim2Client baseClient = new UmaScim2ClientImpl(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 		return new Scim2Client(baseClient);
 	}
 
