@@ -37,7 +37,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 	Scim2Client client;
 	ScimResponse response;
 	
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJwks" , "umaAatClientKeyId","userwebservice.add.username","userwebservice.update.displayname" })
+	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath" , "umaAatClientJksPassword" , "umaAatClientKeyId","userwebservice.add.username","userwebservice.update.displayname" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId,final String username ,final String updateDisplayName ) throws IOException {
 		System.out.println(" username :  "+username +" updateDisplayName :" + updateDisplayName);
