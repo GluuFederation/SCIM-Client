@@ -18,7 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jackson.version>1.9.13</jackson.version>
         <oxauth.version>2.4.4.rc1</oxauth.version>
-        <oxCore.version>2.4.4.rc1</oxCore.version>
+        <oxcore.version>2.4.4.rc1</oxcore.version>
         <resteasy.version>2.3.7.Final</resteasy.version>
     </properties>
 
