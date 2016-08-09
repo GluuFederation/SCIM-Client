@@ -812,7 +812,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 			post.releaseConnection();
 		}
 
-		throw null;
+		return null;
 	}
 
 	/*
