@@ -5,9 +5,7 @@
  */
 package gluu.scim2.client;
 
-import gluu.scim.client.BaseScimClient;
 import gluu.scim.client.ScimResponse;
-import gluu.scim.client.auth.UmaScimClientImpl;
 import gluu.scim2.client.auth.UmaScim2ClientImpl;
 
 import java.io.IOException;
@@ -234,9 +232,8 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * gluu.scim.client.ScimClientService#bulkOperation(gluu.scim.client.model.ScimBulkOperation, java.lang.String)
 	 */
 	@Override
-	@Deprecated
-	public ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws IOException, JAXBException {
-		return scimClient.bulkOperation(bulkRequest, mediaType);
+	public ScimResponse processBulkOperation(BulkRequest bulkRequest) throws IOException {
+		return scimClient.processBulkOperation(bulkRequest);
 	}
 
 	/*
@@ -244,14 +241,13 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * gluu.scim.client.ScimClientService#bulkOperationString(java.lang.String, java.lang.String)
 	 */
 	@Override
-	@Deprecated
-	public ScimResponse bulkOperationString(String operation, String mediaType) throws IOException {
-		return scimClient.bulkOperationString(operation, mediaType);
+	public ScimResponse processBulkOperationString(String bulkRequestString) throws IOException {
+		return scimClient.processBulkOperationString(bulkRequestString);
 	}
 
 	/*
 	 * @see
-	 * gluu.scim.client.ScimClientService#retrieveAllUsers(java.lang.String)
+	 * gluu.scim.client.ScimClientService#retrieveAllUsers()
 	 */
 	@Override
 	public ScimResponse retrieveAllUsers() throws IOException {
@@ -267,7 +263,7 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	 * @param sortBy
 	 * @param sortOrder
 	 * @param attributesArray
-	 * @return
+	 * @return ScimResponse
      * @throws IOException
      */
 	@Override
@@ -275,7 +271,24 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 		return scimClient.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributesArray);
 	}
 
-	/**
+    /**
+     * POST User search on /.search via a filter with pagination and sorting
+     *
+     * @param filter
+     * @param startIndex
+     * @param count
+     * @param sortBy
+     * @param sortOrder
+     * @param attributesArray
+     * @return ScimResponse
+     * @throws IOException
+     */
+    @Override
+    public ScimResponse searchUsersPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+        return scimClient.searchUsersPost(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+    }
+
+    /**
 	 * Group search via a filter with pagination and sorting
 	 *
 	 * @param filter
@@ -292,6 +305,23 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 		return scimClient.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributesArray);
 	}
 
+    /**
+     * POST Group search on /.search via a filter with pagination and sorting
+     *
+     * @param filter
+     * @param startIndex
+     * @param count
+     * @param sortBy
+     * @param sortOrder
+     * @param attributesArray
+     * @return
+     * @throws IOException
+     */
+    @Override
+    public ScimResponse searchGroupsPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+        return scimClient.searchGroupsPost(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+    }
+
 	/*
      * @see
      * gluu.scim.client.ScimClientService#retrieveAllGroups(java.lang.String)
@@ -299,25 +329,6 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	@Override
 	public ScimResponse retrieveAllGroups() throws IOException {
 		return scimClient.retrieveAllGroups();
-	}
-
-	/*
-	 * @see gluu.scim.client.ScimClientService#personSearch(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	@Deprecated
-	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
-		return scimClient.personSearch(attribute, value, mediaType);
-	}
-
-	/*
-	 * @see
-	 * gluu.scim.client.ScimClientService#personSearchByObject(java.lang.String, java.lang.Object, java.lang.String, java.lang.String)
-	 */
-	@Override
-	@Deprecated
-	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)	throws IOException, JAXBException {
-		return scimClient.personSearchByObject(attribute, value, valueMediaType, outPutMediaType);
 	}
 
 	@Override

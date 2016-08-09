@@ -2,7 +2,7 @@
 
 <suite name="SCIM-Client" parallel="false">
 
-    	<!-- SCIM 1 test cases -->
+    <!-- SCIM 1 test cases -->
 
 	<test name="ScimClientRetreivingEntities test" enabled="true">
 		<classes>
@@ -130,7 +130,7 @@
 		<classes>
 			<class name="gluu.scim.client.EmailSync1Tests"/>
 			<class name="gluu.scim.client.EmailSync2Tests"/>
-			<!--<class name="gluu.scim.client.EmailSyncRetrieveTests"/>-->
+			<!--<class name="gluu.scim.client.EmailSyncRetrieveTests"/>-->  <!-- Disabled by default; needs proper test data -->
 		</classes>
 	</test>
 
@@ -138,7 +138,7 @@
 		<classes>
 			<class name="gluu.scim2.client.EmailSync1Tests"/>
 			<class name="gluu.scim2.client.EmailSync2Tests"/>
-			<!--<class name="gluu.scim2.client.EmailSyncRetrieveTests"/>-->
+			<!--<class name="gluu.scim2.client.EmailSyncRetrieveTests"/>-->  <!-- Disabled by default; needs proper test data -->
 		</classes>
 	</test>
 

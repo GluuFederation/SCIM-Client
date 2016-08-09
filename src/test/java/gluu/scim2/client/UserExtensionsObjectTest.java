@@ -9,7 +9,6 @@ import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 
 import gluu.scim2.client.util.Util;
-import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.*;
@@ -22,7 +21,6 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
@@ -41,7 +39,7 @@ import static org.testng.Assert.assertEquals;
 public class UserExtensionsObjectTest extends BaseScimTest {
 
     String domainURL;
-    String uid;
+    String id;
     Scim2Client client;
     User userToAdd;
     User userToUpdate;
@@ -150,7 +148,7 @@ public class UserExtensionsObjectTest extends BaseScimTest {
 
         User user = Util.toUser(response, client.getUserExtensionSchema());
         
-        this.uid = user.getId();
+        this.id = user.getId();
     }
 
     @Test(groups = "c", dependsOnGroups = "b")
@@ -167,7 +165,7 @@ public class UserExtensionsObjectTest extends BaseScimTest {
         extensionBuilder.setField("scimCustomThird", new BigDecimal(6000));
         userToUpdate.addExtension(extensionBuilder.build());
 
-        ScimResponse response = client.updateUser(userToUpdate, this.uid, new String[]{});
+        ScimResponse response = client.updateUser(userToUpdate, this.id, new String[]{});
 
         System.out.println(" updateUserTest() RESPONSE = " + response.getResponseBodyString());
         assertEquals(response.getStatusCode(), 200, "Could not update the user, status != 200");
@@ -180,7 +178,7 @@ public class UserExtensionsObjectTest extends BaseScimTest {
     @Test(groups = "d", dependsOnGroups = "c")
     public void retrieveUserTest() throws Exception {
 
-        ScimResponse response = client.retrieveUser(this.uid, new String[]{});
+        ScimResponse response = client.retrieveUser(this.id, new String[]{});
 
         System.out.println(" retrieveUserTest() RESPONSE = "  + response.getResponseBodyString());
         assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");
@@ -213,7 +211,8 @@ public class UserExtensionsObjectTest extends BaseScimTest {
 
     @Test(dependsOnGroups = "d", alwaysRun = true)
     public void deleteUserTest() throws Exception {
-        ScimResponse response = client.deletePerson(this.uid);
+
+        ScimResponse response = client.deletePerson(this.id);
         System.out.println(" deleteUserTest() RESPONSE = " + response.getResponseBodyString());
         assertEquals(response.getStatusCode(), 200, "Could not delete the user, status != 200");
     }

@@ -9,18 +9,18 @@ import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 
-import java.io.File;
 import java.io.IOException;
 
-import javax.ws.rs.core.MediaType;
-
 import gluu.scim2.client.util.Util;
-import org.apache.commons.io.FileUtils;
+import org.gluu.oxtrust.model.scim2.BulkOperation;
+import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.BulkResponse;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
 
 /**
  * SCIM Client Bulk operation test
@@ -31,48 +31,69 @@ import org.testng.annotations.Test;
 public class ScimClientBulkOperationsTest extends BaseScimTest {
 
 	private Scim2Client client;
-	private String uid;
+	private BulkRequest bulkRequest;
 
-	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId" })
+    @Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId" })
 	@BeforeTest
-	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword,
-			@Optional final String umaAatClientKeyId) throws IOException {
-		
-		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+    public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws IOException {
+        client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 	}
 
-	@Test
-	@Parameters({ "scim2.builk.request_json" })
-	public void bulkOperationTest(String requestJson) throws Exception {
+	@Test(groups = "a")
+	@Parameters({ "scim2.bulk.request_json" })
+	public void testProcessBulkOperationString(String bulkRequestString) throws Exception {
 
-		System.out.println("bulkOperationTest requestJson:" + requestJson);
+        // bulkRequestString should include cleanup (DELETE operations)
+		System.out.println("bulkRequestString = " + bulkRequestString);
 
-		ScimResponse response = client.bulkOperationString(requestJson, MediaType.APPLICATION_JSON);
-		System.out.println("reponse: " + response.getResponseBodyString());
+		ScimResponse response = client.processBulkOperationString(bulkRequestString);
+		System.out.println("response body = " + response.getResponseBodyString());
 
-		assertEquals(response.getStatusCode(), 200, "cold not Add the user, status != 200");
+		assertEquals(response.getStatusCode(), 200, "Could not process bulk operation string, status != 200");
 
-		BulkResponse  bulkResponse = (BulkResponse) Util.jsonToObject(response, BulkResponse.class);
-		String location = bulkResponse.getOperations().get(0).getLocation();
+        bulkRequest = (BulkRequest) Util.jsonToObject(bulkRequestString, BulkRequest.class);
+		BulkResponse bulkResponse = (BulkResponse) Util.jsonToObject(response, BulkResponse.class);
 
-		this.uid = getUID(location.split("/"));
+        System.out.println("Request operations count = " + bulkRequest.getOperations().size());
+        System.out.println("Response operations count = " + bulkResponse.getOperations().size());
+
+        assert(bulkResponse.getOperations().size() > 0);
+        assertEquals(bulkRequest.getOperations().size(), bulkResponse.getOperations().size());
+
+        checkResults(bulkResponse);
 	}
 
-	@Test(dependsOnMethods = "bulkOperationTest")
-	public void cleanUp() throws Exception {
-		System.out.println("delete: " + this.uid);
-		ScimResponse response = client.deletePerson(this.uid);
-		assertEquals(response.getStatusCode(), 200, "cold not delete the user, status != 200");
-		System.out.println("reponse : " + response.getResponseBodyString());
-	}
+    @Test(groups = "b", dependsOnGroups = "a")
+    public void testProcessBulkOperation() throws Exception {
 
-	private String getUID(String[] strings) {
-		for (String str : strings) {
-			if (str.startsWith("@")) {
-				return str;
-			}
-		}
+        ScimResponse response = client.processBulkOperation(bulkRequest);
+        System.out.println("response body = " + response.getResponseBodyString());
 
-		return null;
-	}
+        assertEquals(response.getStatusCode(), 200, "Could not process bulk request, status != 200");
+
+        BulkResponse bulkResponse = (BulkResponse) Util.jsonToObject(response, BulkResponse.class);
+
+        System.out.println("Request operations count = " + bulkRequest.getOperations().size());
+        System.out.println("Response operations count = " + bulkResponse.getOperations().size());
+
+        assert(bulkResponse.getOperations().size() > 0);
+        assertEquals(bulkRequest.getOperations().size(), bulkResponse.getOperations().size());
+
+        checkResults(bulkResponse);
+    }
+
+    private void checkResults(BulkResponse bulkResponse) {
+
+        int i = 1;
+        for (BulkOperation bulkOperation : bulkResponse.getOperations()) {
+
+            String status = bulkOperation.getStatus();
+            System.out.println("["+i+"]Path = " + bulkOperation.getPath());
+            System.out.println("["+i+"]Method = " + bulkOperation.getMethod());
+            System.out.println("["+i+"]Status = " + bulkOperation.getStatus());
+
+            assert(status.equalsIgnoreCase(String.valueOf(Response.Status.CREATED.getStatusCode())) || status.equalsIgnoreCase(String.valueOf(Response.Status.OK.getStatusCode())));
+            i++;
+        }
+    }
 }

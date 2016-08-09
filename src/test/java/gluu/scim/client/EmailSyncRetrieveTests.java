@@ -9,7 +9,6 @@ import gluu.BaseScimTest;
 import gluu.scim.client.model.ScimPerson;
 import gluu.scim.client.model.ScimPersonEmails;
 import gluu.scim2.client.util.Util;
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -17,7 +16,6 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.MediaType;
-import java.io.File;
 
 import static org.testng.Assert.assertEquals;
 
@@ -29,20 +27,13 @@ import static org.testng.Assert.assertEquals;
  */
 public class EmailSyncRetrieveTests extends BaseScimTest {
 
-    String domainURL;
     ScimClient client;
 
-    // String id = "@!D58A.A2C6.9B5E.11DA!0001!C69B.EF8E!0000!33B1.C9E9";  // Supply record
-    // String id = "@!D58A.A2C6.9B5E.11DA!0001!C69B.EF8E!0000!F82A.8E7D";
-    // String id = "@!D58A.A2C6.9B5E.11DA!0001!C69B.EF8E!0000!33B1.C9E9";
-    // String id = "@!D58A.A2C6.9B5E.11DA!0001!C69B.EF8E!0000!8D5A.226C";
-    String id = "@!D58A.A2C6.9B5E.11DA!0001!C69B.EF8E!0000!07F5.DFC9";
+    String id = "@!0211.A669.234B.5C2B!0001!BFB2.68C5!0000!XXXX.AAAA.1111";  // Supply record
 
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
     public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws Exception {
-        this.domainURL = domainURL;
-        
         client = ScimClient.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 

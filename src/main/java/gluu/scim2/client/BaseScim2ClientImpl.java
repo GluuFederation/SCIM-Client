@@ -6,7 +6,6 @@
 package gluu.scim2.client;
 
 import gluu.scim.client.ScimResponse;
-import gluu.scim.client.model.ScimPersonSearch;
 import gluu.scim.client.util.ResponseMapper;
 import gluu.scim.client.util.Util;
 
@@ -27,11 +26,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.lang.StringUtils;
-// import org.codehaus.jackson.map.ObjectMapper;
-import org.gluu.oxtrust.model.scim2.BulkRequest;
-import org.gluu.oxtrust.model.scim2.Constants;
-import org.gluu.oxtrust.model.scim2.Group;
-import org.gluu.oxtrust.model.scim2.User;
+import org.gluu.oxtrust.model.scim2.*;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +51,8 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	}
 
 	protected String getHost(String uri) throws MalformedURLException {
-		URL url = new URL(uri);
 
+		URL url = new URL(uri);
 		return url.getHost();
 	}
 
@@ -725,12 +720,10 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * gluu.scim.client.ScimClientService#bulkOperation(gluu.scim.client.model
-	 * .BulkOperation, java.lang.String)
+	 * gluu.scim.client.ScimClientService#processBulkOperation(gluu.scim.client.model.BulkRequest)
 	 */
 	@Override
-	@Deprecated
-	public ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws IOException, JAXBException {
+	public ScimResponse processBulkOperation(BulkRequest bulkRequest) throws IOException {
 
 		init();
 
@@ -776,12 +769,10 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * gluu.scim.client.ScimClientService#bulkOperationString(java.lang.String,
-	 * java.lang.String)
+	 * gluu.scim.client.ScimClientService#processBulkOperationString(java.lang.String)
 	 */
 	@Override
-	@Deprecated
-	public ScimResponse bulkOperationString(String operation, String mediaType) throws IOException {
+	public ScimResponse processBulkOperationString(String bulkRequestString) throws IOException {
 
 		init();
 
@@ -793,17 +784,17 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		addAuthenticationHeader(post);
 		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
-		post.setRequestEntity(new StringRequestEntity(operation, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+		post.setRequestEntity(new StringRequestEntity(bulkRequestString, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
 		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			post.setRequestEntity(new StringRequestEntity(operation, "application/json", "utf-8"));
+			post.setRequestEntity(new StringRequestEntity(bulkRequestString, "application/json", "utf-8"));
 		}
 
 		if (mediaType.equals(MediaType.APPLICATION_XML)) {
 			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			post.setRequestEntity(new StringRequestEntity(operation, "text/xml", "utf-8"));
+			post.setRequestEntity(new StringRequestEntity(bulkRequestString, "text/xml", "utf-8"));
 		}
 		*/
 
@@ -827,7 +818,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * gluu.scim.client.ScimClientService#retrieveAllUsers(java.lang.String)
+	 * gluu.scim.client.ScimClientService#retrieveAllUsers()
 	 */
 	@Override
 	public ScimResponse retrieveAllUsers() throws IOException {
@@ -844,7 +835,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * @param sortBy
 	 * @param sortOrder
 	 * @param attributesArray
-	 * @return
+	 * @return ScimResponse
      * @throws IOException
      */
 	@Override
@@ -889,11 +880,63 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		return null;
 	}
 
-	/*
-     * (non-Javadoc)
-     * @see
-     * gluu.scim.client.ScimClientService#retrieveAllGroups(java.lang.String)
+    /**
+     * POST User search on /.search via a filter with pagination and sorting
+     *
+     * @param filter
+     * @param startIndex
+     * @param count
+     * @param sortBy
+     * @param sortOrder
+     * @param attributesArray
+     * @return ScimResponse
+     * @throws IOException
      */
+    @Override
+    public ScimResponse searchUsersPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
+        init();
+
+        HttpClient httpClient = new HttpClient();
+
+        PostMethod post = new PostMethod(this.domain + "/scim/v2/Users/.search");
+        post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+        addAuthenticationHeader(post);
+        post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+
+        SearchRequest searchRequest = new SearchRequest();
+        searchRequest.setFilter(filter);
+        searchRequest.setStartIndex(startIndex);
+        searchRequest.setCount(count);
+        searchRequest.setSortBy(sortBy);
+        searchRequest.setSortOrder(sortOrder);
+        searchRequest.setAttributesArray(((attributesArray != null) ? StringUtils.join(attributesArray, ',') : null));
+
+        post.setRequestEntity(new StringRequestEntity(gluu.scim2.client.util.Util.getObjectMapper().writeValueAsString(searchRequest), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+        try {
+
+            httpClient.executeMethod(post);
+
+            ScimResponse response = ResponseMapper.map(post, new ScimResponse());
+
+            return response;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            post.releaseConnection();
+        }
+
+        return null;
+    }
+
+    /*
+         * (non-Javadoc)
+         * @see
+         * gluu.scim.client.ScimClientService#retrieveAllGroups(java.lang.String)
+         */
 	@Override
 	public ScimResponse retrieveAllGroups() throws IOException {
 
@@ -909,7 +952,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	 * @param sortBy
 	 * @param sortOrder
 	 * @param attributesArray
-	 * @return
+	 * @return ScimResponse
 	 * @throws IOException
 	 */
 	@Override
@@ -955,175 +998,57 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see gluu.scim.client.ScimClientService#personSearch(java.lang.String,
-	 * java.lang.String, java.lang.String)
-	 */
-	@Override
-	@Deprecated
-	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
+    /**
+     * POST Group search on /.search via a filter with pagination and sorting
+     *
+     * @param filter
+     * @param startIndex
+     * @param count
+     * @param sortBy
+     * @param sortOrder
+     * @param attributesArray
+     * @return ScimResponse
+     * @throws IOException
+     */
+    @Override
+    public ScimResponse searchGroupsPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
 
-		init();
+        init();
 
-		HttpClient httpClient = new HttpClient();
+        HttpClient httpClient = new HttpClient();
 
-		PostMethod post = new PostMethod(this.domain + "/scim/v2/Users/Search");
-		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+        PostMethod post = new PostMethod(this.domain + "/scim/v2/Groups/.search");
+        post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
-		ScimPersonSearch searchPattern = new ScimPersonSearch();
-		searchPattern.setAttribute(attribute);
-		searchPattern.setValue(value);
+        addAuthenticationHeader(post);
+        post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
 
-		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+        SearchRequest searchRequest = new SearchRequest();
+        searchRequest.setFilter(filter);
+        searchRequest.setStartIndex(startIndex);
+        searchRequest.setCount(count);
+        searchRequest.setSortBy(sortBy);
+        searchRequest.setSortOrder(sortOrder);
+        searchRequest.setAttributesArray(((attributesArray != null) ? StringUtils.join(attributesArray, ',') : null));
 
-		post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+        post.setRequestEntity(new StringRequestEntity(gluu.scim2.client.util.Util.getObjectMapper().writeValueAsString(searchRequest), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
-		/*
-		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), "application/json", "utf-8"));
-		}
+        try {
 
-		if (mediaType.equals(MediaType.APPLICATION_XML)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(searchPattern, ScimPersonSearch.class), "text/xml", "utf-8"));
-		}
-		*/
+            httpClient.executeMethod(post);
 
-		try {
+            ScimResponse response = ResponseMapper.map(post, new ScimResponse());
 
-			httpClient.executeMethod(post);
+            return response;
 
-			ScimResponse response = ResponseMapper.map(post, new ScimResponse());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            post.releaseConnection();
+        }
 
-			return response;
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			post.releaseConnection();
-		}
-
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * gluu.scim.client.ScimClientService#personSearchByObject(java.lang.String,
-	 * java.lang.Object, java.lang.String, java.lang.String)
-	 */
-	@Override
-	@Deprecated
-	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType) throws IOException, JAXBException {
-
-		init();
-
-		HttpClient httpClient = new HttpClient();
-
-		PostMethod post = new PostMethod(this.domain + "/scim/v2/Users/Search");
-		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
-
-		ScimPersonSearch searchPattern = new ScimPersonSearch();
-		searchPattern.setAttribute(attribute);
-		String stringValue = Util.getJSONString(value);
-
-		/*
-		if (valueMediaType.equals(MediaType.APPLICATION_JSON)) {
-			stringValue = Util.getJSONString(value);
-		}
-
-		if (valueMediaType.equals(MediaType.APPLICATION_XML)) {
-			stringValue = Util.getXMLString(value, value.getClass());
-		}
-		*/
-
-
-		searchPattern.setValue(stringValue);
-
-		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
-
-		post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
-
-		/*
-		if (outPutMediaType.equals(MediaType.APPLICATION_JSON)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), "application/json", "utf-8"));
-		}
-
-		if (outPutMediaType.equals(MediaType.APPLICATION_XML)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(searchPattern, ScimPersonSearch.class), "text/xml", "utf-8"));
-		}
-		*/
-
-		try {
-
-			httpClient.executeMethod(post);
-
-			ScimResponse response = ResponseMapper.map(post, new ScimResponse());
-
-			return response;
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			post.releaseConnection();
-		}
-
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see gluu.scim.client.ScimClientService#personSearch(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	/*
-	@Override
-	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException {
-
-		init();
-
-		HttpClient httpClient = new HttpClient();
-
-		PostMethod post = new PostMethod(this.domain + "/scim/v2/Users/SearchPersons");
-		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
-
-		ScimPersonSearch searchPattern = new ScimPersonSearch();
-		searchPattern.setAttribute(attribute);
-		searchPattern.setValue(value);
-
-		addAuthenticationHeader(post);
-
-		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-			post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), "application/json", "utf-8"));
-		}
-
-		if (mediaType.equals(MediaType.APPLICATION_XML)) {
-			post.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-			post.setRequestEntity(new StringRequestEntity(Util.getXMLString(searchPattern, ScimPersonSearch.class), "text/xml", "utf-8"));
-		}
-
-		try {
-
-			httpClient.executeMethod(post);
-
-			ScimResponse response = ResponseMapper.map(post, null);
-
-			return response;
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			post.releaseConnection();
-		}
-
-		return null;
-	}
-	*/
+        return null;
+    }
 
 	@Override
 	public UserExtensionSchema getUserExtensionSchema() throws Exception {

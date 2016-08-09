@@ -9,16 +9,11 @@ import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
 import gluu.scim.client.model.ScimGroup;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
-import gluu.scim.client.model.ScimPerson;
 import gluu.scim2.client.util.Util;
-import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.gluu.oxtrust.model.scim2.Group;
 import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;

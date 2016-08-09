@@ -14,6 +14,7 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
 import org.jboss.resteasy.client.ClientExecutor;
@@ -208,6 +209,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
         	
             final PermissionTicket resourceSetPermissionTicket;
 			try {
+				System.out.println("RESPONSE = " + scimResponse.getResponseBodyString());
 				resourceSetPermissionTicket = (new ObjectMapper()).readValue(scimResponse.getResponseBody(), PermissionTicket.class);
 			} catch (Exception ex) {
     			throw new ScimInitializationException("UMA ticket is invalid", ex);
@@ -310,10 +312,10 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	}
 
 	@Override
-	public ScimResponse deletePerson(String uid) throws IOException {
-		ScimResponse scimResponse = super.deletePerson(uid);
+	public ScimResponse deletePerson(String id) throws IOException {
+		ScimResponse scimResponse = super.deletePerson(id);
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.deletePerson(uid);
+            scimResponse = super.deletePerson(id);
 		}
 
 		return scimResponse;
@@ -427,12 +429,21 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 		return scimResponse;
 	}
 
-	@Override
-	@Deprecated
-	public ScimResponse bulkOperationString(String operation, String mediaType) throws IOException {
-		ScimResponse scimResponse = super.bulkOperationString(operation, mediaType);
+    @Override
+    public ScimResponse processBulkOperation(BulkRequest bulkRequest) throws IOException {
+        ScimResponse scimResponse = super.processBulkOperation(bulkRequest);
+        if (autorizeRpt(scimResponse)) {
+            scimResponse = super.processBulkOperation(bulkRequest);
+        }
+
+        return scimResponse;
+    }
+
+    @Override
+	public ScimResponse processBulkOperationString(String bulkRequestString) throws IOException {
+		ScimResponse scimResponse = super.processBulkOperationString(bulkRequestString);
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.bulkOperationString(operation, mediaType);
+            scimResponse = super.processBulkOperationString(bulkRequestString);
 		}
 
 		return scimResponse;
@@ -457,7 +468,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 	 * @param sortBy
 	 * @param sortOrder
 	 * @param attributesArray
-	 * @return
+	 * @return ScimResponse
      * @throws IOException
      */
 	@Override
@@ -472,7 +483,31 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 		return scimResponse;
 	}
 
-	@Override
+    /**
+     * POST User search on /.search via a filter with pagination and sorting
+     *
+     * @param filter
+     * @param startIndex
+     * @param count
+     * @param sortBy
+     * @param sortOrder
+     * @param attributesArray
+     * @return ScimResponse
+     * @throws IOException
+     */
+    @Override
+    public ScimResponse searchUsersPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
+        ScimResponse scimResponse = super.searchUsersPost(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+
+        if (autorizeRpt(scimResponse)) {
+            scimResponse = super.searchUsersPost(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+        }
+
+        return scimResponse;
+    }
+
+    @Override
 	public ScimResponse retrieveAllGroups() throws IOException {
 		ScimResponse scimResponse = super.retrieveAllGroups();
 		if (autorizeRpt(scimResponse)) {
@@ -506,28 +541,29 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 		return scimResponse;
 	}
 
-	@Override
-	@Deprecated
-	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.personSearch(attribute, value, mediaType);
-		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.personSearch(attribute, value, mediaType);
-		}
+    /**
+     * POST Group search on /.search via a filter with pagination and sorting
+     *
+     * @param filter
+     * @param startIndex
+     * @param count
+     * @param sortBy
+     * @param sortOrder
+     * @param attributesArray
+     * @return ScimResponse
+     * @throws IOException
+     */
+    @Override
+    public ScimResponse searchGroupsPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
 
-		return scimResponse;
-	}
+        ScimResponse scimResponse = super.searchGroupsPost(filter, startIndex, count, sortBy, sortOrder, attributesArray);
 
-	@Override
-	@Deprecated
-	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)
-			throws IOException, JAXBException {
-		ScimResponse scimResponse = super.personSearchByObject(attribute, value, valueMediaType, outPutMediaType);
-		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.personSearchByObject(attribute, value, valueMediaType, outPutMediaType);
-		}
+        if (autorizeRpt(scimResponse)) {
+            scimResponse = super.searchGroupsPost(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
 	public ClientExecutor getExecutor() {
 		return executor;

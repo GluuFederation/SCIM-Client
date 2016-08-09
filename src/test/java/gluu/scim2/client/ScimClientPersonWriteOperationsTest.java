@@ -9,13 +9,11 @@ import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
 import gluu.scim2.client.util.Util;
-import org.apache.commons.io.FileUtils;
 import org.gluu.oxtrust.model.scim2.User;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -35,7 +33,6 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws IOException {
-		
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 	}
 
@@ -71,6 +68,7 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 
 	@Test(dependsOnMethods = "updatePersonTest")
 	public void deletePersonTest() throws Exception {
+
 		ScimResponse response = client.deletePerson(this.id);
 		System.out.println("deletePersonTest response json: " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "Could not delete user, status != 200");

@@ -9,11 +9,9 @@ import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 
-import java.io.File;
 import java.io.IOException;
 
 // import gluu.scim2.client.util.Util;
-import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Email;
 import org.gluu.oxtrust.model.scim2.PhoneNumber;
@@ -40,6 +38,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath" , "umaAatClientJksPassword" , "umaAatClientKeyId","userwebservice.add.username","userwebservice.update.displayname" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId,final String username ,final String updateDisplayName ) throws IOException {
+
 		System.out.println(" username :  "+username +" updateDisplayName :" + updateDisplayName);
 		
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
@@ -66,9 +65,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 		address.setRegion("TX");
 		address.setPrimary(true);
 		address.setType(org.gluu.oxtrust.model.scim2.Address.Type.WORK);
-		address.setFormatted(address.getStreetAddress() + " " + address.getLocality() + " " + address.getPostalCode() + " " + address.getRegion() + " "
-				+ address.getCountry());
-		
+		address.setFormatted(address.getStreetAddress() + " " + address.getLocality() + " " + address.getPostalCode() + " " + address.getRegion() + " "	+ address.getCountry());
 		userAdd.getAddresses().add(address);
 		userAdd.setPreferredLanguage("US_en");
 		org.gluu.oxtrust.model.scim2.Name name = new  org.gluu.oxtrust.model.scim2.Name();		
@@ -93,11 +90,11 @@ public class UserWebServiceTestCases extends BaseScimTest {
 	
 	/*@Parameters({ "userInum" })
 	@Test
-	public void retrievePersonTest(final String uid) throws Exception {
+	public void retrievePersonTest(final String id) throws Exception {
 
-		response = client.retrievePerson(uid, MediaType.APPLICATION_JSON);
+		response = client.retrievePerson(id, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases : retrievePersonTest : response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not get the user, status != 200");
+		assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");
 		
 	}
 	
@@ -106,29 +103,29 @@ public class UserWebServiceTestCases extends BaseScimTest {
 
 		response = client.createPerson(userAdd, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases createPersonTest :response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 201, "cold not Add the user, status != 201");
+		assertEquals(response.getStatusCode(), 201, "Could not add the user, status != 201");
 		User user = Util.toUser(response, client.getUserExtensionSchema());
-		this.uid = user.getId();
-		System.out.println("create uid  " + uid);
+		this.id = user.getId();
+		System.out.println("create id  " + id);
 
 	}
 
 	@Test
 	public void updatePersonTest() throws Exception {
 
-		response = client.updatePerson(userToUpdate, uid, MediaType.APPLICATION_JSON);
+		response = client.updatePerson(userToUpdate, id, MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases :updatePersonTest: response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not update the user, status != 200");
+		assertEquals(response.getStatusCode(), 200, "Could not update the user, status != 200");
 		User user = Util.toUser(response, client.getUserExtensionSchema());
-		assertEquals(user.getDisplayName(), userToUpdate.getDisplayName(), "could not update the user");
+		assertEquals(user.getDisplayName(), userToUpdate.getDisplayName(), "Could not update the user");
 	}
 
 	@Test
 	public void deletePersonTest() throws Exception {
 
-		response = client.deletePerson(this.uid);
+		response = client.deletePerson(this.id);
 		System.out.println("UserWebServiceTestCases :deletePersonTest :response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "cold not delete the user, status != 200");
+		assertEquals(response.getStatusCode(), 200, "Could not delete the user, status != 200");
 
 	}
 	
@@ -138,7 +135,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 
 		response = client.personSearch("mail", "abc123@cc.com", MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases :response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "unable to retrive user, status != 200");
+		assertEquals(response.getStatusCode(), 200, "Unable to retrieve user, status != 200");
 	}
 	
 	@Test
@@ -146,6 +143,6 @@ public class UserWebServiceTestCases extends BaseScimTest {
 
 		response = client.searchPersons("mail", "abc123@cc.com", MediaType.APPLICATION_JSON);
 		System.out.println("UserWebServiceTestCases :personSearchListByAttribute :response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "unable to retrive user, status != 200");
+		assertEquals(response.getStatusCode(), 200, "Unable to retrieve user, status != 200");
 	}*/
 }

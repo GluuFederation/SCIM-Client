@@ -25,26 +25,43 @@ import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
 // public interface BaseScim2Client extends BaseScimClient {
 public interface BaseScim2Client extends Serializable {
 
-	/**
-	 * Retrieves a person by his uid
-	 *
-	 * @param uid
-	 * @param mediaType
-	 * @return ScimResponse
-	 * @throws IOException
-	 */
-	@Deprecated
-	ScimResponse retrievePerson(String uid, String mediaType) throws IOException;
+    ScimResponse retrieveServiceProviderConfig() throws IOException;
 
-	/**
+    ScimResponse retrieveResourceTypes() throws	IOException;
+
+    /**
      * Creates a person with User as input
+     *
      * @param user
      * @param mediaType
      * @return ScimResponse
      * @throws Exception
      */
+    @Deprecated
+    ScimResponse createPerson(User user, String mediaType) throws IOException, JAXBException;
+
+    /**
+	 * Retrieves a person by his id
+	 *
+	 * @param id
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
 	@Deprecated
-	ScimResponse createPerson(User user, String mediaType) throws IOException, JAXBException;
+	ScimResponse retrievePerson(String id, String mediaType) throws IOException;
+
+    /**
+     * Updates a person with User as input
+     *
+     * @param user
+     * @param id
+     * @param mediaType
+     * @return ScimResponse
+     * @throws Exception
+     */
+    @Deprecated
+    ScimResponse updatePerson(User user, String id, String mediaType) throws IOException, JAXBException;
 
 	/**
 	 * @param user
@@ -63,17 +80,6 @@ public interface BaseScim2Client extends Serializable {
 	ScimResponse retrieveUser(String id, String[] attributesArray) throws IOException;
 
 	/**
-     * Updates a person with User as input
-     * @param user
-	 * @param id
-     * @param mediaType
-     * @return ScimResponse
-     * @throws Exception
-     */
-	@Deprecated
-	ScimResponse updatePerson(User user, String id, String mediaType) throws IOException, JAXBException;
-
-	/**
 	 * @param user
 	 * @param id
 	 * @param attributesArray
@@ -83,13 +89,24 @@ public interface BaseScim2Client extends Serializable {
 	ScimResponse updateUser(User user, String id, String[] attributesArray) throws IOException;
 
 	/**
-	 * Deletes a person by his uid
+	 * Deletes a person by his id
 	 *
-	 * @param uid
+	 * @param id
 	 * @return ScimResponse
 	 * @throws IOException
 	 */
-	ScimResponse deletePerson(String uid) throws IOException;
+	ScimResponse deletePerson(String id) throws IOException;
+
+    /**
+     * Creates a Group with Group as input
+     *
+     * @param group
+     * @param mediaType
+     * @return ScimResponse
+     * @throws Exception
+     */
+    @Deprecated
+    ScimResponse createGroup(Group group, String mediaType) throws IOException, JAXBException;
 
 	/**
 	 * Retrieves a group by his id
@@ -102,15 +119,16 @@ public interface BaseScim2Client extends Serializable {
 	@Deprecated
 	ScimResponse retrieveGroup(String id, String mediaType) throws IOException;
 
-	/**
-     * Creates a Group with Group as input
+    /**
+     * Updates a Group with Group as input
+     *
      * @param group
      * @param mediaType
      * @return ScimResponse
      * @throws Exception
      */
-	@Deprecated
-	ScimResponse createGroup(Group group, String mediaType) throws IOException, JAXBException;
+    @Deprecated
+    ScimResponse updateGroup(Group group, String id, String mediaType) throws IOException, JAXBException;
 
 	/**
 	 * @param group
@@ -129,16 +147,15 @@ public interface BaseScim2Client extends Serializable {
      */
 	ScimResponse retrieveGroup(String id, String[] attributesArray) throws IOException;
 
-	/**
-     * Updates a Group with Group as input
-	 *
+    /**
      * @param group
-     * @param mediaType
+     * @param id
+     * @param attributesArray
      * @return ScimResponse
-     * @throws Exception
+     * @throws IOException
+     * @throws JAXBException
      */
-	@Deprecated
-	ScimResponse updateGroup(Group group, String id, String mediaType) throws IOException, JAXBException;
+    ScimResponse updateGroup(Group group, String id, String[] attributesArray) throws IOException;
 
 	/**
 	 * Deletes a group by his id
@@ -149,15 +166,23 @@ public interface BaseScim2Client extends Serializable {
 	 */
 	ScimResponse deleteGroup(String id) throws IOException;
 
-	/**
-	 * @param group
-	 * @param id
-	 * @param attributesArray
-	 * @return ScimResponse
-	 * @throws IOException
-     * @throws JAXBException
+    /**
+     * Bulk operation with BulkRequest as input
+     *
+     * @param bulkRequest
+     * @return ScimResponse
+     * @throws IOException
      */
-	ScimResponse updateGroup(Group group, String id, String[] attributesArray) throws IOException;
+    ScimResponse processBulkOperation(BulkRequest bulkRequest) throws IOException;
+
+    /**
+     * Bulk operation with String as input
+     *
+     * @param bulkRequestString
+     * @return ScimResponse
+     * @throws IOException
+     */
+    ScimResponse processBulkOperationString(String bulkRequestString) throws IOException;
 
 	/**
 	 * Creates a person with a String as input
@@ -175,14 +200,14 @@ public interface BaseScim2Client extends Serializable {
 	 * Updates a person with a String as input
 	 *
 	 * @param person
-	 * @param uid
+	 * @param id
 	 * @param mediaType
 	 * @return ScimResponse
 	 * @throws IOException
 	 * @throws JAXBException
 	 */
 	@Deprecated
-	ScimResponse updatePersonString(String person, String uid, String mediaType) throws IOException, JAXBException;
+	ScimResponse updatePersonString(String person, String id, String mediaType) throws IOException, JAXBException;
 
 	/**
 	 * Creates a group with a String as input
@@ -210,53 +235,6 @@ public interface BaseScim2Client extends Serializable {
 	ScimResponse updateGroupString(String group, String id, String mediaType) throws IOException, JAXBException;
 
 	/**
-	 * Bulk operation with BulkOperation as input
-	 * @param bulkRequest
-	 * @param mediaType
-	 * @return ScimResponse
-	 * @throws IOException
-	 * @throws JAXBException
-     */
-	@Deprecated
-	ScimResponse bulkOperation(BulkRequest bulkRequest, String mediaType) throws IOException, JAXBException;
-
-	/**
-	 * Bulk operation with String as input
-	 *
-	 * @param operation
-	 * @param mediaType
-	 * @return ScimResponse
-	 * @throws IOException
-	 */
-	@Deprecated
-	ScimResponse bulkOperationString(String operation, String mediaType) throws IOException;
-
-	/**
-	 * Retrieves all users
-	 *
-	 * @return ScimResponse
-	 * @throws IOException
-	 */
-	ScimResponse retrieveAllUsers() throws IOException;
-
-	/**
-	 * Retrieves all groups
-	 *
-	 * @return ScimResponse
-	 * @throws IOException
-	 */
-	ScimResponse retrieveAllGroups() throws IOException;
-
-	ScimResponse retrieveServiceProviderConfig() throws IOException;
-
-	ScimResponse retrieveResourceTypes() throws	IOException;
-	
-	// ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException;
-
-	@Deprecated
-	ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException;
-
-	/**
 	 * User search via a filter with pagination and sorting
 	 *
 	 * @param filter
@@ -265,10 +243,24 @@ public interface BaseScim2Client extends Serializable {
 	 * @param sortBy
 	 * @param sortOrder
 	 * @param attributesArray
-	 * @return
+	 * @return ScimResponse
      * @throws IOException
      */
 	ScimResponse searchUsers(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
+
+    /**
+     * POST User search on /.search via a filter with pagination and sorting
+     *
+     * @param filter
+     * @param startIndex
+     * @param count
+     * @param sortBy
+     * @param sortOrder
+     * @param attributesArray
+     * @return ScimResponse
+     * @throws IOException
+     */
+    ScimResponse searchUsersPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
 
 	/**
 	 * Group search via a filter with pagination and sorting
@@ -279,19 +271,46 @@ public interface BaseScim2Client extends Serializable {
 	 * @param sortBy
 	 * @param sortOrder
 	 * @param attributesArray
-	 * @return
+	 * @return ScimResponse
      * @throws IOException
      */
 	ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
 
-	/**
-	 * Retrieves the User Extension Schema
-	 *
-	 * @return
-	 * @throws Exception
+    /**
+     * POST Group search on /.search via a filter with pagination and sorting
+     *
+     * @param filter
+     * @param startIndex
+     * @param count
+     * @param sortBy
+     * @param sortOrder
+     * @param attributesArray
+     * @return ScimResponse
+     * @throws IOException
      */
-	UserExtensionSchema getUserExtensionSchema() throws Exception;
+    ScimResponse searchGroupsPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
 
-	@Deprecated
-	ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType) throws IOException, JAXBException;
+    /**
+     * Retrieves all users
+     *
+     * @return ScimResponse
+     * @throws IOException
+     */
+    ScimResponse retrieveAllUsers() throws IOException;
+
+    /**
+     * Retrieves all groups
+     *
+     * @return ScimResponse
+     * @throws IOException
+     */
+    ScimResponse retrieveAllGroups() throws IOException;
+
+    /**
+     * Retrieves the User Extension Schema
+     *
+     * @return
+     * @throws Exception
+     */
+    UserExtensionSchema getUserExtensionSchema() throws Exception;
 }

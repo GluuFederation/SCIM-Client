@@ -9,12 +9,10 @@ import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
 import gluu.scim.client.model.ScimGroup;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -36,37 +34,34 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest{
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath" , "umaAatClientJksPassword" , "umaAatClientKeyId" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws IOException {
-						
 		client = ScimClient.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 	}
 
 	@Test
 	@Parameters({ "scim1.group.create_json" })
 	public void createGroupTest(String CREATEJSON) throws Exception {
-		ScimResponse response = client.createGroupString(CREATEJSON, MediaType.APPLICATION_JSON);
 
-		assertEquals(response.getStatusCode(), 201, "cold not Add the group, status != 201");
+		ScimResponse response = client.createGroupString(CREATEJSON, MediaType.APPLICATION_JSON);
+		assertEquals(response.getStatusCode(), 201, "Could not add the group, status != 201");
+
 		String responseStr = response.getResponseBodyString();
 		group = (ScimGroup) jsonToObject(responseStr, ScimGroup.class);
 		this.id = group.getId();
-
 	}
 
 	@Test(dependsOnMethods = "createGroupTest")
 	@Parameters({ "scim1.group.update_json" })
 	public void updateGroupTest(String UPDATEJSON) throws Exception {
+
 		ScimResponse response = client.updateGroupString(UPDATEJSON, this.id, MediaType.APPLICATION_JSON);
-
-		assertEquals(response.getStatusCode(), 200, "cold not update the group, status != 200");
-
+		assertEquals(response.getStatusCode(), 200, "Could not update the group, status != 200");
 	}
 
 	@Test(dependsOnMethods = "updateGroupTest")
 	public void deleteGroupTest() throws Exception {
+
 		ScimResponse response = client.deleteGroup(this.id);
-
-		assertEquals(response.getStatusCode(), 200, "cold not delete the Group, status != 200");
-
+		assertEquals(response.getStatusCode(), 200, "Could not delete the group, status != 200");
 	}
 
 	private Object jsonToObject(String json, Class<?> clazz) throws Exception {

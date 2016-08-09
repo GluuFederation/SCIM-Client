@@ -8,7 +8,6 @@ package gluu.scim2.client;
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 import gluu.scim2.client.util.Util;
-import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.*;
@@ -18,8 +17,6 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.core.MediaType;
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -36,10 +33,8 @@ import static org.testng.Assert.assertTrue;
  * @author Val Pecaoco
  */
 public class UserObjectAttributesFilterTests extends BaseScimTest {
-    
-    String domainURL;
-    Scim2Client client;
 
+    Scim2Client client;
     String id;
     User user;
 
@@ -49,8 +44,6 @@ public class UserObjectAttributesFilterTests extends BaseScimTest {
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
     public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws Exception {
-        this.domainURL = domainURL;
-        
         client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 
@@ -121,7 +114,7 @@ public class UserObjectAttributesFilterTests extends BaseScimTest {
 
         Thread.sleep(3000);  // Sleep for 3 seconds
 
-        String[] attributesArray = new String[]{"urn:ietf:params:scim:schemas:core:2.0:User:name.formatted"};
+        String[] attributesArray = new String[]{"urn:ietf:params:scim:schemas:core:2.0:User:name.formatted", "displayName"};
         ScimResponse response = client.retrieveUser(this.id, attributesArray);
         System.out.println("response body = " + response.getResponseBodyString());
 
@@ -195,13 +188,23 @@ public class UserObjectAttributesFilterTests extends BaseScimTest {
 
         System.out.println("IN testUserDeserializerGroups...");
 
-        ScimResponse response = client.personSearch("uid", "admin", MediaType.APPLICATION_JSON);
+        String filter = "userName eq \"admin\"";
+        int startIndex = 1;
+        int count = 1;
+        String sortBy = "";
+        String sortOrder = "";
+        String[] attributes = null;
+
+        // POST search on /scim/v2/Users/.search
+        ScimResponse response = client.searchUsersPost(filter, startIndex, count, sortBy, sortOrder, attributes);
         System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
+        ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+        assertEquals(listResponse.getTotalResults(), 1);
 
+        User userRetrieved = (User) listResponse.getResources().get(0);
         assertEquals(userRetrieved.getUserName(), "admin", "User could not be retrieved");
 
         System.out.println("userRetrieved.getId() = " + userRetrieved.getId());

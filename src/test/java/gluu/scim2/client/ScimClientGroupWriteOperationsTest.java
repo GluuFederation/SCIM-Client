@@ -9,13 +9,11 @@ import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
 import gluu.scim2.client.util.Util;
-import org.apache.commons.io.FileUtils;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -34,7 +32,6 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws IOException {
-		
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 	}
 

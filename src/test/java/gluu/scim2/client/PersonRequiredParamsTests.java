@@ -7,14 +7,11 @@ package gluu.scim2.client;
 
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
-import org.apache.commons.io.FileUtils;
 import org.gluu.oxtrust.model.scim2.User;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
-
-import java.io.File;
 
 import static org.testng.Assert.assertEquals;
 
@@ -23,14 +20,11 @@ import static org.testng.Assert.assertEquals;
  */
 public class PersonRequiredParamsTests extends BaseScimTest {
 
-    String domainURL;
     Scim2Client client;
 
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
     public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws Exception {
-        this.domainURL = domainURL;
-        
         client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 

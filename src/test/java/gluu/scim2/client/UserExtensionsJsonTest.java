@@ -9,7 +9,6 @@ import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 
 import gluu.scim2.client.util.Util;
-import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Constants;
@@ -25,7 +24,6 @@ import org.testng.annotations.Test;
 
 import javax.ws.rs.core.MediaType;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
@@ -43,8 +41,7 @@ import static org.testng.Assert.assertEquals;
  */
 public class UserExtensionsJsonTest extends BaseScimTest {
 
-    String domainURL;
-    String uid;
+    String id;
     Scim2Client client;
     User user;
 
@@ -53,9 +50,6 @@ public class UserExtensionsJsonTest extends BaseScimTest {
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
     public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws Exception {
-
-        this.domainURL = domainURL;
-        
         client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 
@@ -105,14 +99,14 @@ public class UserExtensionsJsonTest extends BaseScimTest {
         assertEquals(response.getStatusCode(), 201, "Could not add the user, status != 201");
 
         user = Util.toUser(response, client.getUserExtensionSchema());
-        this.uid = user.getId();
+        this.id = user.getId();
     }
 
     @Test(groups = "c", dependsOnGroups = "b")
     @Parameters({ "scim2.userext.update_json" })
     public void updateUserTest(String updateJson) throws Exception {
 
-        ScimResponse response = client.updatePersonString(updateJson, this.uid, MediaType.APPLICATION_JSON);
+        ScimResponse response = client.updatePersonString(updateJson, this.id, MediaType.APPLICATION_JSON);
 
         System.out.println(" updateUserTest() RESPONSE = " + response.getResponseBodyString());
         assertEquals(response.getStatusCode(), 200, "Could not update the user, status != 200");
@@ -124,7 +118,7 @@ public class UserExtensionsJsonTest extends BaseScimTest {
     @Test(groups = "d", dependsOnGroups = "c")
     public void retrieveUserTest() throws Exception {
 
-        ScimResponse response = client.retrieveUser(this.uid, new String[]{});
+        ScimResponse response = client.retrieveUser(this.id, new String[]{});
 
         System.out.println(" retrieveUserTest() RESPONSE = "  + response.getResponseBodyString());
         assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");
@@ -157,7 +151,8 @@ public class UserExtensionsJsonTest extends BaseScimTest {
 
 	@Test(dependsOnGroups = "d", alwaysRun = true)
 	public void deleteUserTest() throws Exception {
-        ScimResponse response = client.deletePerson(this.uid);
+
+        ScimResponse response = client.deletePerson(this.id);
 		System.out.println(" deleteUserTest() RESPONSE = " + response.getResponseBodyString());
 		assertEquals(response.getStatusCode(), 200, "Could not delete the user, status != 200");
 	}

@@ -8,7 +8,6 @@ package gluu.scim2.client;
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 import gluu.scim2.client.util.Util;
-import org.apache.commons.io.FileUtils;
 import org.gluu.oxtrust.model.scim2.*;
 import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
@@ -17,7 +16,6 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.MediaType;
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -29,16 +27,12 @@ import static org.testng.Assert.assertEquals;
  */
 public class GroupObjectTests extends BaseScimTest {
 
-    String domainURL;
     Scim2Client client;
-
     String id;
 
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
     public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws Exception {
-        this.domainURL = domainURL;
-        
         client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 
@@ -159,13 +153,23 @@ public class GroupObjectTests extends BaseScimTest {
 
         System.out.println("IN testGroupDeserializerUsers...");
 
-        ScimResponse response = client.personSearch("uid", "admin", MediaType.APPLICATION_JSON);
+        String filter = "userName eq \"admin\"";
+        int startIndex = 1;
+        int count = 1;
+        String sortBy = "";
+        String sortOrder = "";
+        String[] attributes = null;
+
+        // GET search on /scim/v2/Users
+        ScimResponse response = client.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes);
         System.out.println("response body = " + response.getResponseBodyString());
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
+        ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+        assertEquals(listResponse.getTotalResults(), 1);
 
+        User userRetrieved = (User) listResponse.getResources().get(0);
         assertEquals(userRetrieved.getUserName(), "admin", "User could not be retrieved");
 
         System.out.println("userRetrieved.getId() = " + userRetrieved.getId());

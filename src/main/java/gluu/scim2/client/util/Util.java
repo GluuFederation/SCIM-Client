@@ -23,14 +23,28 @@ import java.io.IOException;
  */
 public class Util {
 
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    static {
+        mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
+        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+    }
+
+    public static ObjectMapper getObjectMapper() {
+        return mapper;
+    }
+
     public static Object jsonToObject(ScimResponse response, Class<?> clazz) throws Exception {
 
         byte[] bytes = response.getResponseBody();
         String json = new String(bytes);
 
-        ObjectMapper mapper = new ObjectMapper();
+        Object clazzObject = mapper.readValue(json, clazz);
 
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+        return clazzObject;
+    }
+
+    public static Object jsonToObject(String json, Class<?> clazz) throws Exception {
 
         Object clazzObject = mapper.readValue(json, clazz);
 
@@ -46,10 +60,6 @@ public class Util {
      */
     public static String getJSONStringUser(User user) throws IOException {
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
-
         SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
         simpleModule.addSerializer(User.class, new UserSerializer());
         mapper.registerModule(simpleModule);
@@ -62,10 +72,6 @@ public class Util {
     public static User toUser(ScimResponse scimResponse, UserExtensionSchema userExtensionSchema) throws Exception {
 
         String response = getResponseString(scimResponse);
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         UserDeserializer userDeserializer = new UserDeserializer();
         userDeserializer.setUserExtensionSchema(userExtensionSchema);
@@ -82,10 +88,6 @@ public class Util {
     public static Group toGroup(ScimResponse scimResponse) throws Exception {
 
         String response = getResponseString(scimResponse);
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         GroupDeserializer groupDeserializer = new GroupDeserializer();
 
@@ -119,10 +121,6 @@ public class Util {
 
     private static ListResponse jsonToListResponseUser(String json, UserExtensionSchema userExtensionSchema) throws Exception {
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-
         ListResponseUserDeserializer listResponseUserDeserializer = new ListResponseUserDeserializer();
         listResponseUserDeserializer.setUserExtensionSchema(userExtensionSchema);
 
@@ -138,7 +136,6 @@ public class Util {
     private static ListResponse jsonToListResponseGroup(String json) throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
-
         mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         ListResponseGroupDeserializer listResponseGroupDeserializer = new ListResponseGroupDeserializer();

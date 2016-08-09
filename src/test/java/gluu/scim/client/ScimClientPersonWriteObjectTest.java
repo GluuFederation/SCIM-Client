@@ -12,7 +12,6 @@ import gluu.scim.client.model.ScimPersonAddresses;
 import gluu.scim.client.model.ScimPersonEmails;
 import gluu.scim.client.model.ScimPersonPhones;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,6 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import gluu.scim2.client.util.Util;
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
