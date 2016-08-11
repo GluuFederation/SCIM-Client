@@ -12,14 +12,9 @@ import gluu.scim.client.model.ScimPerson;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 
 import javax.xml.bind.JAXBException;
 
-import org.apache.commons.httpclient.HttpException;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.gluu.oxtrust.model.scim2.User;
 import org.xdi.oxauth.model.util.SecurityProviderUtility;
 
 /**
@@ -48,7 +43,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#retrievePerson(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse retrievePerson(String uid, String mediaType) throws HttpException, IOException {
+	public ScimResponse retrievePerson(String uid, String mediaType) throws IOException {
 		return scimClient.retrievePerson(uid, mediaType);
 	}
 
@@ -56,8 +51,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#createPerson(gluu.scim.client.model.ScimPerson, java.lang.String)
 	 */
 	@Override
-	public ScimResponse createPerson(ScimPerson person, String mediaType) throws JsonGenerationException, JsonMappingException,
-			IOException, JAXBException {
+	public ScimResponse createPerson(ScimPerson person, String mediaType) throws IOException, JAXBException {
 		return scimClient.createPerson(person, mediaType);
 	}
 
@@ -65,8 +59,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#updatePerson(gluu.scim.client.model.ScimPerson, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse updatePerson(ScimPerson person, String uid, String mediaType) throws JsonGenerationException, JsonMappingException,
-			UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse updatePerson(ScimPerson person, String uid, String mediaType) throws IOException, JAXBException {
 		return scimClient.updatePerson(person, uid, mediaType);
 	}
 
@@ -74,7 +67,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#deletePerson(java.lang.String)
 	 */
 	@Override
-	public ScimResponse deletePerson(String uid) throws HttpException, IOException {
+	public ScimResponse deletePerson(String uid) throws IOException {
 		return scimClient.deletePerson(uid);
 	}
 
@@ -82,7 +75,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#retrieveGroup(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse retrieveGroup(String id, String mediaType) throws HttpException, IOException {
+	public ScimResponse retrieveGroup(String id, String mediaType) throws IOException {
 		return scimClient.retrieveGroup(id, mediaType);
 	}
 
@@ -90,8 +83,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#createGroup(gluu.scim.client.model.ScimGroup, java.lang.String)
 	 */
 	@Override
-	public ScimResponse createGroup(ScimGroup group, String mediaType) throws JsonGenerationException, JsonMappingException,
-			UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse createGroup(ScimGroup group, String mediaType) throws IOException, JAXBException {
 		return scimClient.createGroup(group, mediaType);
 	}
 
@@ -99,8 +91,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#updateGroup(gluu.scim.client.model.ScimGroup, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse updateGroup(ScimGroup group, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
-			UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse updateGroup(ScimGroup group, String id, String mediaType) throws IOException, JAXBException {
 		return scimClient.updateGroup(group, id, mediaType);
 	}
 
@@ -108,7 +99,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#deleteGroup(java.lang.String)
 	 */
 	@Override
-	public ScimResponse deleteGroup(String id) throws HttpException, IOException {
+	public ScimResponse deleteGroup(String id) throws IOException {
 		return scimClient.deleteGroup(id);
 	}
 
@@ -116,8 +107,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#createPersonString(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse createPersonString(String person, String mediaType) throws JsonGenerationException, JsonMappingException,
-			IOException, JAXBException {
+	public ScimResponse createPersonString(String person, String mediaType) throws IOException, JAXBException {
 		return scimClient.createPersonString(person, mediaType);
 	}
 
@@ -125,8 +115,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#updatePersonString(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse updatePersonString(String person, String uid, String mediaType) throws JsonGenerationException,
-			JsonMappingException, UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse updatePersonString(String person, String uid, String mediaType) throws IOException, JAXBException {
 		return scimClient.updatePersonString(person, uid, mediaType);
 	}
 
@@ -134,8 +123,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#createGroupString(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse createGroupString(String group, String mediaType) throws JsonGenerationException, JsonMappingException,
-			UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse createGroupString(String group, String mediaType) throws IOException, JAXBException {
 		return scimClient.createGroupString(group, mediaType);
 	}
 
@@ -143,8 +131,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#updateGroupString(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse updateGroupString(String group, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
-			UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse updateGroupString(String group, String id, String mediaType) throws IOException, JAXBException {
 		return scimClient.updateGroupString(group, id, mediaType);
 	}
 
@@ -152,8 +139,7 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#bulkOperation(gluu.scim.client.model.ScimBulkOperation, java.lang.String)
 	 */
 	@Override
-	public ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws JsonGenerationException, JsonMappingException,
-			UnsupportedEncodingException, IOException, JAXBException {
+	public ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws IOException, JAXBException {
 		return scimClient.bulkOperation(operation, mediaType);
 	}
 
@@ -161,53 +147,87 @@ public class ScimClient implements BaseScimClient, Serializable {
 	 * @see gluu.scim.client.ScimClientService#bulkOperationString(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public ScimResponse bulkOperationString(String operation, String mediaType) throws HttpException, IOException {
+	public ScimResponse bulkOperationString(String operation, String mediaType) throws IOException {
 		return scimClient.bulkOperationString(operation, mediaType);
 	}
 
 	/*
-	 * @see gluu.scim.client.ScimClientService#retrieveAllPersons(java.lang.String)
+	 * @see gluu.scim.client.ScimClientService#retrieveAllPersons()
 	 */
 	@Override
-	public ScimResponse retrieveAllPersons(String mediaType) throws HttpException, IOException {
-		return scimClient.retrieveAllPersons(mediaType);
+	public ScimResponse retrieveAllPersons() throws IOException {
+		return scimClient.retrieveAllPersons();
+	}
+
+	/**
+	 * Person search via a filter with pagination and sorting
+	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchPersons(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+		return scimClient.searchPersons(filter, startIndex, count, sortBy, sortOrder, attributesArray);
 	}
 
 	/*
-	 * @see gluu.scim.client.ScimClientService#retrieveAllGroups(java.lang.String)
+	 * @see gluu.scim.client.ScimClientService#retrieveAllGroups()
 	 */
 	@Override
-	public ScimResponse retrieveAllGroups(String mediaType) throws HttpException, IOException {
-		return scimClient.retrieveAllGroups(mediaType);
+	public ScimResponse retrieveAllGroups() throws IOException {
+		return scimClient.retrieveAllGroups();
+	}
+
+	/**
+	 * Group search via a filter with pagination and sorting
+	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+		return scimClient.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributesArray);
 	}
 
 	/*
 	 * @see gluu.scim.client.ScimClientService#personSearch(java.lang.String, java.lang.String, java.lang.String)
 	 */
+	/*
 	@Override
-	public ScimResponse personSearch(String attribute, String value, String mediaType) throws JsonGenerationException,
-			JsonMappingException, IOException, JAXBException {
+	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
 		return scimClient.personSearch(attribute, value, mediaType);
 	}
+	*/
 
 	/*
 	 * @see gluu.scim.client.ScimClientService#personSearchByObject(java.lang.String, java.lang.Object, java.lang.String, java.lang.String)
 	 */
+	/*
 	@Override
-	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)
-			throws JsonGenerationException, JsonMappingException, IOException, JAXBException {
+	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)	throws IOException, JAXBException {
 		return scimClient.personSearchByObject(attribute, value, valueMediaType, outPutMediaType);
 	}
-	
-	
+	*/
 
 	/*
 	 * @see gluu.scim.client.ScimClientService#searchPersons(java.lang.String, java.lang.String, java.lang.String)
 	 */
+	/*
 	@Override
-	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws JsonGenerationException,
-			JsonMappingException, IOException, JAXBException {
+	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException {
 		return scimClient.searchPersons(attribute, value, mediaType);
 	}
-
+	*/
 }

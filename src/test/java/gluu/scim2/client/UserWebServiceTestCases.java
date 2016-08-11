@@ -31,7 +31,7 @@ public class UserWebServiceTestCases extends BaseScimTest {
 	User userAdd;
 	User userToUpdate;
 	
-	String uid;
+	String id;
 	Scim2Client client;
 	ScimResponse response;
 	

@@ -25,17 +25,20 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.gluu.oxtrust.model.scim2.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
 
 /**
  * SCIM default client
@@ -693,82 +696,124 @@ public abstract class BaseScimClientImpl implements BaseScimClient, Serializable
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * gluu.scim.client.ScimClientService#retrieveAllPersons(java.lang.String)
+	 * gluu.scim.client.ScimClientService#retrieveAllPersons()
 	 */
 	@Override
-	public ScimResponse retrieveAllPersons(String mediaType) throws HttpException, IOException {
+	public ScimResponse retrieveAllPersons() throws IOException {
+
+		return searchPersons("", 1, MAX_COUNT, "", "", new String[]{});
+	}
+
+	/**
+	 * Person search via a filter with pagination and sorting
+	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchPersons(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
 		init();
+
 		HttpClient httpClient = new HttpClient();
 		GetMethod get = new GetMethod(this.domain + "/scim/v1/Users/");
+
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
+		get.setQueryString(new NameValuePair[] {
+			new NameValuePair("filter", filter),
+			new NameValuePair("startIndex", String.valueOf(startIndex)),
+			new NameValuePair("count", String.valueOf(count)),
+			new NameValuePair("sortBy", sortBy),
+			new NameValuePair("sortOrder", sortOrder),
+			new NameValuePair("attributes", ((attributesArray != null) ? StringUtils.join(attributesArray, ',') : null))
+		});
+
 		addAuthenticationHeader(get);
-
-		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
-			get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-
-		}
-
-		if (mediaType.equals(MediaType.APPLICATION_XML)) {
-			get.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-
-		}
+		get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
 
 		try {
+
 			httpClient.executeMethod(get);
 
-			ScimResponse response = ResponseMapper.map(get, null);
+			ScimResponse response = ResponseMapper.map(get, new ScimResponse());
 
 			return response;
+
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			get.releaseConnection();
-
 		}
+
 		return null;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * gluu.scim.client.ScimClientService#retrieveAllGroups(java.lang.String)
+	 * gluu.scim.client.ScimClientService#retrieveAllGroups()
 	 */
 	@Override
-	public ScimResponse retrieveAllGroups(String mediaType) throws HttpException, IOException {
+	public ScimResponse retrieveAllGroups() throws IOException {
+
+		return searchGroups("", 1, MAX_COUNT, "", "", new String[]{});
+	}
+
+	/**
+	 * Person search via a filter with pagination and sorting
+	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
 		init();
+
 		HttpClient httpClient = new HttpClient();
 		GetMethod get = new GetMethod(this.domain + "/scim/v1/Groups/");
+
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
+		get.setQueryString(new NameValuePair[] {
+			new NameValuePair("filter", filter),
+			new NameValuePair("startIndex", String.valueOf(startIndex)),
+			new NameValuePair("count", String.valueOf(count)),
+			new NameValuePair("sortBy", sortBy),
+			new NameValuePair("sortOrder", sortOrder),
+			new NameValuePair("attributes", ((attributesArray != null) ? StringUtils.join(attributesArray, ',') : null))
+		});
+
 		addAuthenticationHeader(get);
-
-		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
-			get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-
-		}
-
-		if (mediaType.equals(MediaType.APPLICATION_XML)) {
-			get.setRequestHeader("Accept", MediaType.APPLICATION_XML);
-
-		}
+		get.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
 
 		try {
+
 			httpClient.executeMethod(get);
 
-			ScimResponse response = ResponseMapper.map(get, null);
+			ScimResponse response = ResponseMapper.map(get, new ScimResponse());
 
 			return response;
+
 		} catch (Exception ex) {
-
-			log.error(" an Error occured : ", ex);
-
+			ex.printStackTrace();
 		} finally {
 			get.releaseConnection();
-
 		}
+
 		return null;
 	}
 
@@ -777,9 +822,9 @@ public abstract class BaseScimClientImpl implements BaseScimClient, Serializable
 	 * @see gluu.scim.client.ScimClientService#personSearch(java.lang.String,
 	 * java.lang.String, java.lang.String)
 	 */
+	/*
 	@Override
-	public ScimResponse personSearch(String attribute, String value, String mediaType) throws JsonGenerationException,
-			JsonMappingException, IOException, JAXBException {
+	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
 
 		init();
 
@@ -821,6 +866,7 @@ public abstract class BaseScimClientImpl implements BaseScimClient, Serializable
 		}
 		return null;
 	}
+	*/
 
 	/*
 	 * (non-Javadoc)
@@ -828,9 +874,9 @@ public abstract class BaseScimClientImpl implements BaseScimClient, Serializable
 	 * gluu.scim.client.ScimClientService#personSearchByObject(java.lang.String,
 	 * java.lang.Object, java.lang.String, java.lang.String)
 	 */
+	/*
 	@Override
-	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)
-			throws JsonGenerationException, JsonMappingException, IOException, JAXBException {
+	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)	throws IOException, JAXBException {
 
 		init();
 
@@ -881,15 +927,14 @@ public abstract class BaseScimClientImpl implements BaseScimClient, Serializable
 		}
 		return null;
 	}
-	
-	
+	*/
 	
 	/* (non-Javadoc)
 	 * @see gluu.scim.client.ScimClientService#searchPersons(java.lang.String, java.lang.String, java.lang.String)
 	 */
+	/*
 	@Override
-	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws JsonGenerationException,
-			JsonMappingException, IOException, JAXBException {
+	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException {
 
 		init();
 
@@ -931,6 +976,7 @@ public abstract class BaseScimClientImpl implements BaseScimClient, Serializable
 		}
 		return null;
 	}
+	*/
 
 	protected abstract void init();
 

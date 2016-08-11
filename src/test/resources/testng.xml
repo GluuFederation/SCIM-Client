@@ -2,7 +2,7 @@
 
 <suite name="SCIM-Client" parallel="false">
 
-    <!-- SCIM 1 test cases -->
+	<!-- SCIM 1 test cases -->
 
 	<test name="ScimClientRetreivingEntities test" enabled="true">
 		<classes>
@@ -43,6 +43,20 @@
 	<test name="ExcelMapper test" enabled="true">
 		<classes>
 			<class name="gluu.scim.client.ExcelMapperTest" />
+		</classes>
+	</test>
+
+	<test name="SCIM 1 UserFiltersTests test" enabled="true">
+		<classes>
+			<class name="gluu.scim.client.PersonFiltersMainTests"/>
+			<class name="gluu.scim.client.PersonFiltersNegativeTests"/>
+		</classes>
+	</test>
+
+	<test name="SCIM 1 GroupFiltersTests test" enabled="true">
+		<classes>
+			<class name="gluu.scim.client.GroupFiltersMainTests"/>
+			<class name="gluu.scim.client.GroupFiltersNegativeTests"/>
 		</classes>
 	</test>
 

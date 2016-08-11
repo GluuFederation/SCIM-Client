@@ -173,26 +173,54 @@ public interface BaseScimClient extends Serializable {
 	ScimResponse bulkOperationString(String operation,String mediaType) throws IOException;
 
 	/**
-	 * Retrieves All persons
+	 * Person search via a filter with pagination and sorting
 	 *
-	 * @param mediaType
-	 * @return ScimResponse
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
 	 * @throws IOException
-     */
-	ScimResponse retrieveAllPersons(String mediaType) throws IOException;
+	 */
+	ScimResponse searchPersons(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
 
 	/**
-	 * Retrieves All groups
+	 * Group search via a filter with pagination and sorting
 	 *
-	 * @param mediaType
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
+
+	/**
+	 * Retrieves all persons
+	 *
 	 * @return ScimResponse
 	 * @throws IOException
      */
-	ScimResponse retrieveAllGroups(String mediaType) throws IOException;
+	ScimResponse retrieveAllPersons() throws IOException;
 
+	/**
+	 * Retrieves all groups
+	 *
+	 * @return ScimResponse
+	 * @throws IOException
+     */
+	ScimResponse retrieveAllGroups() throws IOException;
+
+	/*
 	ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException;
 
 	ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType) throws IOException, JAXBException;
 
 	ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException;
+	*/
 }

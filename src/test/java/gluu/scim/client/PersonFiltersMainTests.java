@@ -3,19 +3,19 @@
  *
  * Copyright (c) 2014, Gluu
  */
-package gluu.scim2.client;
+package gluu.scim.client;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
 import gluu.scim2.client.util.Util;
-import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import static org.gluu.oxtrust.model.scim2.Constants.USER_CORE_SCHEMA_ID;
+import java.util.Map;
+
+import static org.gluu.oxtrust.model.scim2.Constants.SCIM1_CORE_SCHEMA_ID;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -26,18 +26,18 @@ import static org.testng.Assert.assertEquals;
  *
  * @author Val Pecaoco
  */
-public class UserFiltersMainTests extends BaseScimTest {
+public class PersonFiltersMainTests extends BaseScimTest {
 
-    Scim2Client client;
+    ScimClient client;
 
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
     public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws Exception {
-        client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+        client = ScimClient.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 
     @Test
-    public void testSearchUsers1() throws Exception {
+    public void testSearchPersons1() throws Exception {
 
         String[] filters = new String[] {
             "name[givenName co \"aaaa\" and name[familyName ew \"test\"]]",
@@ -71,37 +71,37 @@ public class UserFiltersMainTests extends BaseScimTest {
         String sortBy = "userName";
         String sortOrder = "ascending";
         String[] attributes = null;
-        // String[] attributes = new String[] {"name","emails","addresses"};  // Not supported as per spec
-        // String[] attributes = new String[] {"name.givenName","emails.type","emails.primary","emails.value"};  // Supported
 
         for (int i = 0; i < filters.length; i++) {
 
-            ScimResponse response = client.searchUsers(filters[i], startIndex, count, sortBy, sortOrder, attributes);
+            ScimResponse response = client.searchPersons(filters[i], startIndex, count, sortBy, sortOrder, attributes);
 
-            System.out.println(" testSearchUsers1 response (" + i + ") = " + response.getResponseBodyString());
+            System.out.println(" testSearchPersons1 response (" + i + ") = " + response.getResponseBodyString());
             assertEquals(response.getStatusCode(), 200, "Status != 200");
 
-            ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+            Map<String, Object> objectMap = (Map<String, Object>)Util.jsonToObject(response, Map.class);
 
-            System.out.println(" filter = " + filters[i] + ", totalResults = " + listResponse.getTotalResults() + "\n");
-            Assert.assertTrue(listResponse.getTotalResults() > 0);
+            int totalResults = (Integer) objectMap.get("totalResults");
+
+            System.out.println(" filter = " + filters[i] + ", totalResults = " + totalResults + "\n");
+            Assert.assertTrue(totalResults > 0);
         }
     }
 
     @Test
-    public void testSearchUsers2() throws Exception {
+    public void testSearchPersons2() throws Exception {
 
         String[] filters = new String[] {
-            USER_CORE_SCHEMA_ID + ":userName sw \"aaaa1111\"",
-            USER_CORE_SCHEMA_ID + ":userName ew \"1111\" and emails.type eq \"work\"",
-            USER_CORE_SCHEMA_ID + ":name.givenName co \"2222\" and addresses.type eq \"work\"",
-            USER_CORE_SCHEMA_ID + ":addresses.primary pr",
-            USER_CORE_SCHEMA_ID + ":addresses pr",
+            SCIM1_CORE_SCHEMA_ID + ":userName sw \"aaaa1111\"",
+            SCIM1_CORE_SCHEMA_ID + ":userName ew \"1111\" and emails.type eq \"work\"",
+            SCIM1_CORE_SCHEMA_ID + ":name.givenName co \"2222\" and addresses.type eq \"work\"",
+            SCIM1_CORE_SCHEMA_ID + ":addresses.type pr",
+            SCIM1_CORE_SCHEMA_ID + ":addresses pr",
             "emails.type pr",
             "emails pr",
-            "addresses.primary eq \"true\"",
-            "not emails.display pr",
-            "not " + USER_CORE_SCHEMA_ID + ":emails.primary eq \"true\""
+            "addresses.type eq \"work\"",
+            "not emails.value pr",
+            "not " + SCIM1_CORE_SCHEMA_ID + ":emails.type eq \"home\""
         };
 
         int startIndex = 1;
@@ -110,26 +110,28 @@ public class UserFiltersMainTests extends BaseScimTest {
         String sortOrder = "descending";
         String[] attributes = new String[] {
             "name.honorificPrefix", "name.givenName", "name.middleName", "name.familyName", "name.honorificSuffix",
-            "emails.value", "emails.type", "emails.primary",
+            "emails.value", "emails.type",
             "addresses.formatted", "addresses.country", "addresses.type"
         };
 
         for (int i = 0; i < filters.length; i++) {
 
-            ScimResponse response = client.searchUsers(filters[i], startIndex, count, sortBy, sortOrder, attributes);
+            ScimResponse response = client.searchPersons(filters[i], startIndex, count, sortBy, sortOrder, attributes);
 
-            System.out.println(" testSearchUsers2 response (" + i + ") = " + response.getResponseBodyString());
+            System.out.println(" testSearchPersons2 response (" + i + ") = " + response.getResponseBodyString());
             assertEquals(response.getStatusCode(), 200, "Status != 200");
 
-            ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+            Map<String, Object> objectMap = (Map<String, Object>)Util.jsonToObject(response, Map.class);
 
-            System.out.println(" filter = " + filters[i] + ", totalResults = " + listResponse.getTotalResults() + "\n");
-            Assert.assertTrue(listResponse.getTotalResults() > 0);
+            int totalResults = (Integer) objectMap.get("totalResults");
+
+            System.out.println(" filter = " + filters[i] + ", totalResults = " + totalResults + "\n");
+            Assert.assertTrue(totalResults > 0);
         }
     }
 
     @Test
-    public void testSearchUsersPaging() throws Exception {
+    public void testSearchPersonsPaging() throws Exception {
 
         String filter = "externalId pr";
         int startIndex = 1;
@@ -141,15 +143,15 @@ public class UserFiltersMainTests extends BaseScimTest {
         // Completely page through all the results
         while (true) {
 
-            ScimResponse response = client.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes);
+            ScimResponse response = client.searchPersons(filter, startIndex, count, sortBy, sortOrder, attributes);
 
-            System.out.println(" testSearchUsersPaging response = " + response.getResponseBodyString());
+            System.out.println(" testSearchPersonsPaging response = " + response.getResponseBodyString());
             assertEquals(response.getStatusCode(), 200, "Status != 200");
 
-            ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+            Map<String, Object> objectMap = (Map<String, Object>)Util.jsonToObject(response, Map.class);
 
-            int totalResults = listResponse.getTotalResults();
-            int itemsPerPage = listResponse.getItemsPerPage();
+            int totalResults = (Integer) objectMap.get("totalResults");
+            int itemsPerPage = (Integer) objectMap.get("itemsPerPage");
 
             System.out.println(" totalResults = " + totalResults);
             System.out.println(" startIndex = " + startIndex);

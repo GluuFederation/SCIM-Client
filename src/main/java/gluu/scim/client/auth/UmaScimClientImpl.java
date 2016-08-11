@@ -386,25 +386,74 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 	}
 
 	@Override
-	public ScimResponse retrieveAllPersons(String mediaType) throws IOException {
-		ScimResponse scimResponse = super.retrieveAllPersons(mediaType);
+	public ScimResponse retrieveAllPersons() throws IOException {
+		ScimResponse scimResponse = super.retrieveAllPersons();
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.retrieveAllPersons(mediaType);
+            scimResponse = super.retrieveAllPersons();
+		}
+
+		return scimResponse;
+	}
+
+	/**
+	 * Person search via a filter with pagination and sorting
+	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchPersons(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.searchPersons(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+
+		if (autorizeRpt(scimResponse)) {
+			scimResponse = super.searchPersons(filter, startIndex, count, sortBy, sortOrder, attributesArray);
 		}
 
 		return scimResponse;
 	}
 
 	@Override
-	public ScimResponse retrieveAllGroups(String mediaType) throws IOException {
-		ScimResponse scimResponse = super.retrieveAllGroups(mediaType);
+	public ScimResponse retrieveAllGroups() throws IOException {
+		ScimResponse scimResponse = super.retrieveAllGroups();
 		if (autorizeRpt(scimResponse)) {
-            scimResponse = super.retrieveAllGroups(mediaType);
+            scimResponse = super.retrieveAllGroups();
 		}
 
 		return scimResponse;
 	}
 
+	/**
+	 * Group search via a filter with pagination and sorting
+	 *
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+
+		if (autorizeRpt(scimResponse)) {
+			scimResponse = super.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+		}
+
+		return scimResponse;
+	}
+
+	/*
 	@Override
 	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.personSearch(attribute, value, mediaType);
@@ -438,4 +487,5 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 
 		return scimResponse;
 	}
+	*/
 }
