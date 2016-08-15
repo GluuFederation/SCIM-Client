@@ -21,8 +21,10 @@ import static org.testng.Assert.assertEquals;
 /**
  * README:
  *
- * Check first if /install/community-edition-setup/templates/test/scim-client/data/scim-test-data.ldif
- * has been loaded to LDAP.
+ * 1. Check first if /install/community-edition-setup/templates/test/scim-client/data/scim-test-data.ldif
+ *    has been loaded to LDAP.
+ * 2. This uses multithreaded tests so UMA RPT connection pooling must also be turned on in oxTrust (under
+ *    "Configuration" -> "JSON Configuration" -> "OxTrust Configuration").
  *
  * @author Val Pecaoco
  */
@@ -36,7 +38,7 @@ public class GroupFiltersMainTests extends BaseScimTest {
         client = ScimClient.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 
-    @Test
+    @Test(threadPoolSize = 5, invocationCount = 15, timeOut = 10000)
     public void testSearchGroups1() throws Exception {
 
         String[] filters = new String[] {
@@ -70,7 +72,7 @@ public class GroupFiltersMainTests extends BaseScimTest {
         }
     }
 
-    @Test
+    @Test(threadPoolSize = 5, invocationCount = 15, timeOut = 10000)
     public void testSearchGroups2() throws Exception {
 
         String filter = "(id co \"!\" and displayName pr)";
