@@ -22,6 +22,9 @@ import static org.gluu.oxtrust.model.scim2.Constants.GROUP_CORE_SCHEMA_ID;
 import static org.testng.Assert.assertEquals;
 
 /**
+ * This uses a multi-threaded test so UMA RPT connection pooling must also be turned on in oxTrust (under
+ * "Configuration" -> "JSON Configuration" -> "OxTrust Configuration").
+ *
  * @author Val Pecaoco
  */
 public class GroupFiltersMainTests extends BaseScimTest {
@@ -37,7 +40,7 @@ public class GroupFiltersMainTests extends BaseScimTest {
         client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 
-    @Test
+    @Test(threadPoolSize = 5, invocationCount = 15, timeOut = 10000)
     public void testSearchGroups() throws Exception {
 
         String[] filters = new String[] {
