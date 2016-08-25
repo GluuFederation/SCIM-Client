@@ -23,137 +23,161 @@ import java.io.IOException;
  */
 public class Util {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+	public static ObjectMapper getObjectMapper() {
 
-    static {
-        mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-    }
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
+		mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-    public static ObjectMapper getObjectMapper() {
-        return mapper;
-    }
+		return mapper;
+	}
 
-    public static Object jsonToObject(ScimResponse response, Class<?> clazz) throws Exception {
+	public static Object jsonToObject(ScimResponse response, Class<?> clazz) throws Exception {
 
-        byte[] bytes = response.getResponseBody();
-        String json = new String(bytes);
+		byte[] bytes = response.getResponseBody();
+		String json = new String(bytes);
 
-        Object clazzObject = mapper.readValue(json, clazz);
+		Object clazzObject = getObjectMapper().readValue(json, clazz);
 
-        return clazzObject;
-    }
+		return clazzObject;
+	}
 
-    public static Object jsonToObject(String json, Class<?> clazz) throws Exception {
+	public static Object jsonToObject(String json, Class<?> clazz) throws Exception {
 
-        Object clazzObject = mapper.readValue(json, clazz);
+		Object clazzObject = getObjectMapper().readValue(json, clazz);
 
-        return clazzObject;
-    }
+		return clazzObject;
+	}
 
-    /**
-     * For an SCIM 2.0 User class with extensions.
-     *
-     * @param user
-     * @return
-     * @throws IOException
-     */
-    public static String getJSONStringUser(User user) throws IOException {
+	/**
+	 * For an SCIM 2.0 User class with extensions.
+	 *
+	 * @param user
+	 * @return
+	 * @throws IOException
+	 */
+	public static String getJSONStringUser(User user) throws IOException {
 
-        SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
-        simpleModule.addSerializer(User.class, new UserSerializer());
-        mapper.registerModule(simpleModule);
+		SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
+		simpleModule.addSerializer(User.class, new UserSerializer());
+		ObjectMapper mapper = getObjectMapper();
+		mapper.registerModule(simpleModule);
 
-        String value = mapper.writeValueAsString(user);
+		String value = mapper.writeValueAsString(user);
 
-        return value;
-    }
+		return value;
+	}
 
-    public static User toUser(ScimResponse scimResponse, UserExtensionSchema userExtensionSchema) throws Exception {
+	public static User toUser(ScimResponse scimResponse, UserExtensionSchema userExtensionSchema) throws Exception {
 
-        String response = getResponseString(scimResponse);
+		String response = getResponseString(scimResponse);
 
-        UserDeserializer userDeserializer = new UserDeserializer();
-        userDeserializer.setUserExtensionSchema(userExtensionSchema);
+		UserDeserializer userDeserializer = new UserDeserializer();
+		userDeserializer.setUserExtensionSchema(userExtensionSchema);
 
-        SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
-        simpleModule.addDeserializer(User.class, userDeserializer);
-        mapper.registerModule(simpleModule);
+		SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
+		simpleModule.addDeserializer(User.class, userDeserializer);
+		ObjectMapper mapper = getObjectMapper();
+		mapper.registerModule(simpleModule);
 
-        User user = mapper.readValue(response, User.class);
+		User user = mapper.readValue(response, User.class);
 
-        return user;
-    }
+		return user;
+	}
 
-    public static Group toGroup(ScimResponse scimResponse) throws Exception {
+	public static Group toGroup(ScimResponse scimResponse) throws Exception {
 
-        String response = getResponseString(scimResponse);
+		String response = getResponseString(scimResponse);
 
-        GroupDeserializer groupDeserializer = new GroupDeserializer();
+		GroupDeserializer groupDeserializer = new GroupDeserializer();
 
-        SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
-        simpleModule.addDeserializer(Group.class, groupDeserializer);
-        mapper.registerModule(simpleModule);
+		SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
+		simpleModule.addDeserializer(Group.class, groupDeserializer);
+		ObjectMapper mapper = getObjectMapper();
+		mapper.registerModule(simpleModule);
 
-        Group group = mapper.readValue(response, Group.class);
+		Group group = mapper.readValue(response, Group.class);
 
-        return group;
-    }
+		return group;
+	}
 
-    public static ListResponse toListResponseUser(ScimResponse scimResponse, UserExtensionSchema userExtensionSchema) throws Exception {
+	public static ListResponse toListResponseUser(ScimResponse scimResponse, UserExtensionSchema userExtensionSchema) throws Exception {
 
-        String response = getResponseString(scimResponse);
+		String response = getResponseString(scimResponse);
 
-        ListResponse listResponse = jsonToListResponseUser(response, userExtensionSchema);
+		ListResponse listResponse = jsonToListResponseUser(response, userExtensionSchema);
 
-        return listResponse;
-    }
+		return listResponse;
+	}
 
-    public static ListResponse toListResponseGroup(ScimResponse scimResponse) throws Exception {
+	public static ListResponse toListResponseGroup(ScimResponse scimResponse) throws Exception {
 
-        byte[] bytes = scimResponse.getResponseBody();
-        String response = new String(bytes);
+		byte[] bytes = scimResponse.getResponseBody();
+		String response = new String(bytes);
 
-        ListResponse listResponse = jsonToListResponseGroup(response);
+		ListResponse listResponse = jsonToListResponseGroup(response);
 
-        return listResponse;
-    }
+		return listResponse;
+	}
 
-    private static ListResponse jsonToListResponseUser(String json, UserExtensionSchema userExtensionSchema) throws Exception {
+	public static ListResponse toListResponseFidoDevice(ScimResponse scimResponse) throws Exception {
 
-        ListResponseUserDeserializer listResponseUserDeserializer = new ListResponseUserDeserializer();
-        listResponseUserDeserializer.setUserExtensionSchema(userExtensionSchema);
+		byte[] bytes = scimResponse.getResponseBody();
+		String response = new String(bytes);
 
-        SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
-        simpleModule.addDeserializer(ListResponse.class, listResponseUserDeserializer);
-        mapper.registerModule(simpleModule);
+		ListResponse listResponse = jsonToListResponseFidoDevice(response);
 
-        ListResponse listResponseUser = mapper.readValue(json, ListResponse.class);
+		return listResponse;
+	}
 
-        return listResponseUser;
-    }
+	private static ListResponse jsonToListResponseUser(String json, UserExtensionSchema userExtensionSchema) throws Exception {
 
-    private static ListResponse jsonToListResponseGroup(String json) throws Exception {
+		ListResponseUserDeserializer listResponseUserDeserializer = new ListResponseUserDeserializer();
+		listResponseUserDeserializer.setUserExtensionSchema(userExtensionSchema);
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+		SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
+		simpleModule.addDeserializer(ListResponse.class, listResponseUserDeserializer);
+		ObjectMapper mapper = getObjectMapper();
+		mapper.registerModule(simpleModule);
 
-        ListResponseGroupDeserializer listResponseGroupDeserializer = new ListResponseGroupDeserializer();
+		ListResponse listResponseUser = mapper.readValue(json, ListResponse.class);
 
-        SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
-        simpleModule.addDeserializer(ListResponse.class, listResponseGroupDeserializer);
-        mapper.registerModule(simpleModule);
+		return listResponseUser;
+	}
 
-        ListResponse listResponseGroup = mapper.readValue(json, ListResponse.class);
+	private static ListResponse jsonToListResponseGroup(String json) throws Exception {
 
-        return listResponseGroup;
-    }
+		ListResponseGroupDeserializer listResponseGroupDeserializer = new ListResponseGroupDeserializer();
 
-    private static String getResponseString(ScimResponse scimResponse) {
+		SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
+		simpleModule.addDeserializer(ListResponse.class, listResponseGroupDeserializer);
+		ObjectMapper mapper = getObjectMapper();
+		mapper.registerModule(simpleModule);
 
-        byte[] bytes = scimResponse.getResponseBody();
-        String response = new String(bytes);
+		ListResponse listResponseGroup = mapper.readValue(json, ListResponse.class);
 
-        return response;
-    }
+		return listResponseGroup;
+	}
+
+	private static ListResponse jsonToListResponseFidoDevice(String json) throws Exception {
+
+		ListResponseFidoDeviceDeserializer listResponseFidoDeviceDeserializer = new ListResponseFidoDeviceDeserializer();
+
+		SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
+		simpleModule.addDeserializer(ListResponse.class, listResponseFidoDeviceDeserializer);
+		ObjectMapper mapper = getObjectMapper();
+		mapper.registerModule(simpleModule);
+
+		ListResponse listResponseFidoDevice = mapper.readValue(json, ListResponse.class);
+
+		return listResponseFidoDevice;
+	}
+
+	private static String getResponseString(ScimResponse scimResponse) {
+
+		byte[] bytes = scimResponse.getResponseBody();
+		String response = new String(bytes);
+
+		return response;
+	}
 }

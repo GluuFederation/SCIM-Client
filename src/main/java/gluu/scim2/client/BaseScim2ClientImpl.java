@@ -27,6 +27,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.lang.StringUtils;
 import org.gluu.oxtrust.model.scim2.*;
+import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,10 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 	public BaseScim2ClientImpl(String domain) {
 		this.domain = domain;
 	}
+
+	protected abstract void init();
+
+	protected abstract void addAuthenticationHeader(HttpMethodBase httpMethod);
 
 	protected String getHost(String uri) throws MalformedURLException {
 
@@ -1068,7 +1073,245 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		return userExtensionSchema;
 	}
 
-	protected abstract void init();
+	/**
+	 * FIDO devices search via a filter with pagination and sorting
+	 *
+	 * @param userId
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchFidoDevices(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
 
-	protected abstract void addAuthenticationHeader(HttpMethodBase httpMethod);
+		init();
+
+		HttpClient httpClient = new HttpClient();
+
+		GetMethod get = new GetMethod(this.domain + "/scim/v2/FidoDevices/");
+
+		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		addAuthenticationHeader(get);
+
+		// SCIM 2.0 uses JSON only
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+
+		get.setQueryString(new NameValuePair[] {
+			new NameValuePair("userId", userId),
+			new NameValuePair("filter", filter),
+			new NameValuePair("startIndex", String.valueOf(startIndex)),
+			new NameValuePair("count", String.valueOf(count)),
+			new NameValuePair("sortBy", sortBy),
+			new NameValuePair("sortOrder", sortOrder),
+			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
+		});
+
+		try {
+
+			httpClient.executeMethod(get);
+
+			ScimResponse response = ResponseMapper.map(get, new ScimResponse());
+
+			return response;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			get.releaseConnection();
+		}
+
+		return null;
+	}
+
+	/**
+	 * POST FIDO devices search on /.search via a filter with pagination and sorting
+	 *
+	 * @param userId
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchFidoDevicesPost(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
+		init();
+
+		HttpClient httpClient = new HttpClient();
+
+		PostMethod post = new PostMethod(this.domain + "/scim/v2/FidoDevices/.search");
+		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		addAuthenticationHeader(post);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+
+		post.setQueryString(new NameValuePair[] {
+			new NameValuePair("userId", userId)
+		});
+
+		SearchRequest searchRequest = new SearchRequest();
+		searchRequest.setFilter(filter);
+		searchRequest.setStartIndex(startIndex);
+		searchRequest.setCount(count);
+		searchRequest.setSortBy(sortBy);
+		searchRequest.setSortOrder(sortOrder);
+		searchRequest.setAttributesArray(((attributesArray != null) ? StringUtils.join(attributesArray, ',') : null));
+
+		post.setRequestEntity(new StringRequestEntity(gluu.scim2.client.util.Util.getObjectMapper().writeValueAsString(searchRequest), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+		try {
+
+			httpClient.executeMethod(post);
+
+			ScimResponse response = ResponseMapper.map(post, new ScimResponse());
+
+			return response;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			post.releaseConnection();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Retrieves a FIDO device
+	 *
+	 * @param id
+	 * @param userId
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse retrieveFidoDevice(String id, String userId, String[] attributesArray) throws IOException {
+
+		init();
+
+		HttpClient httpClient = new HttpClient();
+
+		GetMethod get = new GetMethod(this.domain + "/scim/v2/FidoDevices/" + id);
+		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		addAuthenticationHeader(get);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+
+		get.setQueryString(new NameValuePair[] {
+			new NameValuePair("userId", userId),
+			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
+		});
+
+		try {
+
+			httpClient.executeMethod(get);
+
+			ScimResponse response = ResponseMapper.map(get, new ScimResponse());
+
+			return response;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			get.releaseConnection();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Updates a FIDO device
+	 *
+	 * @param fidoDevice
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse updateFidoDevice(FidoDevice fidoDevice, String[] attributesArray) throws IOException {
+
+		if (fidoDevice.getId() == null || fidoDevice.getId().isEmpty()) {
+			throw new IllegalArgumentException("FIDO device id is null or an empty string");
+		}
+
+		init();
+
+		HttpClient httpClient = new HttpClient();
+
+		PutMethod put = new PutMethod(this.domain + "/scim/v2/FidoDevices/" + fidoDevice.getId());
+		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		addAuthenticationHeader(put);
+		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+
+		put.setQueryString(new NameValuePair[] {
+			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
+		});
+
+		put.setRequestEntity(new StringRequestEntity(Util.getJSONString(fidoDevice), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+		try {
+
+			httpClient.executeMethod(put);
+
+			ScimResponse response = ResponseMapper.map(put, new ScimResponse());
+
+			return response;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			put.releaseConnection();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Deletes a FIDO device
+	 *
+	 * @param id
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse deleteFidoDevice(String id) throws IOException {
+
+		init();
+
+		HttpClient httpClient = new HttpClient();
+
+		DeleteMethod delete = new DeleteMethod(this.domain + "/scim/v2/FidoDevices/" + id);
+		delete.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		addAuthenticationHeader(delete);
+		delete.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+
+		try {
+
+			httpClient.executeMethod(delete);
+
+			ScimResponse response = ResponseMapper.map(delete, new ScimResponse());
+
+			return response;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			delete.releaseConnection();
+		}
+
+		return null;
+	}
 }

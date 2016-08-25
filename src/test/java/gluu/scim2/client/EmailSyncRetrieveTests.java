@@ -10,7 +10,7 @@ import gluu.scim.client.ScimResponse;
 import gluu.scim2.client.util.Util;
 import org.gluu.oxtrust.model.scim2.Email;
 import org.gluu.oxtrust.model.scim2.User;
-import org.junit.Assert;
+import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;

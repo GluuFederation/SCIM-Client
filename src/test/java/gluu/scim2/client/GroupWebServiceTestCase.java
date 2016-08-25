@@ -73,7 +73,7 @@ public class GroupWebServiceTestCase extends BaseScimTest {
 
 		response = client.deleteGroup(this.id);
 		System.out.println("GroupWebServiceTestCase deleteGroupTest :response : " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not delete the group, status != 200");
+		assertEquals(response.getStatusCode(), 204, "Could not delete the group; status != 204");
 	}
 
 	@Parameters({ "group1Inum" })

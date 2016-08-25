@@ -178,7 +178,7 @@ public class UserObjectAttributesFilterTests extends BaseScimTest {
         System.out.println("IN testDeleteUser...");
 
         ScimResponse response = client.deletePerson(this.id);
-        assertEquals(response.getStatusCode(), 200, "User could not be deleted, status != 200");
+        assertEquals(response.getStatusCode(), 204, "User could not be deleted; status != 204");
 
         System.out.println("LEAVING testDeleteUser..." + "\n");
     }
@@ -232,7 +232,7 @@ public class UserObjectAttributesFilterTests extends BaseScimTest {
 
         user.setActive(true);
 
-        user.setUserName("chessMachine_" +  + new Date().getTime());
+        user.setUserName("chessMachine_" + new Date().getTime());
         user.setPassword("worldChampion");
         user.setDisplayName(displayName);
         user.setNickName("Capa");

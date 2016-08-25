@@ -15,6 +15,7 @@ import javax.xml.bind.JAXBException;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
+import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
 
 /**
@@ -22,7 +23,6 @@ import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
  *
  * @author Reda Zerrad Date: 05.28.2012
  */
-// public interface BaseScim2Client extends BaseScimClient {
 public interface BaseScim2Client extends Serializable {
 
     ScimResponse retrieveServiceProviderConfig() throws IOException;
@@ -41,7 +41,7 @@ public interface BaseScim2Client extends Serializable {
     ScimResponse createPerson(User user, String mediaType) throws IOException, JAXBException;
 
     /**
-	 * Retrieves a person by his id
+	 * Retrieves a person by its id
 	 *
 	 * @param id
 	 * @param mediaType
@@ -89,7 +89,7 @@ public interface BaseScim2Client extends Serializable {
 	ScimResponse updateUser(User user, String id, String[] attributesArray) throws IOException;
 
 	/**
-	 * Deletes a person by his id
+	 * Deletes a person by its id
 	 *
 	 * @param id
 	 * @return ScimResponse
@@ -109,7 +109,7 @@ public interface BaseScim2Client extends Serializable {
     ScimResponse createGroup(Group group, String mediaType) throws IOException, JAXBException;
 
 	/**
-	 * Retrieves a group by his id
+	 * Retrieves a group by its id
 	 *
 	 * @param id
 	 * @param mediaType
@@ -158,7 +158,7 @@ public interface BaseScim2Client extends Serializable {
     ScimResponse updateGroup(Group group, String id, String[] attributesArray) throws IOException;
 
 	/**
-	 * Deletes a group by his id
+	 * Deletes a group by its id
 	 *
 	 * @param id
 	 * @return ScimResponse
@@ -313,4 +313,64 @@ public interface BaseScim2Client extends Serializable {
      * @throws Exception
      */
     UserExtensionSchema getUserExtensionSchema() throws Exception;
+
+	/**
+	 * FIDO devices search via a filter with pagination and sorting
+	 *
+	 * @param userId
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 */
+	ScimResponse searchFidoDevices(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
+
+	/**
+	 * POST FIDO devices search on /.search via a filter with pagination and sorting
+	 *
+	 * @param userId
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 */
+	ScimResponse searchFidoDevicesPost(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException;
+
+	/**
+	 * Retrieves a FIDO device
+	 *
+	 * @param id
+	 * @param userId
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	ScimResponse retrieveFidoDevice(String id, String userId, String[] attributesArray) throws IOException;
+
+	/**
+	 * Updates a FIDO device
+	 *
+	 * @param fidoDevice
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	ScimResponse updateFidoDevice(FidoDevice fidoDevice, String[] attributesArray) throws IOException;
+
+	/**
+	 * Deletes a FIDO device
+	 *
+	 * @param id
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	ScimResponse deleteFidoDevice(String id) throws IOException;
 }

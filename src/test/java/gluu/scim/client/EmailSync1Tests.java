@@ -8,7 +8,7 @@ package gluu.scim.client;
 import gluu.BaseScimTest;
 import gluu.scim.client.model.*;
 import gluu.scim2.client.util.Util;
-import org.junit.Assert;
+import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
@@ -99,7 +99,7 @@ public class EmailSync1Tests extends BaseScimTest {
         System.out.println("IN testDeletePerson...");
 
         ScimResponse response = client.deletePerson(this.id);
-        assertEquals(response.getStatusCode(), 200, "Person could not be deleted, status != 200");
+        assertEquals(response.getStatusCode(), 200, "Person could not be deleted; status != 200");
 
         System.out.println("LEAVING testDeletePerson..." + "\n");
     }

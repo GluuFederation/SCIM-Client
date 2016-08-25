@@ -17,6 +17,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
+import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
 import org.jboss.resteasy.client.ClientExecutor;
 import org.jboss.resteasy.client.ClientResponseFailure;
 import org.xdi.oxauth.client.TokenRequest;
@@ -564,6 +565,116 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 
         return scimResponse;
     }
+
+	/**
+	 * FIDO devices search via a filter with pagination and sorting
+	 *
+	 * @param userId
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchFidoDevices(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.searchFidoDevices(userId, filter, startIndex, count, sortBy, sortOrder, attributesArray);
+
+		if (autorizeRpt(scimResponse)) {
+			scimResponse = super.searchFidoDevices(userId, filter, startIndex, count, sortBy, sortOrder, attributesArray);
+		}
+
+		return scimResponse;
+	}
+
+	/**
+	 * POST FIDO devices search on /.search via a filter with pagination and sorting
+	 *
+	 * @param userId
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchFidoDevicesPost(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.searchFidoDevicesPost(userId, filter, startIndex, count, sortBy, sortOrder, attributesArray);
+
+		if (autorizeRpt(scimResponse)) {
+			scimResponse = super.searchFidoDevicesPost(userId, filter, startIndex, count, sortBy, sortOrder, attributesArray);
+		}
+
+		return scimResponse;
+	}
+
+	/**
+	 * Retrieves a FIDO device
+	 *
+	 * @param id
+	 * @param userId
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse retrieveFidoDevice(String id, String userId, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.retrieveFidoDevice(id, userId, attributesArray);
+
+		if (autorizeRpt(scimResponse)) {
+			scimResponse = super.retrieveFidoDevice(id, userId, attributesArray);
+		}
+
+		return scimResponse;
+	}
+
+	/**
+	 * Updates a FIDO device
+	 *
+	 * @param fidoDevice
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse updateFidoDevice(FidoDevice fidoDevice, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.updateFidoDevice(fidoDevice, attributesArray);
+
+		if (autorizeRpt(scimResponse)) {
+			scimResponse = super.updateFidoDevice(fidoDevice, attributesArray);
+		}
+
+		return scimResponse;
+	}
+
+	/**
+	 * Deletes a FIDO device
+	 *
+	 * @param id
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse deleteFidoDevice(String id) throws IOException {
+
+		ScimResponse scimResponse = super.deleteFidoDevice(id);
+
+		if (autorizeRpt(scimResponse)) {
+			scimResponse = super.deleteFidoDevice(id);
+		}
+
+		return scimResponse;
+	}
 
 	public ClientExecutor getExecutor() {
 		return executor;

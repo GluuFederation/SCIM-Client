@@ -9,7 +9,7 @@ import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
 import gluu.scim2.client.util.Util;
 import org.gluu.oxtrust.model.scim2.*;
-import org.junit.Assert;
+import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
@@ -145,7 +145,7 @@ public class UserObjectTests extends BaseScimTest {
         System.out.println("IN testDeleteUser...");
 
         ScimResponse response = client.deletePerson(this.id);
-        assertEquals(response.getStatusCode(), 200, "User could not be deleted, status != 200");
+        assertEquals(response.getStatusCode(), 204, "User could not be deleted; status != 204");
 
         System.out.println("LEAVING testDeleteUser..." + "\n");
     }
@@ -199,7 +199,7 @@ public class UserObjectTests extends BaseScimTest {
 
         user.setActive(true);
 
-        user.setUserName("chessMachine_" +  + new Date().getTime());
+        user.setUserName("chessMachine_" + new Date().getTime());
         user.setPassword("worldChampion");
         user.setDisplayName("Jose Raul Capablanca");
         user.setNickName("Capa");

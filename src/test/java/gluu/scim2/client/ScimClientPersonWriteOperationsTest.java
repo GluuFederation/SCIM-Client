@@ -71,6 +71,6 @@ public class ScimClientPersonWriteOperationsTest extends BaseScimTest {
 
 		ScimResponse response = client.deletePerson(this.id);
 		System.out.println("deletePersonTest response json: " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not delete user, status != 200");
+		assertEquals(response.getStatusCode(), 204, "Could not delete user; status != 204");
 	}
 }

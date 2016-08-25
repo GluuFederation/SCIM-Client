@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBException;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.User;
+import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
 import org.xdi.oxauth.model.util.SecurityProviderUtility;
 
@@ -344,5 +345,80 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	@Override
 	public UserExtensionSchema getUserExtensionSchema() throws Exception {
 		return scimClient.getUserExtensionSchema();
+	}
+
+	/**
+	 * FIDO devices search via a filter with pagination and sorting
+	 *
+	 * @param userId
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchFidoDevices(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+		return scimClient.searchFidoDevices(userId, filter, startIndex, count, sortBy, sortOrder, attributesArray);
+	}
+
+	/**
+	 * POST FIDO devices search on /.search via a filter with pagination and sorting
+	 *
+	 * @param userId
+	 * @param filter
+	 * @param startIndex
+	 * @param count
+	 * @param sortBy
+	 * @param sortOrder
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse searchFidoDevicesPost(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+		return scimClient.searchFidoDevicesPost(userId, filter, startIndex, count, sortBy, sortOrder, attributesArray);
+	}
+
+	/**
+	 * Retrieves a FIDO device
+	 *
+	 * @param id
+	 * @param userId
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse retrieveFidoDevice(String id, String userId, String[] attributesArray) throws IOException {
+		return scimClient.retrieveFidoDevice(id, userId, attributesArray);
+	}
+
+	/**
+	 * Updates a FIDO device
+	 *
+	 * @param fidoDevice
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse updateFidoDevice(FidoDevice fidoDevice, String[] attributesArray) throws IOException {
+		return scimClient.updateFidoDevice(fidoDevice, attributesArray);
+	}
+
+	/**
+	 * Deletes a FIDO device
+	 *
+	 * @param id
+	 * @return ScimResponse
+	 * @throws IOException
+	 */
+	@Override
+	public ScimResponse deleteFidoDevice(String id) throws IOException {
+		return scimClient.deleteFidoDevice(id);
 	}
 }

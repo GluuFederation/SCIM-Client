@@ -154,6 +154,6 @@ public class UserExtensionsJsonTest extends BaseScimTest {
 
         ScimResponse response = client.deletePerson(this.id);
 		System.out.println(" deleteUserTest() RESPONSE = " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not delete the user, status != 200");
+		assertEquals(response.getStatusCode(), 204, "Could not delete the user; status != 204");
 	}
 }

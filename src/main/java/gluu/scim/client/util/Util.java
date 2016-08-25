@@ -26,17 +26,17 @@ public class Util implements Serializable {
 	 */
 	private static final long serialVersionUID = -4493708632437502015L;
 
-	public static String getJSONString(Object person) throws IOException {
+	public static String getJSONString(Object object) throws IOException {
 		StringWriter sw = new StringWriter();
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(sw, person);
+		mapper.writeValue(sw, object);
 		return sw.toString();
 	}
 
-	public static String getXMLString(Object person,Class<?> clazz) throws JAXBException {
+	public static String getXMLString(Object object, Class<?> clazz) throws JAXBException {
 		StringWriter sw = new StringWriter();
 		JAXBContext context = JAXBContext.newInstance(clazz);
-		context.createMarshaller().marshal(person, sw);
+		context.createMarshaller().marshal(object, sw);
 		String output =sw.toString();
 		System.out.println(output);
 		return output;
