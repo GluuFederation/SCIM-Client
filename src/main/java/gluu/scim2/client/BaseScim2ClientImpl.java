@@ -91,7 +91,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
-		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
@@ -137,7 +137,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
-		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		/*
 		if (mediaType.equals(MediaType.APPLICATION_JSON)) {
@@ -188,7 +188,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
-		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		get.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
@@ -234,7 +234,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		post.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
@@ -283,7 +283,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
-		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		put.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
@@ -324,7 +324,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		delete.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(delete);
-		delete.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		delete.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		try {
 
@@ -365,7 +365,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(get);
-		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		get.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
@@ -411,7 +411,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		post.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
@@ -459,7 +459,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
-		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		put.setQueryString(new NameValuePair[] {
 			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
@@ -499,7 +499,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		delete.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(delete);
-		delete.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		delete.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		try {
 
@@ -536,7 +536,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		post.setRequestEntity(new StringRequestEntity(person, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
@@ -587,7 +587,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
-		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		put.setRequestEntity(new StringRequestEntity(person, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
@@ -638,7 +638,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		post.setRequestEntity(new StringRequestEntity(group, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
@@ -689,7 +689,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);
-		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		put.setRequestEntity(new StringRequestEntity(group, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
@@ -740,7 +740,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		post.setRequestEntity(new StringRequestEntity(Util.getJSONString(bulkRequest), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
@@ -791,7 +791,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		post.setRequestEntity(new StringRequestEntity(operation, Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
@@ -870,7 +870,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		addAuthenticationHeader(get);
 
 		// SCIM 2.0 uses JSON only
-		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		try {
 
@@ -926,7 +926,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		addAuthenticationHeader(get);
 
 		// SCIM 2.0 uses JSON only
-		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		get.setQueryString(new NameValuePair[] {
 			new NameValuePair("filter", filter),
@@ -976,7 +976,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		searchPattern.setValue(value);
 
 		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
@@ -1044,7 +1044,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		searchPattern.setValue(stringValue);
 
 		addAuthenticationHeader(post);
-		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		post.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		post.setRequestEntity(new StringRequestEntity(Util.getJSONString(searchPattern), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
 
@@ -1131,7 +1131,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 		GetMethod get = new GetMethod(this.domain + "/scim/v2/Schemas/" + Constants.USER_EXT_SCHEMA_ID);
 		get.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
-		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+		get.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8");
 
 		HttpClient httpClient = new HttpClient();
 		httpClient.executeMethod(get);
