@@ -44,7 +44,7 @@ public class UserObjectAttributesFilterTests extends BaseScimTest {
     User user;
 
     String displayName = "Jose Raul Capablanca";
-    String formatted = "Jose Raul Graupera Capablanca";
+    String formatted = "a4TåâAȜ^## B<AIYKß(=à\"W.Hp~.ĐJ+q:PQ=";
 
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
@@ -222,9 +222,9 @@ public class UserObjectAttributesFilterTests extends BaseScimTest {
         User user = new User();
 
         Name name = new Name();
-        name.setGivenName("Jose Raul");
-        name.setMiddleName("Graupera");
-        name.setFamilyName("Capablanca");
+        name.setGivenName("a4TåâAȜ^##");
+        // name.setMiddleName("Graupera");
+        name.setFamilyName("B<AIYKß(=à\"W.Hp~.ĐJ+q:PQ=");
         user.setName(name);
 
         user.setActive(true);
