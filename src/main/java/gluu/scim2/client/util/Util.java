@@ -6,13 +6,16 @@
 package gluu.scim2.client.util;
 
 import gluu.scim.client.ScimResponse;
+
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
+import org.gluu.oxtrust.model.scim.ScimPersonPatch;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.ListResponse;
+import org.gluu.oxtrust.model.scim2.ScimPatchUser;
 import org.gluu.oxtrust.model.scim2.User;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
 
@@ -179,5 +182,25 @@ public class Util {
 		String response = new String(bytes);
 
 		return response;
+	}
+	
+	
+	/**
+	 * For an SCIM 2.0 User class.
+	 *
+	 * @param ScimPersonPatch
+	 * @return
+	 * @throws IOException
+	 */
+	public static String getJSONStringUserPatch(ScimPatchUser scimPersonPatch) throws IOException {
+
+		SimpleModule simpleModule = new SimpleModule("SimpleModule", new Version(1, 0, 0, ""));
+		simpleModule.addSerializer(User.class, new UserSerializer());
+		ObjectMapper mapper = getObjectMapper();
+		mapper.registerModule(simpleModule);
+
+		String value = mapper.writeValueAsString(scimPersonPatch);
+
+		return value;
 	}
 }

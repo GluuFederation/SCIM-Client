@@ -9,11 +9,13 @@ import gluu.scim.client.ScimResponse;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URISyntaxException;
 
 import javax.xml.bind.JAXBException;
 
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
+import org.gluu.oxtrust.model.scim2.ScimPatchUser;
 import org.gluu.oxtrust.model.scim2.User;
 import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
@@ -373,4 +375,18 @@ public interface BaseScim2Client extends Serializable {
 	 * @throws IOException
 	 */
 	ScimResponse deleteFidoDevice(String id) throws IOException;
+	
+	/**
+	 * @param user
+	 * @param id
+	 * @param attributesArray
+	 * @return ScimResponse
+	 * @throws IOException
+	 * @throws URISyntaxException 
+     */
+	ScimResponse patchUser(ScimPatchUser scimPatchUser, String id, String[] attributesArray) throws IOException, URISyntaxException;
+
+	
+	
+	
 }

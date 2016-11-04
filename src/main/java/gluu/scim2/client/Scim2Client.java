@@ -10,11 +10,13 @@ import gluu.scim2.client.auth.UmaScim2ClientImpl;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URISyntaxException;
 
 import javax.xml.bind.JAXBException;
 
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
+import org.gluu.oxtrust.model.scim2.ScimPatchUser;
 import org.gluu.oxtrust.model.scim2.User;
 import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
@@ -421,4 +423,18 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	public ScimResponse deleteFidoDevice(String id) throws IOException {
 		return scimClient.deleteFidoDevice(id);
 	}
+	
+	/**
+	 * @param user
+	 * @param id
+	 * @param attributesArray
+	 * @return
+	 * @throws IOException
+	 * @throws URISyntaxException 
+	 */
+	@Override
+	public ScimResponse patchUser(ScimPatchUser scimPatchUser, String id, String[] attributesArray) throws IOException, URISyntaxException {
+		return scimClient.patchUser(scimPatchUser, id, attributesArray);
+	}
+
 }

@@ -16,6 +16,7 @@ import org.apache.commons.httpclient.HttpMethodBase;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.Group;
+import org.gluu.oxtrust.model.scim2.ScimPatchUser;
 import org.gluu.oxtrust.model.scim2.User;
 import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
 import org.jboss.resteasy.client.ClientExecutor;
@@ -682,5 +683,17 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 
 	public void setExecutor(ClientExecutor executor) {
 		this.executor = executor;
+	}
+	
+	@Override
+	public ScimResponse patchUser(ScimPatchUser scimPatchUser, String id, String[] attributesArray) throws IOException {
+
+		ScimResponse scimResponse = super.patchUser(scimPatchUser, id, attributesArray);
+
+		if (autorizeRpt(scimResponse)) {
+            scimResponse = super.patchUser(scimPatchUser, id, attributesArray);
+		}
+
+		return scimResponse;
 	}
 }

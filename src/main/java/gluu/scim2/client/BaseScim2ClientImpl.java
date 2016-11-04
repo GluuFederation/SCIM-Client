@@ -1314,4 +1314,40 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 
 		return null;
 	}
+	
+	
+	@Override
+	public ScimResponse patchUser(ScimPatchUser scimPatchUser, String id, String[] attributesArray) throws IOException {
+
+		init();
+
+		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/" + id);
+		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
+
+		addAuthenticationHeader(put);
+		put.setRequestHeader("Accept", Constants.MEDIA_TYPE_SCIM_JSON);
+
+		put.setQueryString(new NameValuePair[] {
+			new NameValuePair("attributes", ((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null))
+		});
+
+		// put.setRequestEntity(new StringRequestEntity(Util.getJSONString(person), "application/json", "utf-8"));
+		put.setRequestEntity(new StringRequestEntity(gluu.scim2.client.util.Util.getJSONStringUserPatch(scimPatchUser), Constants.MEDIA_TYPE_SCIM_JSON, "utf-8"));
+
+		try {
+			HttpClient httpClient = new HttpClient();
+			httpClient.executeMethod(put);
+
+			ScimResponse response = ResponseMapper.map(put, new ScimResponse());
+
+			return response;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			put.releaseConnection();
+		}
+
+		return null;
+	}
 }
