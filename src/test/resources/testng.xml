@@ -162,5 +162,11 @@
 			<class name="gluu.scim2.client.PersonRequiredParamsTests"/>
 		</classes>
 	</test>
+	
+	<test name="Person Patch test" enabled="true">
+		<classes>
+			<class name="gluu.scim2.client.UserPatchWebServiceTestCases"/>
+		</classes>
+	</test>
 
 </suite>
