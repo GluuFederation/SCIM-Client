@@ -1321,7 +1321,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
 
 		init();
 
-		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/" + id);
+		PutMethod put = new PutMethod(this.domain + "/scim/v2/Users/patch/" + id);
 		put.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "utf-8");
 
 		addAuthenticationHeader(put);

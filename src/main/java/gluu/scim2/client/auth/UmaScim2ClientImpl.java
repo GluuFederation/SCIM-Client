@@ -7,6 +7,7 @@ package gluu.scim2.client.auth;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -695,5 +696,11 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 		}
 
 		return scimResponse;
+	}
+	
+	@Override
+	public ScimResponse patchUser(ScimPatchUser scimPatchUser, String id,String mediaType) throws IOException, JAXBException,
+			URISyntaxException {
+		return patchUser(scimPatchUser, id, new String[]{});
 	}
 }

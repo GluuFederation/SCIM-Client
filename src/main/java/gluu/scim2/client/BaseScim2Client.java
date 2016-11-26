@@ -386,6 +386,15 @@ public interface BaseScim2Client extends Serializable {
      */
 	ScimResponse patchUser(ScimPatchUser scimPatchUser, String id, String[] attributesArray) throws IOException, URISyntaxException;
 
+	/**
+	 * @param user
+	 * @param id
+	 * @param mediaType
+	 * @return ScimResponse
+	 * @throws IOException
+	 * @throws URISyntaxException 
+     */	
+	ScimResponse patchUser(ScimPatchUser scimPatchUser, String id, String mediaType) throws IOException, JAXBException, URISyntaxException ;
 	
 	
 	

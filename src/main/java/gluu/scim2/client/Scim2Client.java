@@ -436,5 +436,18 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 	public ScimResponse patchUser(ScimPatchUser scimPatchUser, String id, String[] attributesArray) throws IOException, URISyntaxException {
 		return scimClient.patchUser(scimPatchUser, id, attributesArray);
 	}
+	
+	/**
+	 * @param user
+	 * @param id
+	 * @param mediaType
+	 * @return
+	 * @throws IOException
+	 * @throws URISyntaxException 
+	 */	
+	@Override
+	public ScimResponse patchUser(ScimPatchUser scimPatchUser, String id, String mediaType) throws IOException, JAXBException, URISyntaxException {
+		return scimClient.patchUser(scimPatchUser, id, new String[]{});
+	}
 
 }
