@@ -20,6 +20,8 @@ import org.gluu.oxtrust.model.scim2.Extension;
 import org.gluu.oxtrust.model.scim2.GroupRef;
 import org.gluu.oxtrust.model.scim2.User;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,12 +37,14 @@ import java.util.Map;
  */
 public class UserDeserializer extends JsonDeserializer<User> {
 
+    private static final Logger log = LoggerFactory.getLogger(UserDeserializer.class);
+
     private UserExtensionSchema userExtensionSchema;
 
     @Override
     public User deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
 
-        System.out.println(" IN UserDeserializer.deserialize()... ");
+        log.debug(" IN UserDeserializer.deserialize()... ");
 
         try {
 
@@ -130,7 +134,7 @@ public class UserDeserializer extends JsonDeserializer<User> {
 
             user.setGroups(groups);
 
-            System.out.println(" LEAVING UserDeserializer.deserialize()... ");
+            log.debug(" LEAVING UserDeserializer.deserialize()... ");
 
             return user;
 
