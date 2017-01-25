@@ -142,37 +142,8 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 			if (StringHelper.isEmpty(umaAatClientJksPath) || StringHelper.isEmpty(umaAatClientJksPassword)) {
 				throw new ScimInitializationException("UMA JKS keystore path or password is empty");
 			}
-			OxAuthCryptoProvider cryptoProvider;
-			try {
-				cryptoProvider = new OxAuthCryptoProvider(umaAatClientJksPath, umaAatClientJksPassword, null);
-			} catch (Exception ex) {
-				throw new ScimInitializationException("Failed to initialize crypto provider");
-			}
 
-			String keyId = umaAatClientKeyId;
-	        if (StringHelper.isEmpty(keyId)) {
-	        	// Get first key
-	        	List<String> aliases = cryptoProvider.getKeyAliases();
-	        	if (aliases.size() > 0) {
-	        		keyId = aliases.get(0);
-	        	}
-	        }
-
-	        if (StringHelper.isEmpty(keyId)) {
-				throw new ScimInitializationException("UMA keyId is empty");
-			}
-	        
-	        SignatureAlgorithm algorithm = cryptoProvider.getSignatureAlgorithm(keyId);
-			TokenRequest tokenRequest = TokenRequest.builder().aat().grantType(GrantType.CLIENT_CREDENTIALS).build();
-
-			tokenRequest.setAuthenticationMethod(AuthenticationMethod.PRIVATE_KEY_JWT);
-	        tokenRequest.setAuthUsername(umaAatClientId);
-	        tokenRequest.setCryptoProvider(cryptoProvider);
-	        tokenRequest.setAlgorithm(algorithm);
-	        tokenRequest.setKeyId(keyId);
-	        tokenRequest.setAudience(metadataConfiguration.getTokenEndpoint());
-
-			this.umaAat = UmaClient.request(metadataConfiguration.getTokenEndpoint(), tokenRequest);
+			this.umaAat = UmaClient.requestAat(metadataConfiguration.getTokenEndpoint(), umaAatClientJksPath, umaAatClientJksPassword, umaAatClientId, umaAatClientKeyId);
 		} catch (ClientResponseFailure ex) {
 			String errorMessage = (String) ex.getResponse().getEntity(String.class);
 			throw new ScimInitializationException("Failed to get AAT token. Error: " + errorMessage, ex);
