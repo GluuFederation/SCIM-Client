@@ -48,7 +48,7 @@ public class UserFiltersMainTests extends BaseScimTest {
             "groups sw \"inum=@\"",
             "externalId sw \"1\"",
             "externalId ew \"3000\"",
-            "birthdate ge \"2014-01-01\" and externalId co \"2\"",
+            "birthdate ge \"20140101000000Z\" and externalId co \"2\"",
             "userName sw \"aaaa\"",
             "(name.givenName sw \"aaaa 1111\" and name.familyName ew \"test\")",
             "emails.type pr",
