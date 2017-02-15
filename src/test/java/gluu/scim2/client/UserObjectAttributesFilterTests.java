@@ -245,8 +245,8 @@ public class UserObjectAttributesFilterTests extends BaseScimTest {
         Email email = new Email();
         email.setOperation("CREATE");
         email.setPrimary(true);
-        email.setValue("a@b.com");
-        email.setDisplay("a@b.com");
+        email.setValue("as2o1@b.com");
+        email.setDisplay("as2o1@b.com");
         email.setType(Email.Type.WORK);
         email.setReference("");
         emails.add(email);
