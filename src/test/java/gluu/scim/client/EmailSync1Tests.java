@@ -64,7 +64,7 @@ public class EmailSync1Tests extends BaseScimTest {
         for (int i = 1; i <= 2; i++) {
             ScimPersonEmails scimPersonEmail = new ScimPersonEmails();
             scimPersonEmail.setPrimary(i == 1 ? "true" : "false");
-            scimPersonEmail.setValue(i == 1 ? "c@d.com" : "e@f.com");
+            scimPersonEmail.setValue(i == 1 ? "cs1t1@d.com" : "es1t1@f.com");
             scimPersonEmail.setType(i == 1 ? "work" : "other");
             emails.add(scimPersonEmail);
         }
@@ -129,7 +129,7 @@ public class EmailSync1Tests extends BaseScimTest {
         person.setTitle("Super GM");
 
         ScimPersonEmails email = new ScimPersonEmails();
-        email.setValue("a@b.com");
+        email.setValue("as1t1@b.com");
         email.setType("work");
         email.setPrimary("true");
         person.getEmails().add(email);
