@@ -65,7 +65,7 @@ public class EmailSync2Tests extends BaseScimTest {
         List<ScimPersonEmails> emails = new ArrayList<ScimPersonEmails>();
         ScimPersonEmails email = new ScimPersonEmails();
         email.setPrimary("true");
-        email.setValue("e@f.com");
+        email.setValue("es1t2@f.com");
         email.setType(Email.Type.WORK.getValue());
         emails.add(email);
         personCreated.setEmails(emails);
@@ -130,7 +130,7 @@ public class EmailSync2Tests extends BaseScimTest {
         List<ScimPersonEmails> scimPersonEmails  = new ArrayList<ScimPersonEmails>();
         for (int i = 1; i <= 2; i++) {
             ScimPersonEmails email = new ScimPersonEmails();
-            email.setValue(i == 1 ? "a@b.com" : "c@d.com");
+            email.setValue(i == 1 ? "as1t2@b.com" : "cs1t2@d.com");
             email.setType(i == 1 ? "work" : "home");
             email.setPrimary(i == 1 ? "true" : "false");
             scimPersonEmails.add(email);

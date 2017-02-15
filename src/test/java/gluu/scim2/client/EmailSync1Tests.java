@@ -65,8 +65,8 @@ public class EmailSync1Tests extends BaseScimTest {
             Email email = new Email();
             email.setOperation("UPDATE");
             email.setPrimary(i == 1 ? true : false);
-            email.setValue(i == 1 ? "c@d.com" : "e@f.com");
-            email.setDisplay(i == 1 ? "c@d.com" : "e@f.com");
+            email.setValue(i == 1 ? "cs2t1@d.com" : "es2t1@f.com");
+            email.setDisplay(i == 1 ? "cs2t1@d.com" : "es2t1@f.com");
             email.setType(i == 1 ? Email.Type.WORK : Email.Type.HOME);
             email.setReference("");
             emails.add(email);
@@ -132,8 +132,8 @@ public class EmailSync1Tests extends BaseScimTest {
         Email email = new Email();
         email.setOperation("CREATE");
         email.setPrimary(true);
-        email.setValue("a@b.com");
-        email.setDisplay("a@b.com");
+        email.setValue("as2t1@b.com");
+        email.setDisplay("as2t1@b.com");
         email.setType(Email.Type.WORK);
         email.setReference("");
         user.getEmails().add(email);
