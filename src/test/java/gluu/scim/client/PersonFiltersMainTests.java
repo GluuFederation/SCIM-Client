@@ -76,6 +76,7 @@ public class PersonFiltersMainTests extends BaseScimTest {
 
             ScimResponse response = client.searchPersons(filters[i], startIndex, count, sortBy, sortOrder, attributes);
 
+            System.out.println(" filter = " + filters[i]);
             System.out.println(" testSearchPersons1 response (" + i + ") = " + response.getResponseBodyString());
             assertEquals(response.getStatusCode(), 200, "Status != 200");
 
@@ -83,7 +84,7 @@ public class PersonFiltersMainTests extends BaseScimTest {
 
             int totalResults = (Integer) objectMap.get("totalResults");
 
-            System.out.println(" filter = " + filters[i] + ", totalResults = " + totalResults + "\n");
+            System.out.println(" totalResults = " + totalResults + "\n");
             Assert.assertTrue(totalResults > 0);
         }
     }
