@@ -6,14 +6,15 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-import gluu.scim2.client.util.Util;
 import org.gluu.oxtrust.model.scim2.ListResponse;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
 
 import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
 import static org.testng.Assert.assertEquals;
@@ -40,12 +41,11 @@ public class UserFiltersNegativeTests extends BaseScimTest {
     public void testRetrieveAllUsers() throws Exception {
 
         // This is the old method
-        ScimResponse response = client.retrieveAllUsers();
+        BaseClientResponse<ListResponse> response = client.retrieveAllUsers();
 
-        System.out.println(" testRetrieveAllUsers response = " + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "Status != 200");
+        assertEquals(response.getStatus(), 200, "Status != 200");
 
-        ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+        ListResponse listResponse = response.getEntity();
 
         System.out.println(" listResponseRetrieved.getTotalResults() = " + listResponse.getTotalResults());
         Assert.assertTrue(listResponse.getTotalResults() > 0);
@@ -54,12 +54,11 @@ public class UserFiltersNegativeTests extends BaseScimTest {
     @Test
     public void testNullFilterParams() throws Exception {
 
-        ScimResponse response = client.searchUsers(null, 0, 0, null, null, null);
+        BaseClientResponse<ListResponse> response = client.searchUsers(null, 0, 0, null, null, null);
 
-        System.out.println(" testNullFilterParams response = " + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "Status != 200");
+        assertEquals(response.getStatus(), 200, "Status != 200");
 
-        ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+        ListResponse listResponse = response.getEntity();
 
         System.out.println(" listResponseRetrieved.getTotalResults() = " + listResponse.getTotalResults());
         Assert.assertTrue(listResponse.getTotalResults() > 0);
@@ -68,12 +67,11 @@ public class UserFiltersNegativeTests extends BaseScimTest {
     @Test
     public void testEmptyFilterParams() throws Exception {
 
-        ScimResponse response = client.searchUsers("", 0, 0, "", "", new String[]{""});
+        BaseClientResponse<ListResponse> response = client.searchUsers("", 0, 0, "", "", new String[]{""});
 
-        System.out.println(" testEmptyFilterParams response = " + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "Status != 200");
+        assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Status != 200");
 
-        ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+        ListResponse listResponse = response.getEntity();
 
         System.out.println(" listResponseRetrieved.getTotalResults() = " + listResponse.getTotalResults());
         Assert.assertTrue(listResponse.getTotalResults() > 0);
@@ -81,10 +79,7 @@ public class UserFiltersNegativeTests extends BaseScimTest {
 
     @Test
     public void testMoreThanMaxCount() throws Exception {
-
-        ScimResponse response = client.searchUsers("", 0, (MAX_COUNT + 1), "", "", new String[]{""});
-
-        System.out.println(" testMoreThanMaxCount response = " + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 400, "Status != 400");
+        BaseClientResponse<ListResponse> response = client.searchUsers("", 0, (MAX_COUNT + 1), "", "", new String[]{""});
+        assertEquals(response.getStatus(), Response.Status.BAD_REQUEST.getStatusCode(), "Status != 400");
     }
 }

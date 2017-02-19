@@ -6,14 +6,15 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-import gluu.scim2.client.util.Util;
 import org.gluu.oxtrust.model.scim2.ListResponse;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
 
 import static org.gluu.oxtrust.model.scim2.Constants.GROUP_CORE_SCHEMA_ID;
 import static org.testng.Assert.assertEquals;
@@ -23,6 +24,7 @@ import static org.testng.Assert.assertEquals;
  */
 public class GroupFiltersMainTests extends BaseScimTest {
 
+    //TODO: test this
     Scim2Client client;
 
     @BeforeTest
@@ -52,12 +54,11 @@ public class GroupFiltersMainTests extends BaseScimTest {
 
         for (int i = 0; i < filters.length; i++) {
 
-            ScimResponse response = client.searchGroups(filters[i], startIndex, count, sortBy, sortOrder, attributes);
+            BaseClientResponse<ListResponse> response = client.searchGroups(filters[i], startIndex, count, sortBy, sortOrder, attributes);
 
-            System.out.println(" testSearchGroups response (" + i + ") = " + response.getResponseBodyString());
-            assertEquals(response.getStatusCode(), 200, "Status != 200");
+            assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Status != 200");
 
-            ListResponse listResponse = Util.toListResponseGroup(response);
+            ListResponse listResponse = response.getEntity();
 
             System.out.println(" filter = " + filters[i] + ", totalResults = " + listResponse.getTotalResults() + "\n");
             Assert.assertTrue(listResponse.getTotalResults() > 0);

@@ -5,17 +5,21 @@
  */
 package gluu.scim2.client;
 
-import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-
-import java.io.IOException;
-import javax.ws.rs.core.MediaType;
-
+import org.gluu.oxtrust.model.scim2.Group;
+import org.gluu.oxtrust.model.scim2.ListResponse;
+import org.gluu.oxtrust.model.scim2.User;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * @author Shekhar Laad 
@@ -23,8 +27,7 @@ import org.testng.annotations.Test;
 public class ScimClientRetreivingEntitiesTest extends BaseScimTest {
 
 	Scim2Client client;
-	ScimResponse response;
-	
+
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath" , "umaAatClientJksPassword" , "umaAatClientKeyId" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws IOException {
@@ -34,18 +37,14 @@ public class ScimClientRetreivingEntitiesTest extends BaseScimTest {
 	@Parameters({ "userInum" })
 	@Test
 	public void retrievePersonTest(final String id) throws IOException {
-
-		response = client.retrievePerson(id, MediaType.APPLICATION_JSON);
-		System.out.println("retrievePersonTest + responseStr = "  + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");
+		BaseClientResponse<User> response = client.retrievePerson(id, MediaType.APPLICATION_JSON);
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not get the user, status != 200");
 	}
 
 	@Test
 	public void retrieveAllUsersTest() throws IOException {
-
-		response = client.retrieveAllUsers();
-		System.out.println("response body = "  + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not get the list of all users, status != 200");
+		BaseClientResponse<ListResponse> response = client.retrieveAllUsers();
+		assertEquals(response.getStatus(), 200, "Could not get the list of all users, status != 200");
 	}
 
     @Parameters({ "userInum" })
@@ -53,34 +52,30 @@ public class ScimClientRetreivingEntitiesTest extends BaseScimTest {
     public void testSearchUsersPost(final String id) throws IOException {
 
         String filter = "id eq \"" + id + "\"";
-        response = client.searchUsersPost(filter, 1, 1, "", "", null);
-        System.out.println("response body = "  + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");
+        BaseClientResponse<ListResponse> response = client.searchUsersPost(filter, 1, 1, "", "", null);
+        assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not get the user, status != 200");
     }
 
     @Parameters({ "group1Inum" })
 	@Test
 	public void retrieveGroupTest(final String id) throws IOException {
 
-		response = client.retrieveGroup(id, MediaType.APPLICATION_JSON);
-		System.out.println("retrieveGroupTest + responseStr = "  + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not get the group, status != 200");
+		BaseClientResponse<Group> response = client.retrieveGroup(id, MediaType.APPLICATION_JSON);
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not get the group, status != 200");
 	}
 
 	@Test
 	public void retrieveAllGroupsTest() throws IOException {
 
-		response = client.retrieveAllGroups();
-		System.out.println("response body = "  + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not get a list of all groups, status != 200");
+		BaseClientResponse<ListResponse> response = client.retrieveAllGroups();
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not get a list of all groups, status != 200");
 	}
 
     @Test
     public void testSearchGroupsPost() throws IOException {
 
         String filter = "id pr";
-        response = client.searchGroupsPost(filter, 1, 10, "", "", null);
-        System.out.println("response body = "  + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");
+        BaseClientResponse<ListResponse> response = client.searchGroupsPost(filter, 1, 10, "", "", null);
+        assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not get the user, status != 200");
     }
 }

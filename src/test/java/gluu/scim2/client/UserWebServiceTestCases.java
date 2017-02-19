@@ -5,21 +5,25 @@
  */
 package gluu.scim2.client;
 
-import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
 import gluu.scim.client.ScimResponse;
-
-import java.io.IOException;
-
-// import gluu.scim2.client.util.Util;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Email;
+import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.gluu.oxtrust.model.scim2.PhoneNumber;
 import org.gluu.oxtrust.model.scim2.User;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+
+import static org.testng.Assert.assertEquals;
+
+// import gluu.scim2.client.util.Util;
 
 /**
  * @author Shekhar Laad 
@@ -82,10 +86,8 @@ public class UserWebServiceTestCases extends BaseScimTest {
 	
 	@Test
 	public void retrieveAllUsersTest() throws IOException {
-
-		response = client.retrieveAllUsers();
-		System.out.println("UserWebServiceTestCases : retrieveAllUsersTest response = " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not get a list of all users, status != 200");
+		BaseClientResponse<ListResponse> response = client.retrieveAllUsers();
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not get a list of all users, status != 200");
 	}
 	
 	/*@Parameters({ "userInum" })

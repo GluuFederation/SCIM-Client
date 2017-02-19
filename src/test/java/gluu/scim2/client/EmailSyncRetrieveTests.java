@@ -6,15 +6,16 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-import gluu.scim2.client.util.Util;
 import org.gluu.oxtrust.model.scim2.Email;
 import org.gluu.oxtrust.model.scim2.User;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
 
 import static org.testng.Assert.assertEquals;
 
@@ -41,12 +42,11 @@ public class EmailSyncRetrieveTests extends BaseScimTest {
 
         System.out.println("IN testRetrieveEmail...");
 
-        ScimResponse response = client.retrieveUser(this.id, new String[]{});
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<User> response = client.retrieveUser(this.id, new String[]{});
 
-        assertEquals(response.getStatusCode(), 200, "Could not retrieve user, status != 200");
+        assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not retrieve user, status != 200");
 
-        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
+        User userRetrieved = response.getEntity();
 
         for (Email emailRetrieved : userRetrieved.getEmails()) {
             Assert.assertNotNull(emailRetrieved);

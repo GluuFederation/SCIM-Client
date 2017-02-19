@@ -6,14 +6,15 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-import gluu.scim2.client.util.Util;
 import org.gluu.oxtrust.model.scim2.ListResponse;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
 
 import static org.gluu.oxtrust.model.scim2.Constants.USER_CORE_SCHEMA_ID;
 import static org.testng.Assert.assertEquals;
@@ -76,12 +77,11 @@ public class UserFiltersMainTests extends BaseScimTest {
 
         for (int i = 0; i < filters.length; i++) {
 
-            ScimResponse response = client.searchUsers(filters[i], startIndex, count, sortBy, sortOrder, attributes);
+            BaseClientResponse<ListResponse> response = client.searchUsers(filters[i], startIndex, count, sortBy, sortOrder, attributes);
 
-            System.out.println(" testSearchUsers1 response (" + i + ") = " + response.getResponseBodyString());
-            assertEquals(response.getStatusCode(), 200, "Status != 200");
+            assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Status != 200");
 
-            ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+            ListResponse listResponse = response.getEntity();
 
             System.out.println(" filter = " + filters[i] + ", totalResults = " + listResponse.getTotalResults() + "\n");
             Assert.assertTrue(listResponse.getTotalResults() > 0);
@@ -116,12 +116,11 @@ public class UserFiltersMainTests extends BaseScimTest {
 
         for (int i = 0; i < filters.length; i++) {
 
-            ScimResponse response = client.searchUsers(filters[i], startIndex, count, sortBy, sortOrder, attributes);
+            BaseClientResponse<ListResponse> response = client.searchUsers(filters[i], startIndex, count, sortBy, sortOrder, attributes);
 
-            System.out.println(" testSearchUsers2 response (" + i + ") = " + response.getResponseBodyString());
-            assertEquals(response.getStatusCode(), 200, "Status != 200");
+            assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Status != 200");
 
-            ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+            ListResponse listResponse = response.getEntity();
 
             System.out.println(" filter = " + filters[i] + ", totalResults = " + listResponse.getTotalResults() + "\n");
             Assert.assertTrue(listResponse.getTotalResults() > 0);
@@ -141,12 +140,11 @@ public class UserFiltersMainTests extends BaseScimTest {
         // Completely page through all the results
         while (true) {
 
-            ScimResponse response = client.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes);
+            BaseClientResponse<ListResponse> response = client.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes);
 
-            System.out.println(" testSearchUsersPaging response = " + response.getResponseBodyString());
-            assertEquals(response.getStatusCode(), 200, "Status != 200");
+            assertEquals(response.getStatus(), Response.Status.OK, "Status != 200");
 
-            ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+            ListResponse listResponse = response.getEntity();
 
             int totalResults = listResponse.getTotalResults();
             int itemsPerPage = listResponse.getItemsPerPage();

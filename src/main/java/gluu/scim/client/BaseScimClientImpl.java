@@ -8,35 +8,28 @@ package gluu.scim.client;
 import gluu.scim.client.model.ScimBulkOperation;
 import gluu.scim.client.model.ScimGroup;
 import gluu.scim.client.model.ScimPerson;
-import gluu.scim.client.model.ScimPersonSearch;
 import gluu.scim.client.util.ResponseMapper;
 import gluu.scim.client.util.Util;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Calendar;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBException;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Calendar;
 
 import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
 
@@ -826,7 +819,7 @@ public abstract class BaseScimClientImpl implements BaseScimClient, Serializable
 	@Override
 	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
 
-		init();
+		prepareRequest();
 
 		HttpClient httpClient = new HttpClient();
 
@@ -878,7 +871,7 @@ public abstract class BaseScimClientImpl implements BaseScimClient, Serializable
 	@Override
 	public ScimResponse personSearchByObject(String attribute, Object value, String valueMediaType, String outPutMediaType)	throws IOException, JAXBException {
 
-		init();
+		prepareRequest();
 
 		HttpClient httpClient = new HttpClient();
 
@@ -936,7 +929,7 @@ public abstract class BaseScimClientImpl implements BaseScimClient, Serializable
 	@Override
 	public ScimResponse searchPersons(String attribute, String value, String mediaType) throws IOException, JAXBException {
 
-		init();
+		prepareRequest();
 
 		HttpClient httpClient = new HttpClient();
 

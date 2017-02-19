@@ -6,14 +6,12 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-
-import gluu.scim2.client.util.Util;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.*;
 import org.gluu.oxtrust.model.scim2.schema.AttributeHolder;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
@@ -21,6 +19,7 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
@@ -105,7 +104,8 @@ public class UserExtensionsObjectTest extends BaseScimTest {
     @Test(groups = "a")
     public void checkIfExtensionsExist() throws Exception {
 
-        UserExtensionSchema userExtensionSchema = client.getUserExtensionSchema();
+        BaseClientResponse<UserExtensionSchema> response= client.getUserExtensionSchema();
+        UserExtensionSchema userExtensionSchema = response.getEntity();
 
         assertEquals(userExtensionSchema.getId(), Constants.USER_EXT_SCHEMA_ID);
 
@@ -141,12 +141,11 @@ public class UserExtensionsObjectTest extends BaseScimTest {
     @Test(groups = "b", dependsOnGroups = "a")
     public void createUserTest() throws Exception {
 
-        ScimResponse response = client.createUser(userToAdd, new String[]{});
+        BaseClientResponse<User> response = client.createUser(userToAdd, new String[]{});
 
-        System.out.println(" createUserTest() RESPONSE = " + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 201, "Could not add the user, status != 201");
+        assertEquals(response.getStatus(), Response.Status.CREATED, "Could not add the user, status != 201");
 
-        User user = Util.toUser(response, client.getUserExtensionSchema());
+        User user = response.getEntity(User.class);
         
         this.id = user.getId();
     }
@@ -165,12 +164,11 @@ public class UserExtensionsObjectTest extends BaseScimTest {
         extensionBuilder.setField("scimCustomThird", new BigDecimal(6000));
         userToUpdate.addExtension(extensionBuilder.build());
 
-        ScimResponse response = client.updateUser(userToUpdate, this.id, new String[]{});
+        BaseClientResponse<User> response = client.updateUser(userToUpdate, this.id, new String[]{});
 
-        System.out.println(" updateUserTest() RESPONSE = " + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "Could not update the user, status != 200");
+        assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not update the user, status != 200");
 
-        User user = Util.toUser(response, client.getUserExtensionSchema());
+        User user = response.getEntity();
         
         assertEquals(user.getDisplayName(), updateDisplayName, "Could not update the user");
     }
@@ -178,12 +176,11 @@ public class UserExtensionsObjectTest extends BaseScimTest {
     @Test(groups = "d", dependsOnGroups = "c")
     public void retrieveUserTest() throws Exception {
 
-        ScimResponse response = client.retrieveUser(this.id, new String[]{});
+        BaseClientResponse<User> response = client.retrieveUser(this.id, new String[]{});
 
-        System.out.println(" retrieveUserTest() RESPONSE = "  + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");
+        assertEquals(response.getStatus(), 200, "Could not get the user, status != 200");
 
-        User user = Util.toUser(response, client.getUserExtensionSchema());
+        User user = response.getEntity();
 
         Extension extension = user.getExtension(Constants.USER_EXT_SCHEMA_ID);
         Assert.assertNotNull("(Deserialization) Custom extension not deserialized.", extension);
@@ -211,9 +208,7 @@ public class UserExtensionsObjectTest extends BaseScimTest {
 
     @Test(dependsOnGroups = "d", alwaysRun = true)
     public void deleteUserTest() throws Exception {
-
-        ScimResponse response = client.deletePerson(this.id);
-        System.out.println(" deleteUserTest() RESPONSE = " + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 204, "Could not delete the user; status != 204");
+        BaseClientResponse response = client.deletePerson(this.id);
+        assertEquals(response.getStatus(), Response.Status.NO_CONTENT, "Could not delete the user; status != 204");
     }
 }

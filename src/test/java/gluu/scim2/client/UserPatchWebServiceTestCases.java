@@ -5,35 +5,22 @@
  */
 package gluu.scim2.client;
 
-import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-import gluu.scim2.client.util.Util;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.gluu.oxtrust.model.scim2.*;
+import org.jboss.resteasy.client.core.BaseClientResponse;
+import org.testng.Assert;
+import org.testng.annotations.*;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
+import static org.testng.Assert.assertEquals;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 // import gluu.scim2.client.util.Util;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.gluu.oxtrust.model.scim2.Email;
-import org.gluu.oxtrust.model.scim2.Entitlement;
-import org.gluu.oxtrust.model.scim2.Im;
-import org.gluu.oxtrust.model.scim2.Operation;
-import org.gluu.oxtrust.model.scim2.PhoneNumber;
-import org.gluu.oxtrust.model.scim2.ScimPatchUser;
-import org.gluu.oxtrust.model.scim2.User;
-import org.gluu.oxtrust.model.scim2.X509Certificate;
-import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
 
 /**
  * @author Shekhar Laad 
@@ -45,7 +32,6 @@ public class UserPatchWebServiceTestCases extends BaseScimTest {
 	String id;
 	String username;
 	Scim2Client client;
-	ScimResponse response;
 	User createdUser;
 	
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath" , "umaAatClientJksPassword" , "umaAatClientKeyId","userwebservice.add.username","userwebservice.update.displayname" })
@@ -55,7 +41,6 @@ public class UserPatchWebServiceTestCases extends BaseScimTest {
 		System.out.println(" username :  "+username +" updateDisplayName :" + updateDisplayName);
 		
 		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
-		response = null;
 		initalizeUsers(username ,updateDisplayName);
 	
 		ObjectMapper mapper = new ObjectMapper();
@@ -66,11 +51,10 @@ public class UserPatchWebServiceTestCases extends BaseScimTest {
 	@Test()
 	public void createPersonTest() throws Exception {
 
-		response = client.createPerson(userAdd, MediaType.APPLICATION_JSON);
-		System.out.println("UserWebServiceTestCases createPersonTest :response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 201, "Could not add the user, status != 201");
+		BaseClientResponse<User> response = client.createPerson(userAdd, MediaType.APPLICATION_JSON);
+		assertEquals(response.getStatus(), Response.Status.CREATED, "Could not add the user, status != 201");
 		
-		createdUser = Util.toUser(response, client.getUserExtensionSchema());
+		createdUser = response.getEntity();
 		this.id = createdUser.getId();
 		System.out.println("create id  " + id);
 		ObjectMapper mapper = new ObjectMapper();
@@ -93,10 +77,9 @@ public class UserPatchWebServiceTestCases extends BaseScimTest {
 		String jsonInString = mapper.writeValueAsString(scimPatchUser);
 		System.out.println("replacePatchPersonTest request    :  "+jsonInString);
 
-		response = client.patchUser(scimPatchUser, id, MediaType.APPLICATION_JSON);//(userToUpdate, id, MediaType.APPLICATION_JSON);
-		System.out.println("UserWebServiceTestCases :replacePatchPersonTest: response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not update the user, status != 200");
-		User user = Util.toUser(response, client.getUserExtensionSchema());
+		BaseClientResponse<User> response = client.patchUser(scimPatchUser, id, null);//(userToUpdate, id, MediaType.APPLICATION_JSON);
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not update the user, status != 200");
+		User user = response.getEntity();
 		assertEquals(user.getDisplayName(), userPatch.getDisplayName(), "Could not update the user");
 	}
 	
@@ -114,10 +97,9 @@ public class UserPatchWebServiceTestCases extends BaseScimTest {
 		String jsonInString = mapper.writeValueAsString(scimPatchUser);
 		System.out.println("addPatchPersonTest request    :  "+jsonInString);
 
-		response = client.patchUser(scimPatchUser, id, MediaType.APPLICATION_JSON);//(userToUpdate, id, MediaType.APPLICATION_JSON);
-		System.out.println("UserWebServiceTestCases :addPatchPersonTest: response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not update the user, status != 200");
-		User user = Util.toUser(response, client.getUserExtensionSchema());
+		BaseClientResponse<User> response = client.patchUser(scimPatchUser, id, null);//(userToUpdate, id, MediaType.APPLICATION_JSON);
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not update the user, status != 200");
+		User user = response.getEntity();
 		System.out.println("addPatchPersonTest : size of updated user email count :" + user.getEmails().size() +  ":::     old User" + createdUser.getEmails().size());
 		Assert.assertTrue(user.getEmails().size() > createdUser.getEmails().size(), "Patch is not added.");
 		createdUser = user;
@@ -138,10 +120,9 @@ public class UserPatchWebServiceTestCases extends BaseScimTest {
 		String jsonInString = mapper.writeValueAsString(scimPatchUser);
 		System.out.println("removePatchPersonTest request   :  "+jsonInString);
 
-		response = client.patchUser(scimPatchUser, id, MediaType.APPLICATION_JSON);
-		System.out.println("UserWebServiceTestCases :removePatchPersonTest: response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not update the user, status != 200");
-		User user = Util.toUser(response, client.getUserExtensionSchema());
+		BaseClientResponse<User> response = client.patchUser(scimPatchUser, id, null);
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not update the user, status != 200");
+		User user = response.getEntity();
 		System.out.println("removePatchPersonTest : size of updated user email " + user.getEmails().size() +  " ::   old User   :  " + createdUser.getEmails().size());
 		Assert.assertTrue(user.getEmails().size() < createdUser.getEmails().size(), "Patch is not removed.");
 		
@@ -149,11 +130,8 @@ public class UserPatchWebServiceTestCases extends BaseScimTest {
 	
 	@AfterTest
 	public void deletePersonTest() throws Exception {
-
-		response = client.deletePerson(this.id);
-		System.out.println("UserWebServiceTestCases :deletePersonTest :response " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 204, "Could not delete the user, status != 200");
-
+		BaseClientResponse response = client.deletePerson(this.id);
+		assertEquals(response.getStatus(), Response.Status.NO_CONTENT.getStatusCode(), "Could not delete the user, status != 200");
 	}
 	
 	public void initalizeUsers( String username , String updateDisplayName){

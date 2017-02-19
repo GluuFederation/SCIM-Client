@@ -5,22 +5,21 @@
  */
 package gluu.scim2.client;
 
-import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-
-import java.io.IOException;
-
 import gluu.scim2.client.util.Util;
 import org.gluu.oxtrust.model.scim2.BulkOperation;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.BulkResponse;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * SCIM Client Bulk operation test
@@ -46,13 +45,12 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
         // bulkRequestString should include cleanup (DELETE operations)
 		System.out.println("bulkRequestString = " + bulkRequestString);
 
-		ScimResponse response = client.processBulkOperationString(bulkRequestString);
-		System.out.println("response body = " + response.getResponseBodyString());
+		BaseClientResponse<BulkResponse> response = client.processBulkOperationString(bulkRequestString);
 
-		assertEquals(response.getStatusCode(), 200, "Could not process bulk operation string, status != 200");
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not process bulk operation string, status != 200");
 
         bulkRequest = (BulkRequest) Util.jsonToObject(bulkRequestString, BulkRequest.class);
-		BulkResponse bulkResponse = (BulkResponse) Util.jsonToObject(response, BulkResponse.class);
+		BulkResponse bulkResponse = response.getEntity();
 
         System.out.println("Request operations count = " + bulkRequest.getOperations().size());
         System.out.println("Response operations count = " + bulkResponse.getOperations().size());
@@ -66,12 +64,11 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
     @Test(groups = "b", dependsOnGroups = "a")
     public void testProcessBulkOperation() throws Exception {
 
-        ScimResponse response = client.processBulkOperation(bulkRequest);
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<BulkResponse> response = client.processBulkOperation(bulkRequest);
 
-        assertEquals(response.getStatusCode(), 200, "Could not process bulk request, status != 200");
+        assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not process bulk request, status != 200");
 
-        BulkResponse bulkResponse = (BulkResponse) Util.jsonToObject(response, BulkResponse.class);
+        BulkResponse bulkResponse = response.getEntity();
 
         System.out.println("Request operations count = " + bulkRequest.getOperations().size());
         System.out.println("Response operations count = " + bulkResponse.getOperations().size());

@@ -6,9 +6,8 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-import gluu.scim2.client.util.Util;
 import org.gluu.oxtrust.model.scim2.*;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -16,6 +15,7 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,12 +48,11 @@ public class UserObjectTests extends BaseScimTest {
 
         User user = createDummyUser();
 
-        ScimResponse response = client.createPerson(user, MediaType.APPLICATION_JSON);
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<User> response = client.createPerson(user, MediaType.APPLICATION_JSON);
 
-        assertEquals(response.getStatusCode(), 201, "Could not add user, status != 201");
+        assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode(), "Could not add user, status != 201");
 
-        User userCreated = Util.toUser(response, client.getUserExtensionSchema());
+        User userCreated = response.getEntity();
         this.id = userCreated.getId();
 
         System.out.println("userCreated.getId() = " + userCreated.getId());
@@ -67,12 +66,11 @@ public class UserObjectTests extends BaseScimTest {
 
         System.out.println("IN testRetrieveNewUser...");
 
-        ScimResponse response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<User> response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(200, response.getStatusCode());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
+        User userRetrieved = response.getEntity();
         assertEquals(userRetrieved.getId(), this.id, "User could not be retrieved");
 
         System.out.println("userRetrieved.getId() = " + userRetrieved.getId());
@@ -88,22 +86,20 @@ public class UserObjectTests extends BaseScimTest {
 
         Thread.sleep(3000);  // Sleep for 3 seconds
 
-        ScimResponse response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<User> response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(200, response.getStatusCode());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
+        User userRetrieved = response.getEntity();
 
         userRetrieved.setDisplayName(userRetrieved.getDisplayName() + " UPDATED");
         userRetrieved.setPassword(null);
 
-        ScimResponse responseUpdated = client.updatePerson(userRetrieved, this.id, MediaType.APPLICATION_JSON);
-        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
+        BaseClientResponse<User> responseUpdated = client.updatePerson(userRetrieved, this.id, MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(200, responseUpdated.getStatusCode());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), responseUpdated.getStatus());
 
-        User userUpdated = Util.toUser(responseUpdated, client.getUserExtensionSchema());
+        User userUpdated = responseUpdated.getEntity();
 
         assertEquals(userUpdated.getId(), this.id, "User could not be retrieved");
         assert(userUpdated.getMeta().getLastModified().getTime() > userUpdated.getMeta().getCreated().getTime());
@@ -121,20 +117,18 @@ public class UserObjectTests extends BaseScimTest {
 
         System.out.println("IN testUpdateUserNameDifferentId...");
 
-        ScimResponse response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<User> response = client.retrievePerson(this.id, MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(200, response.getStatusCode());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        User userRetrieved = Util.toUser(response, client.getUserExtensionSchema());
+        User userRetrieved = response.getEntity();
 
         userRetrieved.setUserName("aaaa1111");
         userRetrieved.setPassword(null);
 
-        ScimResponse responseUpdated = client.updatePerson(userRetrieved, this.id, MediaType.APPLICATION_JSON);
-        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
+        BaseClientResponse<User> responseUpdated = client.updatePerson(userRetrieved, this.id, MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(409, responseUpdated.getStatusCode());
+        Assert.assertEquals(Response.Status.CONFLICT.getStatusCode(), responseUpdated.getStatus());
 
         System.out.println("LEAVING testUpdateUserNameDifferentId..." + "\n");
     }
@@ -144,8 +138,8 @@ public class UserObjectTests extends BaseScimTest {
 
         System.out.println("IN testDeleteUser...");
 
-        ScimResponse response = client.deletePerson(this.id);
-        assertEquals(response.getStatusCode(), 204, "User could not be deleted; status != 204");
+        BaseClientResponse response = client.deletePerson(this.id);
+        assertEquals(response.getStatus(), Response.Status.NO_CONTENT.getStatusCode(), "User could not be deleted; status != 204");
 
         System.out.println("LEAVING testDeleteUser..." + "\n");
     }
@@ -163,12 +157,11 @@ public class UserObjectTests extends BaseScimTest {
         String[] attributes = null;
 
         // GET search on /scim/v2/Users
-        ScimResponse response = client.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes);
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<ListResponse> response = client.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes);
 
-        Assert.assertEquals(200, response.getStatusCode());
+        Assert.assertEquals(200, response.getStatus());
 
-        ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+        ListResponse listResponse = response.getEntity();
         assertEquals(listResponse.getTotalResults(), 1);
 
         User userRetrieved = (User) listResponse.getResources().get(0);

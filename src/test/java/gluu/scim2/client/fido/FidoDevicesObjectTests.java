@@ -6,16 +6,16 @@
 package gluu.scim2.client.fido;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
 import gluu.scim2.client.Scim2Client;
-import gluu.scim2.client.util.Util;
 import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import javax.ws.rs.core.Response;
 import java.util.Date;
 
 import static org.testng.Assert.assertEquals;
@@ -45,12 +45,11 @@ public class FidoDevicesObjectTests extends BaseScimTest {
 
 		System.out.println("IN testRetrieveFidoDevice...");
 
-		ScimResponse response = client.retrieveFidoDevice(id, userId, new String[]{});
-		System.out.println("response body = " + response.getResponseBodyString());
+		BaseClientResponse<FidoDevice> response = client.retrieveFidoDevice(id, userId, new String[]{});
 
-		Assert.assertEquals(200, response.getStatusCode());
+		Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-		fidoDevice = (FidoDevice) Util.jsonToObject(response, FidoDevice.class);
+		fidoDevice = response.getEntity();
 
 		System.out.println("id = " + fidoDevice.getId());
 		System.out.println("userId = " + fidoDevice.getUserId());
@@ -74,11 +73,11 @@ public class FidoDevicesObjectTests extends BaseScimTest {
 		fidoDevice.setDescription(testDescription);
 		fidoDevice.setDeviceKeyHandle(testDeviceKeyHandle);
 
-		ScimResponse response = client.updateFidoDevice(fidoDevice, new String[]{});
+		BaseClientResponse<FidoDevice> response = client.updateFidoDevice(fidoDevice, new String[]{});
 
-		Assert.assertEquals(200, response.getStatusCode());
+		Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-		fidoDevice = (FidoDevice) Util.jsonToObject(response, FidoDevice.class);
+		fidoDevice = response.getEntity();
 
 		System.out.println("displayName = " + fidoDevice.getDisplayName());
 		System.out.println("description = " + fidoDevice.getDescription());
@@ -96,8 +95,8 @@ public class FidoDevicesObjectTests extends BaseScimTest {
 
 		System.out.println("IN testDeleteFidoDevice...");
 
-		ScimResponse response = client.deleteFidoDevice(id);
-		assertEquals(response.getStatusCode(), 204, "Device could not be deleted; status != 204");
+		BaseClientResponse response = client.deleteFidoDevice(id);
+		assertEquals(response.getStatus(), Response.Status.NO_CONTENT.getStatusCode(), "Device could not be deleted; status != 204");
 
 		System.out.println("LEAVING testDeleteFidoDevice..." + "\n");
 	}
