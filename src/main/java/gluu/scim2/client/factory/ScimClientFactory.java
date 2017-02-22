@@ -1,5 +1,7 @@
-package gluu.scim2.client;
+package gluu.scim2.client.factory;
 
+import gluu.scim2.client.ScimClient;
+import gluu.scim2.client.UmaScimClient;
 import org.xdi.oxauth.model.util.SecurityProviderUtility;
 
 /**

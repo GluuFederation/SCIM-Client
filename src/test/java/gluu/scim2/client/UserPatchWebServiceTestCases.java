@@ -6,6 +6,7 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
+import gluu.scim2.client.factory.ScimClientFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.*;
 import org.jboss.resteasy.client.core.BaseClientResponse;

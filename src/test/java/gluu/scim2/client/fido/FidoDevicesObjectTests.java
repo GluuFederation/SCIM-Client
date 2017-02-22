@@ -7,7 +7,7 @@ package gluu.scim2.client.fido;
 
 import gluu.BaseScimTest;
 import gluu.scim2.client.ScimClient;
-import gluu.scim2.client.ScimClientFactory;
+import gluu.scim2.client.factory.ScimClientFactory;
 import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
 import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.Assert;

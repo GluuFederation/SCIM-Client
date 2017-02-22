@@ -6,6 +6,7 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
+import gluu.scim2.client.factory.ScimClientFactory;
 import org.gluu.oxtrust.model.scim2.Email;
 import org.gluu.oxtrust.model.scim2.User;
 import org.jboss.resteasy.client.core.BaseClientResponse;
