@@ -5,20 +5,20 @@
  */
 package gluu.scim2.client;
 
-import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-
-import java.io.IOException;
-
-import javax.ws.rs.core.MediaType;
-
-import gluu.scim2.client.util.Util;
+import gluu.scim2.client.factory.ScimClientFactory;
 import org.gluu.oxtrust.model.scim2.Group;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * @author Shekhar Laad
@@ -26,13 +26,13 @@ import org.testng.annotations.Test;
  */
 public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 
-	private Scim2Client client;
+	private ScimClient client;
 	private String id;
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws IOException {
-		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+		client = ScimClientFactory.getClient(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 	}
 
 	@Test
@@ -41,12 +41,11 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 
 		System.out.println("createGroupTest createJson: " + createJson);
 
-		ScimResponse response = client.createGroupString(createJson, MediaType.APPLICATION_JSON);
-		System.out.println("createGroupTest response json: " + response.getResponseBodyString());
+		BaseClientResponse<Group> response = client.createGroupString(createJson, MediaType.APPLICATION_JSON);
 
-		assertEquals(response.getStatusCode(), 201, "Could not add group, status != 201");
+		assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode(), "Could not add group, status != 201");
 
-		Group group = Util.toGroup(response);
+		Group group = response.getEntity();
 		this.id = group.getId();
 
 	}
@@ -56,19 +55,17 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 	public void updateGroupTest(String updateJson, String updatedDisplayName) throws Exception {
 
 		System.out.println("updateGroupTest updateJson: " + updateJson);
-		ScimResponse response = client.updateGroupString(updateJson, this.id, MediaType.APPLICATION_JSON);
+		BaseClientResponse<Group> response = client.updateGroupString(updateJson, this.id, MediaType.APPLICATION_JSON);
 
-		System.out.println("updateGroupTest + responseStr " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not update group, status != 200");
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not update group, status != 200");
 
-		Group group = Util.toGroup(response);
+		Group group = response.getEntity();
 		assertEquals(group.getDisplayName(), updatedDisplayName, "Could not update the group");
 	}
 
 	@Test(dependsOnMethods = "updateGroupTest")
 	public void deleteGroupTest() throws Exception {
-		ScimResponse response = client.deleteGroup(this.id);
-		System.out.println("deleteGroupTest + responseStr " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 204, "Could not delete group; status != 204");
+		BaseClientResponse response = client.deleteGroup(this.id);
+		assertEquals(response.getStatus(), Response.Status.NO_CONTENT.getStatusCode(), "Could not delete group; status != 204");
 	}
 }

@@ -5,19 +5,16 @@
  */
 package gluu.scim.client.auth;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.xml.bind.JAXBException;
-
+import gluu.scim.client.BaseScimClientImpl;
+import gluu.scim.client.ScimResponse;
+import gluu.scim.client.exception.ScimInitializationException;
+import gluu.scim.client.model.ScimBulkOperation;
+import gluu.scim.client.model.ScimGroup;
+import gluu.scim.client.model.ScimPerson;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.jboss.resteasy.client.ClientResponseFailure;
 import org.xdi.oxauth.client.TokenRequest;
 import org.xdi.oxauth.client.uma.CreateRptService;
 import org.xdi.oxauth.client.uma.RptAuthorizationRequestService;
@@ -26,23 +23,17 @@ import org.xdi.oxauth.client.uma.wrapper.UmaClient;
 import org.xdi.oxauth.model.common.AuthenticationMethod;
 import org.xdi.oxauth.model.common.GrantType;
 import org.xdi.oxauth.model.crypto.OxAuthCryptoProvider;
-import org.xdi.oxauth.model.crypto.signature.ECDSAPrivateKey;
-import org.xdi.oxauth.model.crypto.signature.RSAPrivateKey;
 import org.xdi.oxauth.model.crypto.signature.SignatureAlgorithm;
-import org.xdi.oxauth.model.uma.PermissionTicket;
-import org.xdi.oxauth.model.uma.RPTResponse;
-import org.xdi.oxauth.model.uma.RptAuthorizationRequest;
-import org.xdi.oxauth.model.uma.RptAuthorizationResponse;
-import org.xdi.oxauth.model.uma.UmaConfiguration;
+import org.xdi.oxauth.model.uma.*;
 import org.xdi.oxauth.model.uma.wrapper.Token;
 import org.xdi.util.StringHelper;
 
-import gluu.scim.client.BaseScimClientImpl;
-import gluu.scim.client.ScimResponse;
-import gluu.scim.client.exception.ScimInitializationException;
-import gluu.scim.client.model.ScimBulkOperation;
-import gluu.scim.client.model.ScimGroup;
-import gluu.scim.client.model.ScimPerson;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * SCIM UMA client
@@ -167,9 +158,6 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 	        tokenRequest.setAudience(metadataConfiguration.getTokenEndpoint());
 
 			this.umaAat = UmaClient.request(metadataConfiguration.getTokenEndpoint(), tokenRequest);
-		} catch (ClientResponseFailure ex) {
-			String errorMessage = (String) ex.getResponse().getEntity(String.class);
-			throw new ScimInitializationException("Failed to get AAT token. Error: " + errorMessage, ex);
 		} catch (Exception ex) {
 			throw new ScimInitializationException("Failed to get AAT token", ex);
 		}
@@ -184,10 +172,7 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 		this.umaRpt = null;
 		try {
 			umaRpt = rptService.createRPT("Bearer " + this.umaAat.getAccessToken(), getHost(metadataConfiguration.getIssuer()));
-		} catch (ClientResponseFailure ex) {
-			String errorMessage = (String) ex.getResponse().getEntity(String.class);
-			throw new ScimInitializationException("Failed to get RPT token. Error: " + errorMessage, ex);
-        } catch (MalformedURLException ex) {
+		}catch (MalformedURLException ex) {
 			throw new ScimInitializationException("Failed to determine host by URI", ex);
 		}
 
@@ -233,10 +218,7 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
             }
             
             return true;
-        } catch (ClientResponseFailure ex) {
-			String errorMessage = (String) ex.getResponse().getEntity(String.class);
-			throw new ScimInitializationException("Failed to authorize UMA ticket. Error: " + errorMessage, ex);
-        } catch (MalformedURLException ex) {
+        }catch (MalformedURLException ex) {
 			throw new ScimInitializationException("Failed to determine host by URI", ex);
 		} catch (Exception ex) {
 			throw new ScimInitializationException(ex.getMessage(), ex);

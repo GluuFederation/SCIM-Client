@@ -6,9 +6,7 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-
-import gluu.scim2.client.util.Util;
+import gluu.scim2.client.factory.ScimClientFactory;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Constants;
@@ -16,6 +14,7 @@ import org.gluu.oxtrust.model.scim2.Extension;
 import org.gluu.oxtrust.model.scim2.User;
 import org.gluu.oxtrust.model.scim2.schema.AttributeHolder;
 import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -23,7 +22,7 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.MediaType;
-
+import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
@@ -42,7 +41,7 @@ import static org.testng.Assert.assertEquals;
 public class UserExtensionsJsonTest extends BaseScimTest {
 
     String id;
-    Scim2Client client;
+    ScimClient client;
     User user;
 
     String updateGivenName = "userjson.update.givenname";
@@ -50,14 +49,14 @@ public class UserExtensionsJsonTest extends BaseScimTest {
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
     public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws Exception {
-        client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+        client = ScimClientFactory.getClient(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 
     @Test(groups = "a")
     public void checkIfExtensionsExist() throws Exception {
 
-        UserExtensionSchema userExtensionSchema = client.getUserExtensionSchema();
-
+        BaseClientResponse<UserExtensionSchema> response = client.getUserExtensionSchema();
+        UserExtensionSchema userExtensionSchema = response.getEntity();
         assertEquals(userExtensionSchema.getId(), Constants.USER_EXT_SCHEMA_ID);
 
         boolean customFirstExists = false;
@@ -93,12 +92,11 @@ public class UserExtensionsJsonTest extends BaseScimTest {
     @Parameters({ "scim2.userext.create_json" })
     public void createUserTest(String createJson) throws Exception {
 
-        ScimResponse response = client.createPersonString(createJson, MediaType.APPLICATION_JSON);
+        BaseClientResponse<User> response = client.createPersonString(createJson, MediaType.APPLICATION_JSON);
 
-        System.out.println(" createUserTest() RESPONSE = " + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 201, "Could not add the user, status != 201");
+        assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode(), "Could not add the user, status != 201");
 
-        user = Util.toUser(response, client.getUserExtensionSchema());
+        user = response.getEntity();
         this.id = user.getId();
     }
 
@@ -106,24 +104,22 @@ public class UserExtensionsJsonTest extends BaseScimTest {
     @Parameters({ "scim2.userext.update_json" })
     public void updateUserTest(String updateJson) throws Exception {
 
-        ScimResponse response = client.updatePersonString(updateJson, this.id, MediaType.APPLICATION_JSON);
+        BaseClientResponse<User> response = client.updatePersonString(updateJson, this.id, MediaType.APPLICATION_JSON);
 
-        System.out.println(" updateUserTest() RESPONSE = " + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "Could not update the user, status != 200");
+        assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not update the user, status != 200");
 
-        user = Util.toUser(response, client.getUserExtensionSchema());
+        user = response.getEntity();
         assertEquals(user.getName().getGivenName(), updateGivenName, "Could not update the user");
     }
 
     @Test(groups = "d", dependsOnGroups = "c")
     public void retrieveUserTest() throws Exception {
 
-        ScimResponse response = client.retrieveUser(this.id, new String[]{});
+        BaseClientResponse<User> response = client.retrieveUser(this.id, new String[]{});
 
-        System.out.println(" retrieveUserTest() RESPONSE = "  + response.getResponseBodyString());
-        assertEquals(response.getStatusCode(), 200, "Could not get the user, status != 200");
+        assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not get the user, status != 200");
 
-        User user = Util.toUser(response, client.getUserExtensionSchema());
+        User user = response.getEntity();
 
         Extension extension = user.getExtension(Constants.USER_EXT_SCHEMA_ID);
         Assert.assertNotNull("(Deserialization) Custom extension not deserialized.", extension);
@@ -151,9 +147,7 @@ public class UserExtensionsJsonTest extends BaseScimTest {
 
 	@Test(dependsOnGroups = "d", alwaysRun = true)
 	public void deleteUserTest() throws Exception {
-
-        ScimResponse response = client.deletePerson(this.id);
-		System.out.println(" deleteUserTest() RESPONSE = " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 204, "Could not delete the user; status != 204");
+        BaseClientResponse response = client.deletePerson(this.id);
+		assertEquals(response.getStatus(), Response.Status.NO_CONTENT.getStatusCode(), "Could not delete the user; status != 204");
 	}
 }

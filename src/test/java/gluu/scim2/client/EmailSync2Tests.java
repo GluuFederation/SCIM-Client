@@ -6,15 +6,16 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-import gluu.scim2.client.util.Util;
+import gluu.scim2.client.factory.ScimClientFactory;
 import org.gluu.oxtrust.model.scim2.*;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,13 +27,13 @@ import static org.testng.Assert.assertEquals;
  */
 public class EmailSync2Tests extends BaseScimTest {
 
-    Scim2Client client;
+    ScimClient client;
     String id;
 
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
     public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws Exception {
-        client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+        client = ScimClientFactory.getClient(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 
     @Test(groups = "a")
@@ -42,12 +43,11 @@ public class EmailSync2Tests extends BaseScimTest {
 
         User user = createDummyUser();
 
-        ScimResponse response = client.createUser(user, new String[]{});
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<User> response = client.createUser(user, new String[]{});
 
-        assertEquals(response.getStatusCode(), 201, "Could not add user, status != 201");
+        assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode(), "Could not add user, status != 201");
 
-        User userCreated = Util.toUser(response, client.getUserExtensionSchema());
+        User userCreated =response.getEntity(User.class);
         this.id = userCreated.getId();
 
         List<Email> emailsCreated = userCreated.getEmails();
@@ -72,12 +72,11 @@ public class EmailSync2Tests extends BaseScimTest {
         emails.add(email);
         userCreated.setEmails(emails);
 
-        ScimResponse responseUpdated = client.updateUser(userCreated, this.id, new String[]{});
-        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
+        BaseClientResponse<User> responseUpdated = client.updateUser(userCreated, this.id, new String[]{});
 
-        Assert.assertEquals(200, responseUpdated.getStatusCode());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), responseUpdated.getStatus());
 
-        User userUpdated = Util.toUser(responseUpdated, client.getUserExtensionSchema());
+        User userUpdated = responseUpdated.getEntity();
 
         assertEquals(userUpdated.getId(), this.id, "User could not be retrieved");
         assert(userUpdated.getMeta().getLastModified().getTime() > userUpdated.getMeta().getCreated().getTime());
@@ -101,8 +100,8 @@ public class EmailSync2Tests extends BaseScimTest {
 
         System.out.println("IN testDeleteUser...");
 
-        ScimResponse response = client.deletePerson(this.id);
-        assertEquals(response.getStatusCode(), 204, "User could not be deleted; status != 204");
+        BaseClientResponse response = client.deletePerson(this.id);
+        assertEquals(response.getStatus(), Response.Status.NO_CONTENT.getStatusCode(), "User could not be deleted; status != 204");
 
         System.out.println("LEAVING testDeleteUser..." + "\n");
     }

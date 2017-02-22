@@ -6,9 +6,9 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-import gluu.scim2.client.util.Util;
+import gluu.scim2.client.factory.ScimClientFactory;
 import org.gluu.oxtrust.model.scim2.*;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
@@ -16,6 +16,7 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -27,13 +28,13 @@ import static org.testng.Assert.assertEquals;
  */
 public class GroupObjectTests extends BaseScimTest {
 
-    Scim2Client client;
+    ScimClient client;
     String id;
 
     @BeforeTest
     @Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
     public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws Exception {
-        client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+        client = ScimClientFactory.getClient(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 
     @Test(groups = "a")
@@ -46,12 +47,11 @@ public class GroupObjectTests extends BaseScimTest {
         Group group = new Group();
         group.setDisplayName(displayName);
 
-        ScimResponse response = client.createGroup(group, MediaType.APPLICATION_JSON);
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<Group> response = client.createGroup(group, MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(201, response.getStatusCode());
+        Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
 
-        Group groupCreated = Util.toGroup(response);
+        Group groupCreated = response.getEntity();
         assertEquals(groupCreated.getDisplayName(), displayName, "Group not added or retrieved");
 
         this.id = groupCreated.getId();
@@ -67,12 +67,11 @@ public class GroupObjectTests extends BaseScimTest {
 
         System.out.println("IN testRetrieveNewGroup...");
 
-        ScimResponse response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<Group> response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(200, response.getStatusCode());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        Group groupRetrieved = Util.toGroup(response);
+        Group groupRetrieved = response.getEntity();
         assertEquals(groupRetrieved.getId(), this.id, "Group could not be retrieved");
 
         System.out.println("groupRetrieved.getId() = " + groupRetrieved.getId());
@@ -88,21 +87,19 @@ public class GroupObjectTests extends BaseScimTest {
 
         Thread.sleep(3000);  // Sleep for 3 seconds
 
-        ScimResponse response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<Group> response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(200, response.getStatusCode());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        Group groupRetrieved = Util.toGroup(response);
+        Group groupRetrieved = response.getEntity();
 
         groupRetrieved.setDisplayName(groupRetrieved.getDisplayName() + " UPDATED");
 
-        ScimResponse responseUpdated = client.updateGroup(groupRetrieved, this.id, MediaType.APPLICATION_JSON);
-        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
+        BaseClientResponse<Group> responseUpdated = client.updateGroup(groupRetrieved, this.id, MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(200, responseUpdated.getStatusCode());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), responseUpdated.getStatus());
 
-        Group groupUpdated = Util.toGroup(responseUpdated);
+        Group groupUpdated = responseUpdated.getEntity();
 
         assertEquals(groupUpdated.getId(), this.id, "Group could not be retrieved");
         assert(groupUpdated.getMeta().getLastModified().getTime() > groupUpdated.getMeta().getCreated().getTime());
@@ -120,19 +117,17 @@ public class GroupObjectTests extends BaseScimTest {
 
         System.out.println("IN testUpdateDisplayNameDifferentId...");
 
-        ScimResponse response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<Group> response = client.retrieveGroup(this.id, MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(200, response.getStatusCode());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        Group groupRetrieved = Util.toGroup(response);
+        Group groupRetrieved = response.getEntity();
 
         groupRetrieved.setDisplayName("Gluu Manager Group");
 
-        ScimResponse responseUpdated = client.updateGroup(groupRetrieved, this.id, MediaType.APPLICATION_JSON);
-        System.out.println("UPDATED response body = " + responseUpdated.getResponseBodyString());
+        BaseClientResponse<Group> responseUpdated = client.updateGroup(groupRetrieved, this.id, MediaType.APPLICATION_JSON);
 
-        Assert.assertEquals(409, responseUpdated.getStatusCode());
+        Assert.assertEquals(Response.Status.CONFLICT.getStatusCode(), responseUpdated.getStatus());
 
         System.out.println("LEAVING testUpdateDisplayNameDifferentId..." + "\n");
     }
@@ -142,8 +137,8 @@ public class GroupObjectTests extends BaseScimTest {
 
         System.out.println("IN testDeleteGroup...");
 
-        ScimResponse response = client.deleteGroup(this.id);
-        assertEquals(response.getStatusCode(), 204, "Group could not be deleted; status != 204");
+        BaseClientResponse response = client.deleteGroup(this.id);
+        assertEquals(response.getStatus(), Response.Status.NO_CONTENT.getStatusCode(), "Group could not be deleted; status != 204");
 
         System.out.println("LEAVING testDeleteGroup..." + "\n");
     }
@@ -161,12 +156,11 @@ public class GroupObjectTests extends BaseScimTest {
         String[] attributes = null;
 
         // GET search on /scim/v2/Users
-        ScimResponse response = client.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes);
-        System.out.println("response body = " + response.getResponseBodyString());
+        BaseClientResponse<ListResponse> response = client.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes);
 
-        Assert.assertEquals(200, response.getStatusCode());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        ListResponse listResponse = Util.toListResponseUser(response, client.getUserExtensionSchema());
+        ListResponse listResponse = response.getEntity();
         assertEquals(listResponse.getTotalResults(), 1);
 
         User userRetrieved = (User) listResponse.getResources().get(0);
@@ -185,11 +179,11 @@ public class GroupObjectTests extends BaseScimTest {
                 System.out.println("group $ref = " + group.getReference());
                 Assert.assertNotNull(group.getReference());
 
-                ScimResponse groupRetrievedResponse = client.retrieveGroup(group.getValue(), MediaType.APPLICATION_JSON);
+                BaseClientResponse<Group> groupRetrievedResponse = client.retrieveGroup(group.getValue(), MediaType.APPLICATION_JSON);
 
-                Assert.assertEquals(200, groupRetrievedResponse.getStatusCode());
+                Assert.assertEquals(Response.Status.OK.getStatusCode(), groupRetrievedResponse.getStatus());
 
-                Group adminGroup = Util.toGroup(groupRetrievedResponse);
+                Group adminGroup = groupRetrievedResponse.getEntity();
 
                 Set<MemberRef> members = adminGroup.getMembers();
                 for (MemberRef member : members) {

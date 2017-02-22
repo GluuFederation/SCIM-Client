@@ -5,44 +5,42 @@
  */
 package gluu.scim2.client;
 
-import static org.testng.Assert.assertEquals;
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-
-import java.io.IOException;
-
-// import gluu.scim2.client.util.Util;
+import gluu.scim2.client.factory.ScimClientFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Email;
+import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.gluu.oxtrust.model.scim2.PhoneNumber;
 import org.gluu.oxtrust.model.scim2.User;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * @author Shekhar Laad 
  */
 public class UserWebServiceTestCases extends BaseScimTest {	
 
-	User personToAdd;
-	User personToUpdate;
 	User userAdd;
 	User userToUpdate;
 	
 	String id;
-	Scim2Client client;
-	ScimResponse response;
-	
+	ScimClient client;
+
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath" , "umaAatClientJksPassword" , "umaAatClientKeyId","userwebservice.add.username","userwebservice.update.displayname" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId,final String username ,final String updateDisplayName ) throws IOException {
 
 		System.out.println(" username :  "+username +" updateDisplayName :" + updateDisplayName);
 		
-		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
-		response = null;
+		client = ScimClientFactory.getClient(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 		userAdd = new User();
 		userToUpdate = new User();
 		userAdd.setUserName(username);
@@ -82,10 +80,8 @@ public class UserWebServiceTestCases extends BaseScimTest {
 	
 	@Test
 	public void retrieveAllUsersTest() throws IOException {
-
-		response = client.retrieveAllUsers();
-		System.out.println("UserWebServiceTestCases : retrieveAllUsersTest response = " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Could not get a list of all users, status != 200");
+		BaseClientResponse<ListResponse> response = client.retrieveAllUsers();
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not get a list of all users, status != 200");
 	}
 	
 	/*@Parameters({ "userInum" })

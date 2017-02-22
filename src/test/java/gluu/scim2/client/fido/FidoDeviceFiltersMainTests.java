@@ -6,17 +6,19 @@
 package gluu.scim2.client.fido;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
-import gluu.scim2.client.Scim2Client;
-import gluu.scim2.client.util.Util;
+import gluu.scim2.client.ScimClient;
+import gluu.scim2.client.factory.ScimClientFactory;
 import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.gluu.oxtrust.model.scim2.Resource;
 import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
+import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
 
 import static org.testng.Assert.assertEquals;
 
@@ -27,12 +29,12 @@ import static org.testng.Assert.assertEquals;
  */
 public class FidoDeviceFiltersMainTests extends BaseScimTest {
 
-	Scim2Client client;
+	ScimClient client;
 
 	@BeforeTest
 	@Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
 	public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws Exception {
-		client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+		client = ScimClientFactory.getClient(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 	}
 
 	@Test
@@ -45,12 +47,11 @@ public class FidoDeviceFiltersMainTests extends BaseScimTest {
 		String sortOrder = "ascending";
 		String[] attributes = null;
 
-		ScimResponse response = client.searchFidoDevices("", filter, startIndex, count, sortBy, sortOrder, attributes);
+		BaseClientResponse<ListResponse> response = client.searchFidoDevices("", filter, startIndex, count, sortBy, sortOrder, attributes);
 
-		System.out.println(" testSearchGet response = " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Status != 200");
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Status != 200");
 
-		ListResponse listResponse = Util.toListResponseFidoDevice(response);
+		ListResponse listResponse = response.getEntity();
 
 		System.out.println(" filter = " + filter + ", totalResults = " + listResponse.getTotalResults() + "\n");
 		Assert.assertTrue(listResponse.getTotalResults() > 0);
@@ -66,12 +67,11 @@ public class FidoDeviceFiltersMainTests extends BaseScimTest {
 		String sortOrder = "ascending";
 		String[] attributes = null;
 
-		ScimResponse response = client.searchFidoDevicesPost("", filter, startIndex, count, sortBy, sortOrder, attributes);
+		BaseClientResponse<ListResponse> response = client.searchFidoDevicesPost("", filter, startIndex, count, sortBy, sortOrder, attributes);
 
-		System.out.println(" testSearchPost response = " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Status != 200");
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Status != 200");
 
-		ListResponse listResponse = Util.toListResponseFidoDevice(response);
+		ListResponse listResponse = response.getEntity();
 
 		System.out.println(" filter = " + filter + ", totalResults = " + listResponse.getTotalResults() + "\n");
 		Assert.assertTrue(listResponse.getTotalResults() > 0);
@@ -87,12 +87,11 @@ public class FidoDeviceFiltersMainTests extends BaseScimTest {
 		String sortOrder = "ascending";
 		String[] attributes = new String[] {"displayName", "description"};
 
-		ScimResponse response = client.searchFidoDevices("", filter, startIndex, count, sortBy, sortOrder, attributes);
+		BaseClientResponse<ListResponse> response = client.searchFidoDevices("", filter, startIndex, count, sortBy, sortOrder, attributes);
 
-		System.out.println(" testSearchGetFilterAttributes response = " + response.getResponseBodyString());
-		assertEquals(response.getStatusCode(), 200, "Status != 200");
+		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Status != 200");
 
-		ListResponse listResponse = Util.toListResponseFidoDevice(response);
+		ListResponse listResponse = response.getEntity();
 
 		for (Resource resource : listResponse.getResources()) {
 

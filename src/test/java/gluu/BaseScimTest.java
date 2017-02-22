@@ -30,7 +30,7 @@ public abstract class BaseScimTest {
     public void initTestSuite(ITestContext context) throws FileNotFoundException, IOException {
         SecurityProviderUtility.installBCProvider();
 
-        Reporter.log("Invoked init test suite method \n", true);
+        Reporter.log("Invoked prepareRequest test suite method \n", true);
 
         String propertiesFile = context.getCurrentXmlTest().getParameter("propertiesFile");
         if (StringHelper.isEmpty(propertiesFile)) {
