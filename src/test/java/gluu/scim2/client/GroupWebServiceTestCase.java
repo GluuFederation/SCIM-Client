@@ -28,7 +28,7 @@ public class GroupWebServiceTestCase extends BaseScimTest {
 	Group groupToAdd;
 	Group groupToUpdate;
 	String id;
-	Scim2Client client;
+	ScimClient client;
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId", "groupwebservice.add.displayname", "groupwebservice.update.displayname" })
 	@BeforeTest
@@ -36,7 +36,7 @@ public class GroupWebServiceTestCase extends BaseScimTest {
 
 		System.out.println(" displayName : " + displayName + "   updateDisplayName : " + updateDisplayName);
 		
-		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+		client = ScimClientFactory.getClient(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 		groupToAdd = new Group();
 		groupToUpdate = new Group();
 		groupToAdd.setDisplayName(displayName);

@@ -39,7 +39,7 @@ public class UserExtensionsObjectTest extends BaseScimTest {
 
     String domainURL;
     String id;
-    Scim2Client client;
+    ScimClient client;
     User userToAdd;
     User userToUpdate;
 
@@ -52,7 +52,7 @@ public class UserExtensionsObjectTest extends BaseScimTest {
 
         this.domainURL = domainURL;
         
-        client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+        client = ScimClientFactory.getClient(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 
         userToAdd = new User();
         userToUpdate = new User();

@@ -3,10 +3,9 @@
  *
  * Copyright (c) 2014, Gluu
  */
-package gluu.scim2.client.auth;
+package gluu.scim2.client;
 
 import gluu.scim.client.exception.ScimInitializationException;
-import gluu.scim2.client.BaseScim2ClientImpl;
 import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.xdi.oxauth.client.uma.CreateRptService;
 import org.xdi.oxauth.client.uma.RptAuthorizationRequestService;
@@ -30,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Yuriy Movchan
  * @author Yuriy Zabrovarnyy
  */
-public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
+public class UmaScimClient extends AbstractScimClient {
 
     private static final long serialVersionUID = 7099883500099353832L;
 
@@ -50,7 +49,7 @@ public class UmaScim2ClientImpl extends BaseScim2ClientImpl {
 
     private final ReentrantLock lock = new ReentrantLock();
 
-    public UmaScim2ClientImpl(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
+    public UmaScimClient(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
         super(domain);
         this.umaMetaDataUrl = umaMetaDataUrl;
         this.umaAatClientId = umaAatClientId;

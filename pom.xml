@@ -195,7 +195,7 @@
                 </property>
             </activation>
             <properties>
-                <cfg>gene</cfg>
+                <cfg>default</cfg>
             </properties>
         </profile>
     </profiles>

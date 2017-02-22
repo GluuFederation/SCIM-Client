@@ -6,6 +6,8 @@
 package gluu.scim2.client;
 
 import gluu.scim2.client.jackson.ScimContextResolver;
+import gluu.scim2.client.jackson.ScimProvider;
+import gluu.scim2.client.rest.ScimService;
 import org.apache.commons.lang.StringUtils;
 import org.gluu.oxtrust.model.scim2.*;
 import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
@@ -16,11 +18,8 @@ import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 
 import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
 
@@ -29,17 +28,16 @@ import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
  *
  * @author Yuriy Movchan Date: 08/23/2013
  */
-public abstract class BaseScim2ClientImpl implements BaseScim2Client {
+public abstract class AbstractScimClient implements ScimClient {
 
     private static final long serialVersionUID = 9098930517944520482L;
 
-    private static final Logger log = LoggerFactory.getLogger(BaseScim2ClientImpl.class);
-
     private ScimService scimService;
 
-    public BaseScim2ClientImpl(String domain) {
+    public AbstractScimClient(String domain) {
         ResteasyProviderFactory resteasyProviderFactory = ResteasyProviderFactory.getInstance();
-        resteasyProviderFactory.registerProvider(ScimContextResolver.class);
+        resteasyProviderFactory.addContextResolver(ScimContextResolver.class);
+        resteasyProviderFactory.registerProvider(ScimProvider.class);
         this.scimService = ProxyFactory.create(ScimService.class, ProxyFactory.createUri(domain), ClientRequest.getDefaultExecutor(), resteasyProviderFactory);
     }
 
@@ -55,8 +53,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
         try {
             return authorize(response);
         } finally {
-            if (response != null)
-                response.releaseConnection(); // then close InputStream
+            response.releaseConnection(); // close InputStream
         }
     }
 
@@ -70,10 +67,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.retrieveServiceProviderConfig(getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -87,10 +81,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.retrieveResourceTypes(getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -112,10 +103,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.retrieveUser(id, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -129,16 +117,14 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
     public final BaseClientResponse<User> createUser(User user, String[] attributesArray) {
         BaseClientResponse<User> response = null;
         prepareRequest();
+        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
         try {
-            response = scimService.createUser(user, getAuthenticationHeader());
+            response = scimService.createUser(user, attributes, getAuthenticationHeader());
             if (isNeededToAuthorize(response))
-                response = scimService.createUser(user, getAuthenticationHeader());
+                response = scimService.createUser(user, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -160,20 +146,13 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.updateUser(user, id, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see gluu.scim.client.ScimClientService#deletePerson(java.lang.String)
-     */
     @Override
     public final BaseClientResponse deletePerson(String id) {
-        BaseClientResponse<User> response = null;
+        BaseClientResponse response = null;
         prepareRequest();
         try {
             response = scimService.deletePerson(id, getAuthenticationHeader());
@@ -181,17 +160,10 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.deletePerson(id, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see gluu.scim.client.ScimClientService#retrieveGroup(java.lang.String,
-     * java.lang.String)
-     */
     @Override
     @Deprecated
     public final BaseClientResponse<Group> retrieveGroup(String id, String mediaType) {
@@ -210,19 +182,10 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.retrieveGroup(id, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * gluu.scim.client.ScimClientService#createGroup(gluu.scim.client.model
-     * .ScimGroup, java.lang.String)
-     */
     @Override
     @Deprecated
     public final BaseClientResponse<Group> createGroup(Group group, String mediaType) {
@@ -241,10 +204,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.createGroup(group, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -266,10 +226,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.updateGroup(group, id, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -284,14 +241,13 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.deleteGroup(id, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
     @Override
     @Deprecated
+    @SuppressWarnings("deprecation")
     public final BaseClientResponse<User> createPersonString(String person, String mediaType) {
 
         BaseClientResponse<User> response = null;
@@ -303,15 +259,13 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.createPersonString(person, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
     @Override
     @Deprecated
+    @SuppressWarnings("deprecation")
     public final BaseClientResponse<User> updatePersonString(String person, String id, String mediaType) {
         BaseClientResponse<User> response = null;
         prepareRequest();
@@ -322,15 +276,13 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.updatePersonString(person, id, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
     @Override
     @Deprecated
+    @SuppressWarnings("deprecation")
     public final BaseClientResponse<Group> createGroupString(String group, String mediaType) {
         BaseClientResponse<Group> response = null;
         prepareRequest();
@@ -341,15 +293,13 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.createGroupString(group, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
     @Override
     @Deprecated
+    @SuppressWarnings("deprecation")
     public final BaseClientResponse<Group> updateGroupString(String group, String id, String mediaType) {
         BaseClientResponse<Group> response = null;
         prepareRequest();
@@ -360,10 +310,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.updateGroupString(group, id, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -378,10 +325,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.processBulkOperation(bulkRequest, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -396,10 +340,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.processBulkOperationString(bulkRequestString, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();// caching entity
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -420,13 +361,11 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
+    @Override
     public final BaseClientResponse<ListResponse> searchUsersPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) {
         BaseClientResponse<ListResponse> response = null;
         prepareRequest();
@@ -445,10 +384,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.searchUsersPost(searchRequest, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -469,13 +405,11 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
+    @Override
     public final BaseClientResponse<ListResponse> searchGroupsPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) {
         BaseClientResponse<ListResponse> response = null;
         prepareRequest();
@@ -494,18 +428,22 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.searchGroupsPost(searchRequest, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
     @Override
     public final BaseClientResponse<UserExtensionSchema> getUserExtensionSchema() {
-        return scimService.getUserExtensionSchema(getAuthenticationHeader());
+        BaseClientResponse<UserExtensionSchema> response = null;
+        try {
+            response = scimService.getUserExtensionSchema(Constants.USER_EXT_SCHEMA_ID);
+            return response;
+        } finally {
+            finalize(response);
+        }
     }
 
+    @Override
     public final BaseClientResponse<ListResponse> searchFidoDevices(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) {
         BaseClientResponse<ListResponse> response = null;
         prepareRequest();
@@ -517,13 +455,11 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.searchFidoDevices(userId, filter, startIndex, count, sortBy, sortOrder, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
+    @Override
     public final BaseClientResponse<ListResponse> searchFidoDevicesPost(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) {
         BaseClientResponse<ListResponse> response = null;
         prepareRequest();
@@ -542,10 +478,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.searchFidoDevicesPost(userId, searchRequest, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -560,21 +493,10 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.retrieveFidoDevice(id, userId, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
-    /**
-     * Updates a FIDO device
-     *
-     * @param fidoDevice
-     * @param attributesArray
-     * @return ScimResponse
-     * @throws IOException
-     */
     @Override
     public final BaseClientResponse<FidoDevice> updateFidoDevice(FidoDevice fidoDevice, String[] attributesArray) {
         BaseClientResponse<FidoDevice> response = null;
@@ -586,20 +508,10 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.updateFidoDevice(fidoDevice.getId(), fidoDevice, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
-    /**
-     * Deletes a FIDO device
-     *
-     * @param id
-     * @return ScimResponse
-     * @throws IOException
-     */
     @Override
     public final BaseClientResponse deleteFidoDevice(String id) {
         BaseClientResponse response = null;
@@ -610,9 +522,7 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.deleteFidoDevice(id, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
     }
 
@@ -628,10 +538,16 @@ public abstract class BaseScim2ClientImpl implements BaseScim2Client {
                 response = scimService.patchUser(id, scimPatchUser, attributes, getAuthenticationHeader());
             return response;
         } finally {
-            if (response != null) {
-                response.getEntity();
-                response.releaseConnection(); // then close InputStream
-            }
+            finalize(response);
         }
+    }
+
+    private void finalize(BaseClientResponse response) {
+        if (response == null)
+            return;
+
+        if (response.getReturnType() != null && response.getStatus() >= 200 && response.getStatus() < 300)
+            response.getEntity();
+        response.releaseConnection(); // then close InputStream
     }
 }

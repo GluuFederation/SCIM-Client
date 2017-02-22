@@ -25,13 +25,13 @@ import static org.testng.Assert.assertEquals;
  */
 public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 
-	private Scim2Client client;
+	private ScimClient client;
 	private String id;
 
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws IOException {
-		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+		client = ScimClientFactory.getClient(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class ScimClientGroupWriteOperationsTest extends BaseScimTest {
 
 		BaseClientResponse<Group> response = client.createGroupString(createJson, MediaType.APPLICATION_JSON);
 
-		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not add group, status != 201");
+		assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode(), "Could not add group, status != 201");
 
 		Group group = response.getEntity();
 		this.id = group.getId();

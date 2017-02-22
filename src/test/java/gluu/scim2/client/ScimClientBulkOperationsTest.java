@@ -6,7 +6,9 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
-import gluu.scim2.client.util.Util;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.gluu.oxtrust.model.scim2.BulkOperation;
 import org.gluu.oxtrust.model.scim2.BulkRequest;
 import org.gluu.oxtrust.model.scim2.BulkResponse;
@@ -29,13 +31,13 @@ import static org.testng.Assert.assertEquals;
  */
 public class ScimClientBulkOperationsTest extends BaseScimTest {
 
-	private Scim2Client client;
+	private ScimClient client;
 	private BulkRequest bulkRequest;
 
     @Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId" })
 	@BeforeTest
     public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws IOException {
-        client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+        client = ScimClientFactory.getClient(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 	}
 
 	@Test(groups = "a")
@@ -49,11 +51,8 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
 
 		assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not process bulk operation string, status != 200");
 
-        bulkRequest = (BulkRequest) Util.jsonToObject(bulkRequestString, BulkRequest.class);
+        bulkRequest = bulkRequestFromString(bulkRequestString);
 		BulkResponse bulkResponse = response.getEntity();
-
-        System.out.println("Request operations count = " + bulkRequest.getOperations().size());
-        System.out.println("Response operations count = " + bulkResponse.getOperations().size());
 
         assert(bulkResponse.getOperations().size() > 0);
         assertEquals(bulkRequest.getOperations().size(), bulkResponse.getOperations().size());
@@ -92,5 +91,12 @@ public class ScimClientBulkOperationsTest extends BaseScimTest {
             assert(status.equalsIgnoreCase(String.valueOf(Response.Status.CREATED.getStatusCode())) || status.equalsIgnoreCase(String.valueOf(Response.Status.OK.getStatusCode())));
             i++;
         }
+    }
+
+    private BulkRequest bulkRequestFromString(String bulkRequestString) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
+        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+        return mapper.readValue(bulkRequestString, BulkRequest.class);
     }
 }

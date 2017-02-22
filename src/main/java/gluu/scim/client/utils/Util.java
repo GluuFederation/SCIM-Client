@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014, Gluu
  */
-package gluu.scim2.client.util;
+package gluu.scim.client.utils;
 
 import gluu.scim.client.ScimResponse;
 
@@ -12,7 +12,6 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
-import org.gluu.oxtrust.model.scim.ScimPersonPatch;
 import org.gluu.oxtrust.model.scim2.Group;
 import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.gluu.oxtrust.model.scim2.ScimPatchUser;

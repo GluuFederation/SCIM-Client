@@ -1,4 +1,4 @@
-package gluu.scim2.client;
+package gluu.scim2.client.rest;
 
 import org.gluu.oxtrust.model.scim2.*;
 import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
@@ -51,7 +51,7 @@ public interface ScimService {
     @POST
     @Produces({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     @Consumes({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
-    BaseClientResponse<User> createUser(User user, @HeaderParam("Authorization") String authorization);
+    BaseClientResponse<User> createUser(User user, @QueryParam("attributes") String attributesArray, @HeaderParam("Authorization") String authorization);
 
     @Path("/scim/v2/Users/{id}")
     @GET
@@ -89,19 +89,19 @@ public interface ScimService {
     @Consumes({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     BaseClientResponse<Group> updateGroup(Group group, @PathParam("id") String id, @QueryParam("attributes") String attributesArray, @HeaderParam("Authorization") String authorization);
 
-    @Path("/scim/v2/Users/{id}")
+    @Path("/scim/v2/Groups/{id}")
     @DELETE
     @Produces({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     @Consumes({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     BaseClientResponse deleteGroup(@PathParam("id") String id, @HeaderParam("Authorization") String authorization);
 
-    @Path("/scim/v2/Bulk/")
+    @Path("/scim/v2/Bulk")
     @POST
     @Produces({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     @Consumes({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     BaseClientResponse<BulkResponse> processBulkOperation(BulkRequest bulkRequest, @HeaderParam("Authorization") String authorization);
 
-    @Path("/scim/v2/Bulk/")
+    @Path("/scim/v2/Bulk")
     @POST
     @Produces({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     @Consumes({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
@@ -159,11 +159,11 @@ public interface ScimService {
     @Consumes({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     BaseClientResponse<ListResponse> searchGroupsPost(SearchRequest searchRequest, @HeaderParam("Authorization") String authorization);
 
-    @Path("/scim/v2/Schemas/urn:ietf:params:scim:schemas:extension:gluu:2.0:User")
+    @Path("/scim/v2/Schemas/{id}")
     @GET
     @Produces({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     @Consumes({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
-    BaseClientResponse<UserExtensionSchema> getUserExtensionSchema(@HeaderParam("Authorization") String authorization);
+    BaseClientResponse<UserExtensionSchema> getUserExtensionSchema(@PathParam("id") String id);
 
     @Path("/scim/v2/FidoDevices")
     @GET
@@ -171,7 +171,7 @@ public interface ScimService {
     @Consumes({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     BaseClientResponse<ListResponse> searchFidoDevices(@QueryParam("userId") String userId, @QueryParam("filter") String filter, @QueryParam("startIndex") int startIndex, @QueryParam("count") int count, @QueryParam("sortBy") String sortBy, @QueryParam("sortOrder") String sortOrder, @QueryParam("attributes") String attributesArray, @HeaderParam("Authorization") String authorization);
 
-    @Path("/scim/v2/FidoDevices")
+    @Path("/scim/v2/FidoDevices/.search")
     @POST
     @Produces({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     @Consumes({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})

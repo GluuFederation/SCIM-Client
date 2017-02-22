@@ -18,7 +18,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import gluu.scim2.client.util.Util;
+import gluu.scim.client.utils.Util;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Optional;

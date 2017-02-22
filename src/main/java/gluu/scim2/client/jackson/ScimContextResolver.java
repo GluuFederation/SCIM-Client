@@ -20,6 +20,8 @@ import javax.ws.rs.ext.Provider;
 
 /**
  * Created by eugeniuparvan on 2/18/17.
+ * <p>
+ * This class intercepts creation of objectMapper in MessageBodyReaderContext and helps to configure it.
  */
 @Provider
 @Produces({MediaType.APPLICATION_JSON, Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
@@ -36,10 +38,15 @@ public class ScimContextResolver implements ContextResolver<ObjectMapper> {
         objectMapper.getDeserializationConfig().setAnnotationIntrospector(annotationIntrospector);
         objectMapper.getSerializationConfig().setAnnotationIntrospector(annotationIntrospector);
 
+
+        UniquePropertyPolymorphicDeserializer<Resource> deserializer = new UniquePropertyPolymorphicDeserializer<Resource>(Resource.class);
+        deserializer.register("userName", User.class);
+        deserializer.register("members", Group.class);
+        deserializer.register("deviceHashCode", FidoDevice.class);
+        deserializer.register("userId",FidoDevice.class);
         SimpleModule scimModule = new SimpleModule("scimModule", Version.unknownVersion());
-        scimModule.addAbstractTypeMapping(Resource.class, Group.class);
-        scimModule.addAbstractTypeMapping(Resource.class, FidoDevice.class);
-        scimModule.addAbstractTypeMapping(Resource.class, User.class);
+        scimModule.addDeserializer(Resource.class, deserializer);
+
         objectMapper.registerModule(scimModule);
     }
 

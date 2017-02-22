@@ -6,7 +6,6 @@
 package gluu.scim2.client;
 
 import gluu.BaseScimTest;
-import gluu.scim.client.ScimResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.Email;
 import org.gluu.oxtrust.model.scim2.ListResponse;
@@ -23,30 +22,24 @@ import java.io.IOException;
 
 import static org.testng.Assert.assertEquals;
 
-// import gluu.scim2.client.util.Util;
-
 /**
  * @author Shekhar Laad 
  */
 public class UserWebServiceTestCases extends BaseScimTest {	
 
-	User personToAdd;
-	User personToUpdate;
 	User userAdd;
 	User userToUpdate;
 	
 	String id;
-	Scim2Client client;
-	ScimResponse response;
-	
+	ScimClient client;
+
 	@Parameters({ "domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath" , "umaAatClientJksPassword" , "umaAatClientKeyId","userwebservice.add.username","userwebservice.update.displayname" })
 	@BeforeTest
 	public void init(final String domain, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId,final String username ,final String updateDisplayName ) throws IOException {
 
 		System.out.println(" username :  "+username +" updateDisplayName :" + updateDisplayName);
 		
-		client = Scim2Client.umaInstance(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
-		response = null;
+		client = ScimClientFactory.getClient(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 		userAdd = new User();
 		userToUpdate = new User();
 		userAdd.setUserName(username);

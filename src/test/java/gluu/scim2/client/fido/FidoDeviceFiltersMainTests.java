@@ -6,7 +6,8 @@
 package gluu.scim2.client.fido;
 
 import gluu.BaseScimTest;
-import gluu.scim2.client.Scim2Client;
+import gluu.scim2.client.ScimClient;
+import gluu.scim2.client.ScimClientFactory;
 import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.gluu.oxtrust.model.scim2.Resource;
 import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
@@ -28,12 +29,12 @@ import static org.testng.Assert.assertEquals;
  */
 public class FidoDeviceFiltersMainTests extends BaseScimTest {
 
-	Scim2Client client;
+	ScimClient client;
 
 	@BeforeTest
 	@Parameters({"domainURL", "umaMetaDataUrl", "umaAatClientId", "umaAatClientJksPath", "umaAatClientJksPassword", "umaAatClientKeyId"})
 	public void init(final String domainURL, final String umaMetaDataUrl, final String umaAatClientId, final String umaAatClientJksPath, final String umaAatClientJksPassword, @Optional final String umaAatClientKeyId) throws Exception {
-		client = Scim2Client.umaInstance(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+		client = ScimClientFactory.getClient(domainURL, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
 	}
 
 	@Test
