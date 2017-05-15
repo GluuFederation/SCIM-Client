@@ -36,7 +36,7 @@ public abstract class AbstractScimClient implements ScimClient {
 
     public AbstractScimClient(String domain) {
         ResteasyProviderFactory resteasyProviderFactory = ResteasyProviderFactory.getInstance();
-        resteasyProviderFactory.addContextResolver(ScimContextResolver.class);
+        resteasyProviderFactory.registerProvider(ScimContextResolver.class);
         resteasyProviderFactory.registerProvider(ScimProvider.class);
         this.scimService = ProxyFactory.create(ScimService.class, ProxyFactory.createUri(domain), ClientRequest.getDefaultExecutor(), resteasyProviderFactory);
     }
