@@ -34,6 +34,9 @@ public class Scim2Client implements BaseScim2Client, Serializable {
 
 	private BaseScim2Client scimClient;
 
+	public Scim2Client() {
+	}
+
 	public Scim2Client(BaseScim2Client baseClient) {
 		this.scimClient = baseClient;
 	}
