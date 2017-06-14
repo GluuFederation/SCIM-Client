@@ -19,7 +19,8 @@
         <jackson.version>1.9.13</jackson.version>
         <oxauth.version>3.1.0-SNAPSHOT</oxauth.version>
         <oxcore.version>3.1.0-SNAPSHOT</oxcore.version>
-        <resteasy.version>2.3.7.Final</resteasy.version>
+        <resteasy.version>3.0.21.Final</resteasy.version>
+		<jaxr.version>3.0.12.Final</jaxr.version>
     </properties>
 
     <build>
@@ -63,6 +64,14 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <version>3.0.4</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+		<configuration>
+			<failOnError>false</failOnError>
+		</configuration>
             </plugin>
 
             <plugin>
@@ -168,16 +177,21 @@
         </dependency>
 
         <!--resteasy-->
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-client</artifactId>
             <version>${resteasy.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>jaxrs-api</artifactId>
-            <version>${resteasy.version}</version>
-        </dependency>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>jaxrs-api</artifactId>
+			<version>${jaxr.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<version>${jaxr.version}</version>
+		</dependency>
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
