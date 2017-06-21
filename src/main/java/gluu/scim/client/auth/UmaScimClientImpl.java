@@ -12,431 +12,412 @@ import gluu.scim.client.model.ScimBulkOperation;
 import gluu.scim.client.model.ScimGroup;
 import gluu.scim.client.model.ScimPerson;
 import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.xdi.oxauth.client.TokenRequest;
-import org.xdi.oxauth.client.uma.CreateRptService;
-import org.xdi.oxauth.client.uma.RptAuthorizationRequestService;
 import org.xdi.oxauth.client.uma.UmaClientFactory;
+import org.xdi.oxauth.client.uma.UmaTokenService;
 import org.xdi.oxauth.client.uma.wrapper.UmaClient;
 import org.xdi.oxauth.model.common.AuthenticationMethod;
 import org.xdi.oxauth.model.common.GrantType;
 import org.xdi.oxauth.model.crypto.OxAuthCryptoProvider;
-import org.xdi.oxauth.model.crypto.signature.SignatureAlgorithm;
-import org.xdi.oxauth.model.uma.*;
+import org.xdi.oxauth.model.uma.PermissionTicket;
+import org.xdi.oxauth.model.uma.UmaMetadata;
+import org.xdi.oxauth.model.uma.UmaTokenResponse;
 import org.xdi.oxauth.model.uma.wrapper.Token;
 import org.xdi.util.StringHelper;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * SCIM UMA client
- * 
+ *
  * @author Yuriy Movchan
  * @author Yuriy Zabrovarnyy
  */
 public class UmaScimClientImpl extends BaseScimClientImpl {
 
-	private static final long serialVersionUID = 7099883500099353832L;
+    private static final long serialVersionUID = 7099883500099353832L;
 
-	// UMA
-	private UmaConfiguration metadataConfiguration;
-	private Token umaAat;
-	private RPTResponse umaRpt;
+    // UMA
+    private UmaMetadata umaMetadata;
+    private Token umaAat;
+    private String rpt;
 
-	private String umaMetaDataUrl;
+    private String umaMetaDataUrl;
 
-	private String umaAatClientId;
-	private String umaAatClientKeyId;
-	private String umaAatClientJksPath;
-	private String umaAatClientJksPassword;
-	
-	private long umaAatAccessTokenExpiration = 0l; // When the "accessToken" will expire;
+    private String umaAatClientId;
+    private String umaAatClientKeyId;
+    private String umaAatClientJksPath;
+    private String umaAatClientJksPassword;
 
-	private final ReentrantLock lock = new ReentrantLock();
+    private long umaAatAccessTokenExpiration = 0l; // When the "accessToken" will expire;
 
-	public UmaScimClientImpl(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
-		super(domain);
-		this.umaMetaDataUrl = umaMetaDataUrl;
-		this.umaAatClientId = umaAatClientId;
-		this.umaAatClientJksPath = umaAatClientJksPath;
-		this.umaAatClientJksPassword = umaAatClientJksPassword;
-		this.umaAatClientKeyId = umaAatClientKeyId;
-	}
+    private final ReentrantLock lock = new ReentrantLock();
 
-	@Override
-	protected void init() {
-		initUmaAuthentication();
-	}
+    public UmaScimClientImpl(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
+        super(domain);
+        this.umaMetaDataUrl = umaMetaDataUrl;
+        this.umaAatClientId = umaAatClientId;
+        this.umaAatClientJksPath = umaAatClientJksPath;
+        this.umaAatClientJksPassword = umaAatClientJksPassword;
+        this.umaAatClientKeyId = umaAatClientKeyId;
+    }
 
-	@Override
-	protected void addAuthenticationHeader(HttpMethodBase httpMethod) {
-		httpMethod.setRequestHeader("Authorization", "Bearer " + this.umaRpt.getRpt());
-	}
+    @Override
+    protected void init() {
+        initUmaAuthentication();
+    }
 
-	private void initUmaAuthentication() {
-		long now = System.currentTimeMillis();
+    @Override
+    protected void addAuthenticationHeader(HttpMethodBase httpMethod) {
+        httpMethod.setRequestHeader("Authorization", "Bearer " + rpt);
+    }
 
-		// Get new access token only if is the previous one is missing or expired
-		if (!isValidToken(now)) {
-			lock.lock();
-			try {
-				now = System.currentTimeMillis();
-				if (!isValidToken(now)) {
-					initUmaRpt();
-					this.umaAatAccessTokenExpiration = computeAccessTokenExpirationTime(this.umaAat.getExpiresIn());
-				}
-			} catch (Exception ex) {
-				throw new ScimInitializationException("Could not get accessToken", ex);
-			} finally {
-				  lock.unlock();
-			}
-		}
-	}
+    private void initUmaAuthentication() {
+        long now = System.currentTimeMillis();
 
-	private boolean isValidToken(final long now) {
-		if ((this.umaAat == null) || (this.umaAat.getAccessToken() == null) ||
-				(this.umaAatAccessTokenExpiration <= now)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private void initUmaRpt() {
-		// Remove old tokens
- 		this.umaAat = null;
-		this.umaRpt = null;
-
-		// Get metadata configuration
-		this.metadataConfiguration = UmaClientFactory.instance().createMetaDataConfigurationService(umaMetaDataUrl).getMetadataConfiguration();
-
-		if ((metadataConfiguration == null) || !StringHelper.equals(metadataConfiguration.getVersion(), "1.0")) {
-			throw new ScimInitializationException("Failed to load valid UMA metadata configuration");
-		}
-
-		// Get AAT
-		org.xdi.oxauth.model.crypto.PrivateKey privateKey = null;
-		try {
-			if (StringHelper.isEmpty(umaAatClientJksPath) || StringHelper.isEmpty(umaAatClientJksPassword)) {
-				throw new ScimInitializationException("UMA JKS keystore path or password is empty");
-			}
-			OxAuthCryptoProvider cryptoProvider;
-			try {
-				cryptoProvider = new OxAuthCryptoProvider(umaAatClientJksPath, umaAatClientJksPassword, null);
-			} catch (Exception ex) {
-				throw new ScimInitializationException("Failed to initialize crypto provider");
-			}
-
-			String keyId = umaAatClientKeyId;
-	        if (StringHelper.isEmpty(keyId)) {
-	        	// Get first key
-	        	List<String> aliases = cryptoProvider.getKeyAliases();
-	        	if (aliases.size() > 0) {
-	        		keyId = aliases.get(0);
-	        	}
-	        }
-
-	        if (StringHelper.isEmpty(keyId)) {
-				throw new ScimInitializationException("UMA keyId is empty");
-			}
-	        
-	        SignatureAlgorithm algorithm = cryptoProvider.getSignatureAlgorithm(keyId);
-			TokenRequest tokenRequest = TokenRequest.builder().aat().grantType(GrantType.CLIENT_CREDENTIALS).build();
-
-			tokenRequest.setAuthenticationMethod(AuthenticationMethod.PRIVATE_KEY_JWT);
-	        tokenRequest.setAuthUsername(umaAatClientId);
-	        tokenRequest.setCryptoProvider(cryptoProvider);
-	        tokenRequest.setAlgorithm(algorithm);
-	        tokenRequest.setKeyId(keyId);
-	        tokenRequest.setAudience(metadataConfiguration.getTokenEndpoint());
-
-			this.umaAat = UmaClient.request(metadataConfiguration.getTokenEndpoint(), tokenRequest);
-		} catch (Exception ex) {
-			throw new ScimInitializationException("Failed to get AAT token", ex);
-		}
-
-		if (this.umaAat == null) {
-			throw new ScimInitializationException("Failed to get UMA AAT token");
-		}
-
-		CreateRptService rptService = UmaClientFactory.instance().createRequesterPermissionTokenService(metadataConfiguration);
-
-		// Get RPT
-		this.umaRpt = null;
-		try {
-			umaRpt = rptService.createRPT("Bearer " + this.umaAat.getAccessToken(), getHost(metadataConfiguration.getIssuer()));
-		}catch (MalformedURLException ex) {
-			throw new ScimInitializationException("Failed to determine host by URI", ex);
-		}
-
-		if (this.umaRpt == null) {
-			throw new ScimInitializationException("Failed to get UMA RPT token");
-		}
-	}
-
-	private boolean autorizeRpt(ScimResponse scimResponse) {
-		if (scimResponse.getStatusCode() == 403) {
-        	// Forbidden : RPT is not authorized yet
-        	
-            final PermissionTicket resourceSetPermissionTicket;
-			try {
-				resourceSetPermissionTicket = (new ObjectMapper()).readValue(scimResponse.getResponseBody(), PermissionTicket.class);
-			} catch (Exception ex) {
-    			throw new ScimInitializationException("UMA ticket is invalid", ex);
-			}
-
-			authorizeRpt(resourceSetPermissionTicket.getTicket());
-
-			if (StringHelper.isEmpty(resourceSetPermissionTicket.getTicket())) {
-    			throw new ScimInitializationException("UMA ticket is invalid");
+        // Get new access token only if is the previous one is missing or expired
+        if (!isValidToken(now)) {
+            lock.lock();
+            try {
+                now = System.currentTimeMillis();
+                if (!isValidToken(now)) {
+                    initAccessToken();
+                    this.umaAatAccessTokenExpiration = computeAccessTokenExpirationTime(this.umaAat.getExpiresIn());
+                }
+            } catch (Exception ex) {
+                throw new ScimInitializationException("Could not get accessToken", ex);
+            } finally {
+                lock.unlock();
             }
-            
-            return true;
+        }
+    }
+
+    private boolean isValidToken(final long now) {
+        return this.umaAat != null && this.umaAat.getAccessToken() != null && !(this.umaAatAccessTokenExpiration <= now);
+
+    }
+
+    private void initAccessToken() {
+        // Remove old tokens
+        this.umaAat = null;
+
+        // Get metadata configuration
+        this.umaMetadata = UmaClientFactory.instance().createMetadataService(umaMetaDataUrl).getMetadata();
+
+        if ((umaMetadata == null) /* || !StringHelper.equals(umaMetadata.getVersion(), "1.0")*/) {
+            throw new ScimInitializationException("Failed to load valid UMA metadata configuration");
         }
 
-		return false;
-	}
-
-	private boolean authorizeRpt(String ticket) {
+        // Get AAT
+        org.xdi.oxauth.model.crypto.PrivateKey privateKey = null;
         try {
-            RptAuthorizationRequest rptAuthorizationRequest = new RptAuthorizationRequest(umaRpt.getRpt(), ticket);
-			RptAuthorizationRequestService authorizationRequestService = UmaClientFactory.instance().createAuthorizationRequestService(metadataConfiguration);
-
-			RptAuthorizationResponse rptAuthorizationResponse = authorizationRequestService.requestRptPermissionAuthorization(
-                    "Bearer " + umaAat.getAccessToken(),
-                    getHost(metadataConfiguration.getIssuer()),
-                    rptAuthorizationRequest);
-            if (rptAuthorizationResponse == null) {
-            	throw new ScimInitializationException("UMA ticket authorization response is invalid");
+            if (StringHelper.isEmpty(umaAatClientJksPath) || StringHelper.isEmpty(umaAatClientJksPassword)) {
+                throw new ScimInitializationException("UMA JKS keystore path or password is empty");
             }
-            
-            return true;
-        }catch (MalformedURLException ex) {
-			throw new ScimInitializationException("Failed to determine host by URI", ex);
-		} catch (Exception ex) {
-			throw new ScimInitializationException(ex.getMessage(), ex);
-		}
-	}
+            OxAuthCryptoProvider cryptoProvider;
+            try {
+                cryptoProvider = new OxAuthCryptoProvider(umaAatClientJksPath, umaAatClientJksPassword, null);
+            } catch (Exception ex) {
+                throw new ScimInitializationException("Failed to initialize crypto provider");
+            }
 
-	@Override
-	public ScimResponse retrievePerson(String uid, String mediaType) throws IOException {
-		ScimResponse scimResponse = super.retrievePerson(uid, mediaType);
-		if (autorizeRpt(scimResponse)) {
+            String keyId = umaAatClientKeyId;
+            if (StringHelper.isEmpty(keyId)) {
+                // Get first key
+                List<String> aliases = cryptoProvider.getKeyAliases();
+                if (aliases.size() > 0) {
+                    keyId = aliases.get(0);
+                }
+            }
+
+            if (StringHelper.isEmpty(keyId)) {
+                throw new ScimInitializationException("UMA keyId is empty");
+            }
+
+            TokenRequest tokenRequest = new TokenRequest(GrantType.CLIENT_CREDENTIALS);
+            tokenRequest.setAuthenticationMethod(AuthenticationMethod.PRIVATE_KEY_JWT);
+            tokenRequest.setAuthUsername(umaAatClientId);
+            tokenRequest.setCryptoProvider(cryptoProvider);
+            tokenRequest.setAlgorithm(cryptoProvider.getSignatureAlgorithm(keyId));
+            tokenRequest.setKeyId(keyId);
+            tokenRequest.setAudience(umaMetadata.getTokenEndpoint());
+
+            this.umaAat = UmaClient.request(umaMetadata.getTokenEndpoint(), tokenRequest);
+        } catch (Exception ex) {
+            throw new ScimInitializationException("Failed to get AAT token", ex);
+        }
+
+        if (this.umaAat == null) {
+            throw new ScimInitializationException("Failed to get UMA AAT token");
+        }
+    }
+
+    private boolean obtainAutorizedRpt(ScimResponse scimResponse) {
+        if (scimResponse.getStatusCode() == 403) {
+            // Forbidden : RPT is not authorized yet
+
+            final PermissionTicket ticket;
+            try {
+                ticket = (new ObjectMapper()).readValue(scimResponse.getResponseBody(), PermissionTicket.class);
+            } catch (Exception ex) {
+                throw new ScimInitializationException("UMA ticket is invalid", ex);
+            }
+
+            if (StringHelper.isEmpty(ticket.getTicket())) {
+                throw new ScimInitializationException("UMA ticket is invalid");
+            }
+
+            rpt = obtainAuthorizedRpt(ticket.getTicket());
+            return StringUtils.isNotBlank(rpt);
+        }
+
+        return false;
+    }
+
+    private String obtainAuthorizedRpt(String ticket) {
+        try {
+
+            // oxauth 3.1.0 supports only UMA 2 (no UMA 1.0.1 anymore),
+            // Spec: https://docs.kantarainitiative.org/uma/ed/oauth-uma-grant-2.0-04.html#rfc.section.3.3.1
+            // Since it is back-channel call (no user interaction) claimToken must contain all cliams that are used in RPT Authorization Policy Script
+            // in our case cliamsToken is idToken. Please obtain id_token with all claims that are required by RPT script.
+            String idToken = null; // todo id token with all claims that are used by RPT Authorization Policy script.
+            String claimTokenFormat = "http://openid.net/specs/openid-connect-core-1_0.html#IDToken";
+
+            UmaTokenService tokenService = UmaClientFactory.instance().createTokenService(umaMetaDataUrl);
+            UmaTokenResponse rptResponse = tokenService.requestRpt("Bearer " + umaAat.getAccessToken(), GrantType.OXAUTH_UMA_TICKET.getValue(),
+                    ticket, idToken, claimTokenFormat, null, null, null);
+
+            if (rptResponse == null) {
+                throw new ScimInitializationException("UMA RPT token response is invalid");
+            }
+            if (StringUtils.isBlank(rptResponse.getAccessToken())) {
+                throw new ScimInitializationException("UMA RPT is invalid");
+            }
+
+            return rptResponse.getAccessToken();
+        } catch (Exception ex) {
+            throw new ScimInitializationException(ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public ScimResponse retrievePerson(String uid, String mediaType) throws IOException {
+        ScimResponse scimResponse = super.retrievePerson(uid, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.retrievePerson(uid, mediaType);
-		}
-		
-		return scimResponse;
-	}
+        }
 
-	@Override
-	public ScimResponse createPerson(ScimPerson person, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.createPerson(person, mediaType);
-		if (autorizeRpt(scimResponse)) {
+        return scimResponse;
+    }
+
+    @Override
+    public ScimResponse createPerson(ScimPerson person, String mediaType) throws IOException, JAXBException {
+        ScimResponse scimResponse = super.createPerson(person, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.createPerson(person, mediaType);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse updatePerson(ScimPerson person, String uid, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.updatePerson(person, uid, mediaType);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse updatePerson(ScimPerson person, String uid, String mediaType) throws IOException, JAXBException {
+        ScimResponse scimResponse = super.updatePerson(person, uid, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.updatePerson(person, uid, mediaType);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse deletePerson(String uid) throws IOException {
-		ScimResponse scimResponse = super.deletePerson(uid);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse deletePerson(String uid) throws IOException {
+        ScimResponse scimResponse = super.deletePerson(uid);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.deletePerson(uid);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse retrieveGroup(String id, String mediaType) throws IOException {
-		ScimResponse scimResponse = super.retrieveGroup(id, mediaType);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse retrieveGroup(String id, String mediaType) throws IOException {
+        ScimResponse scimResponse = super.retrieveGroup(id, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.retrieveGroup(id, mediaType);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse createGroup(ScimGroup group, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.createGroup(group, mediaType);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse createGroup(ScimGroup group, String mediaType) throws IOException, JAXBException {
+        ScimResponse scimResponse = super.createGroup(group, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.createGroup(group, mediaType);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse updateGroup(ScimGroup group, String id, String mediaType) throws JsonGenerationException, JsonMappingException,
-			UnsupportedEncodingException, IOException, JAXBException {
-		ScimResponse scimResponse = super.updateGroup(group, id, mediaType);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse updateGroup(ScimGroup group, String id, String mediaType) throws IOException, JAXBException {
+        ScimResponse scimResponse = super.updateGroup(group, id, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.updateGroup(group, id, mediaType);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse deleteGroup(String id) throws IOException {
-		ScimResponse scimResponse = super.deleteGroup(id);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse deleteGroup(String id) throws IOException {
+        ScimResponse scimResponse = super.deleteGroup(id);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.deleteGroup(id);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse createPersonString(String person, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.createPersonString(person, mediaType);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse createPersonString(String person, String mediaType) throws IOException, JAXBException {
+        ScimResponse scimResponse = super.createPersonString(person, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.createPersonString(person, mediaType);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse updatePersonString(String person, String uid, String mediaType) throws JsonGenerationException,
-			JsonMappingException, UnsupportedEncodingException, IOException, JAXBException {
-		ScimResponse scimResponse = super.updatePersonString(person, uid, mediaType);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse updatePersonString(String person, String uid, String mediaType) throws JsonGenerationException,
+            IOException, JAXBException {
+        ScimResponse scimResponse = super.updatePersonString(person, uid, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.updatePersonString(person, uid, mediaType);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse createGroupString(String group, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.createGroupString(group, mediaType);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse createGroupString(String group, String mediaType) throws IOException, JAXBException {
+        ScimResponse scimResponse = super.createGroupString(group, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.createGroupString(group, mediaType);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse updateGroupString(String group, String id, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.updateGroupString(group, id, mediaType);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse updateGroupString(String group, String id, String mediaType) throws IOException, JAXBException {
+        ScimResponse scimResponse = super.updateGroupString(group, id, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.updateGroupString(group, id, mediaType);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws IOException, JAXBException {
-		ScimResponse scimResponse = super.bulkOperation(operation, mediaType);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse bulkOperation(ScimBulkOperation operation, String mediaType) throws IOException, JAXBException {
+        ScimResponse scimResponse = super.bulkOperation(operation, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.bulkOperation(operation, mediaType);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse bulkOperationString(String operation, String mediaType) throws IOException {
-		ScimResponse scimResponse = super.bulkOperationString(operation, mediaType);
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse bulkOperationString(String operation, String mediaType) throws IOException {
+        ScimResponse scimResponse = super.bulkOperationString(operation, mediaType);
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.bulkOperationString(operation, mediaType);
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse retrieveAllPersons() throws IOException {
-		ScimResponse scimResponse = super.retrieveAllPersons();
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse retrieveAllPersons() throws IOException {
+        ScimResponse scimResponse = super.retrieveAllPersons();
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.retrieveAllPersons();
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	/**
-	 * Person search via a filter with pagination and sorting
-	 *
-	 * @param filter
-	 * @param startIndex
-	 * @param count
-	 * @param sortBy
-	 * @param sortOrder
-	 * @param attributesArray
-	 * @return ScimResponse
-	 * @throws IOException
-	 */
-	@Override
-	public ScimResponse searchPersons(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+    /**
+     * Person search via a filter with pagination and sorting
+     *
+     * @param filter
+     * @param startIndex
+     * @param count
+     * @param sortBy
+     * @param sortOrder
+     * @param attributesArray
+     * @return ScimResponse
+     * @throws IOException
+     */
+    @Override
+    public ScimResponse searchPersons(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
 
-		ScimResponse scimResponse = super.searchPersons(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+        ScimResponse scimResponse = super.searchPersons(filter, startIndex, count, sortBy, sortOrder, attributesArray);
 
-		if (autorizeRpt(scimResponse)) {
-			scimResponse = super.searchPersons(filter, startIndex, count, sortBy, sortOrder, attributesArray);
-		}
+        if (obtainAutorizedRpt(scimResponse)) {
+            scimResponse = super.searchPersons(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	@Override
-	public ScimResponse retrieveAllGroups() throws IOException {
-		ScimResponse scimResponse = super.retrieveAllGroups();
-		if (autorizeRpt(scimResponse)) {
+    @Override
+    public ScimResponse retrieveAllGroups() throws IOException {
+        ScimResponse scimResponse = super.retrieveAllGroups();
+        if (obtainAutorizedRpt(scimResponse)) {
             scimResponse = super.retrieveAllGroups();
-		}
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
-	/**
-	 * Group search via a filter with pagination and sorting
-	 *
-	 * @param filter
-	 * @param startIndex
-	 * @param count
-	 * @param sortBy
-	 * @param sortOrder
-	 * @param attributesArray
-	 * @return ScimResponse
-	 * @throws IOException
-	 */
-	@Override
-	public ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
+    /**
+     * Group search via a filter with pagination and sorting
+     *
+     * @param filter
+     * @param startIndex
+     * @param count
+     * @param sortBy
+     * @param sortOrder
+     * @param attributesArray
+     * @return ScimResponse
+     * @throws IOException
+     */
+    @Override
+    public ScimResponse searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) throws IOException {
 
-		ScimResponse scimResponse = super.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+        ScimResponse scimResponse = super.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributesArray);
 
-		if (autorizeRpt(scimResponse)) {
-			scimResponse = super.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributesArray);
-		}
+        if (obtainAutorizedRpt(scimResponse)) {
+            scimResponse = super.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributesArray);
+        }
 
-		return scimResponse;
-	}
+        return scimResponse;
+    }
 
 	/*
-	@Override
+    @Override
 	public ScimResponse personSearch(String attribute, String value, String mediaType) throws IOException, JAXBException {
 		ScimResponse scimResponse = super.personSearch(attribute, value, mediaType);
 		if (autorizeRpt(scimResponse)) {
