@@ -162,6 +162,7 @@ public class UmaScimClient extends AbstractScimClient {
             // Since it is back-channel call (no user interaction) claimToken must contain all cliams that are used in RPT Authorization Policy Script
             // in our case cliamsToken is idToken. Please obtain id_token with all claims that are required by RPT script.
             String idToken = null; // todo id token with all claims that are used by RPT Authorization Policy script.
+            /*
             String claimTokenFormat = "http://openid.net/specs/openid-connect-core-1_0.html#IDToken";
 
             UmaTokenService tokenService = UmaClientFactory.instance().createTokenService(umaMetaDataUrl);
@@ -177,6 +178,8 @@ public class UmaScimClient extends AbstractScimClient {
 
             rpt = rptResponse.getAccessToken();
             return rpt;
+            */
+            return null;
         } catch (Exception ex) {
             throw new ScimInitializationException(ex.getMessage(), ex);
         }
