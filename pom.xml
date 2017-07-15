@@ -54,7 +54,8 @@
 
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>target/test-classes/testng.xml</suiteXmlFile>
+                        <!--suiteXmlFile>target/test-classes/testng.xml</suiteXmlFile-->
+                        <suiteXmlFile>target/test-classes/testng-testmode.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <!-- jdk6 support -->
                     <argLine>-Dsun.lang.ClassLoader.allowArraySyntax=true</argLine>
