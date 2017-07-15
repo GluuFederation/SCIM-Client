@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+
+<suite name="SCIM-Client test mode" parallel="false">
+
+    <test name="Basic test for test-mode" enabled="true">
+        <classes>
+            <class name="gluu.scim2.client.TestModeTests"/>
+        </classes>
+    </test>
+
+</suite>
