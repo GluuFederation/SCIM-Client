@@ -182,7 +182,7 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 
     private String obtainAuthorizedRpt(String ticket) {
         try {
-
+/*
             // oxauth 3.1.0 supports only UMA 2 (no UMA 1.0.1 anymore),
             // Spec: https://docs.kantarainitiative.org/uma/ed/oauth-uma-grant-2.0-04.html#rfc.section.3.3.1
             // Since it is back-channel call (no user interaction) claimToken must contain all cliams that are used in RPT Authorization Policy Script
@@ -201,7 +201,8 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
                 throw new ScimInitializationException("UMA RPT is invalid");
             }
 
-            return rptResponse.getAccessToken();
+            return rptResponse.getAccessToken();*/
+return null;
         } catch (Exception ex) {
             throw new ScimInitializationException(ex.getMessage(), ex);
         }
