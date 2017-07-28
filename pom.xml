@@ -54,8 +54,7 @@
 
                 <configuration>
                     <suiteXmlFiles>
-                        <!--suiteXmlFile>target/test-classes/testng.xml</suiteXmlFile-->
-                        <suiteXmlFile>target/test-classes/testng-testmode.xml</suiteXmlFile>
+                        <suiteXmlFile>target/test-classes/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <!-- jdk6 support -->
                     <argLine>-Dsun.lang.ClassLoader.allowArraySyntax=true</argLine>
@@ -65,14 +64,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <version>3.0.4</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-		<configuration>
-			<failOnError>false</failOnError>
-		</configuration>
             </plugin>
 
             <plugin>
