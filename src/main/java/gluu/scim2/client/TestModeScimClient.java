@@ -69,6 +69,7 @@ public class TestModeScimClient extends AbstractScimClient {
             request.setRedirectUris(Arrays.asList(REDIRECT_URI));
             request.setAuthenticationMethod(AuthenticationMethod.CLIENT_SECRET_BASIC);
             request.setSubjectType(SubjectType.PAIRWISE);
+            request.setGrantTypes(Arrays.asList(GrantType.CLIENT_CREDENTIALS));
 
             RegisterClient registerClient = new RegisterClient(registrationEndpoint);
             registerClient.setRequest(request);
@@ -87,16 +88,14 @@ public class TestModeScimClient extends AbstractScimClient {
     private void updateTokens(GrantType grant) {
 
         access_token=null;
-        TokenResponse response=getTokens(grant);
         /*
-        Ideally validation of access_token should take place here, however, as no id_token nor refresh_token is issued
-        when using Grant type = client credentials (the only applicable for this client - see OAuth2 spec), nothing is done here
+        Ideally validation of access_token should take place here, however, as no id_token nor refresh_token is issued when
+        using Grant type = client credentials (the only applicable for this client - see OAuth2 spec), not much is done here
          */
         //String id_token=response.getIdToken();      //this is null
-        refresh_token = response.getRefreshToken(); //this is null
-        access_token=response.getAccessToken();
-
-        System.out.println("tokens: " + access_token + " - " + refresh_token);
+        //refresh_token = response.getRefreshToken(); //this is null
+        access_token=getTokens(grant).getAccessToken();
+        System.out.println("tokens: " + access_token);
 
     }
 
