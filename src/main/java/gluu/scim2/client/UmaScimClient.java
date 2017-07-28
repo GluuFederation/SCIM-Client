@@ -11,8 +11,10 @@ import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.xdi.oxauth.client.TokenRequest;
 import org.xdi.oxauth.client.uma.UmaClientFactory;
 import org.xdi.oxauth.client.uma.UmaTokenService;
+import org.xdi.oxauth.client.uma.wrapper.UmaClient;
 import org.xdi.oxauth.model.common.AuthenticationMethod;
 import org.xdi.oxauth.model.common.GrantType;
+import org.xdi.oxauth.model.crypto.OxAuthCryptoProvider;
 import org.xdi.oxauth.model.uma.PermissionTicket;
 import org.xdi.oxauth.model.uma.UmaMetadata;
 import org.xdi.oxauth.model.uma.UmaTokenResponse;
@@ -21,6 +23,7 @@ import org.xdi.util.StringHelper;
 
 import javax.ws.rs.core.Response;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 // import org.xdi.oxauth.model.util.JwtUtil;
@@ -117,13 +120,14 @@ public class UmaScimClient extends AbstractScimClient {
     }
 
     private void initUmaRpt() {
+        //the same as gluu.scim.client.auth.UmaScimClientImpl.initAccessToken() !?
         // Remove old tokens
         this.umaAat = null;
 
         // Get metadata configuration
         this.umaMetadata = UmaClientFactory.instance().createMetadataService(umaMetaDataUrl).getMetadata();
 
-        if ((umaMetadata == null)) {
+        if (umaMetadata == null) {
             throw new ScimInitializationException("Failed to load valid UMA metadata configuration");
         }
 
@@ -132,19 +136,37 @@ public class UmaScimClient extends AbstractScimClient {
             if (StringHelper.isEmpty(umaAatClientJksPath) || StringHelper.isEmpty(umaAatClientJksPassword)) {
                 throw new ScimInitializationException("UMA JKS keystore path or password is empty");
             }
+            OxAuthCryptoProvider cryptoProvider;
+            try {
+                cryptoProvider = new OxAuthCryptoProvider(umaAatClientJksPath, umaAatClientJksPassword, null);
+            }
+            catch (Exception ex) {
+                throw new ScimInitializationException("Failed to initialize crypto provider");
+            }
+
+            String keyId = umaAatClientKeyId;
+            if (StringHelper.isEmpty(keyId)) {
+                // Get first key
+                List<String> aliases = cryptoProvider.getKeyAliases();
+                if (aliases.size() > 0) {
+                    keyId = aliases.get(0);
+                }
+            }
+
+            if (StringHelper.isEmpty(keyId)) {
+                throw new ScimInitializationException("UMA keyId is empty");
+            }
 
             TokenRequest tokenRequest = new TokenRequest(GrantType.CLIENT_CREDENTIALS);
             tokenRequest.setAuthenticationMethod(AuthenticationMethod.PRIVATE_KEY_JWT);
             tokenRequest.setAuthUsername(umaAatClientId);
+            tokenRequest.setCryptoProvider(cryptoProvider);
+            tokenRequest.setAlgorithm(cryptoProvider.getSignatureAlgorithm(keyId));
+            tokenRequest.setKeyId(keyId);
+            tokenRequest.setAudience(umaMetadata.getTokenEndpoint());
 
-            // todo UMA 2 : obtain token correctly
-//            tokenRequest.setCryptoProvider(cryptoProvider);
-//            tokenRequest.setAlgorithm(cryptoProvider.getSignatureAlgorithm(keyId));
-//            tokenRequest.setKeyId(keyId);
-//            tokenRequest.setAudience(umaMetadata.getTokenEndpoint());
-//
-//            this.umaAat = UmaClient.request(umaMetadata.getTokenEndpoint(), tokenRequest);
-            this.umaAat = null;
+            this.umaAat = UmaClient.request(umaMetadata.getTokenEndpoint(), tokenRequest);
+
         } catch (Exception ex) {
             throw new ScimInitializationException("Failed to get AAT token", ex);
         }
@@ -156,31 +178,22 @@ public class UmaScimClient extends AbstractScimClient {
 
     private String getAuthorizedRpt(String ticket) {
         try {
-
-            // oxauth 3.1.0 supports only UMA 2 (no UMA 1.0.1 anymore),
-            // Spec: https://docs.kantarainitiative.org/uma/ed/oauth-uma-grant-2.0-04.html#rfc.section.3.3.1
-            // Since it is back-channel call (no user interaction) claimToken must contain all cliams that are used in RPT Authorization Policy Script
-            // in our case cliamsToken is idToken. Please obtain id_token with all claims that are required by RPT script.
-            String idToken = null; // todo id token with all claims that are used by RPT Authorization Policy script.
-            /*
+            //No need for claims token. See comments on issue https://github.com/GluuFederation/SCIM-Client/issues/22
             String claimTokenFormat = "http://openid.net/specs/openid-connect-core-1_0.html#IDToken";
+            String authzHeader="Bearer " + umaAat.getAccessToken();
 
-            UmaTokenService tokenService = UmaClientFactory.instance().createTokenService(umaMetaDataUrl);
-            UmaTokenResponse rptResponse = tokenService.requestRpt("Bearer " + umaAat.getAccessToken(), GrantType.OXAUTH_UMA_TICKET.getValue(),
-                    ticket, idToken, claimTokenFormat, null, null, null);
+            UmaTokenService tokenService = UmaClientFactory.instance().createTokenService(umaMetadata);
+            UmaTokenResponse rptResponse = tokenService.requestRpt(authzHeader, GrantType.OXAUTH_UMA_TICKET.getValue(), ticket, null, claimTokenFormat, null, null, null);
 
-            if (rptResponse == null) {
+            if (rptResponse == null)
                 throw new ScimInitializationException("UMA RPT token response is invalid");
-            }
-            if (StringUtils.isBlank(rptResponse.getAccessToken())) {
+            else
+            if (StringUtils.isBlank(rptResponse.getAccessToken()))
                 throw new ScimInitializationException("UMA RPT is invalid");
-            }
-
-            rpt = rptResponse.getAccessToken();
-            return rpt;
-            */
-            return null;
-        } catch (Exception ex) {
+            //System.out.println("@obtainAuthorizedRpt "+ ticket + " - " + rptResponse.getAccessToken());
+            return rptResponse.getAccessToken();
+        }
+        catch (Exception ex) {
             throw new ScimInitializationException(ex.getMessage(), ex);
         }
     }

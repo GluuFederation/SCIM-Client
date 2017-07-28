@@ -110,12 +110,11 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
         // Get metadata configuration
         this.umaMetadata = UmaClientFactory.instance().createMetadataService(umaMetaDataUrl).getMetadata();
 
-        if ((umaMetadata == null) /* || !StringHelper.equals(umaMetadata.getVersion(), "1.0")*/) {
+        if (umaMetadata == null) { // || !StringHelper.equals(umaMetadata.getVersion(), "1.0")
             throw new ScimInitializationException("Failed to load valid UMA metadata configuration");
         }
 
         // Get AAT
-        org.xdi.oxauth.model.crypto.PrivateKey privateKey = null;
         try {
             if (StringHelper.isEmpty(umaAatClientJksPath) || StringHelper.isEmpty(umaAatClientJksPassword)) {
                 throw new ScimInitializationException("UMA JKS keystore path or password is empty");
@@ -123,7 +122,8 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
             OxAuthCryptoProvider cryptoProvider;
             try {
                 cryptoProvider = new OxAuthCryptoProvider(umaAatClientJksPath, umaAatClientJksPassword, null);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 throw new ScimInitializationException("Failed to initialize crypto provider");
             }
 
@@ -182,28 +182,23 @@ public class UmaScimClientImpl extends BaseScimClientImpl {
 
     private String obtainAuthorizedRpt(String ticket) {
         try {
-/*
-            // oxauth 3.1.0 supports only UMA 2 (no UMA 1.0.1 anymore),
-            // Spec: https://docs.kantarainitiative.org/uma/ed/oauth-uma-grant-2.0-04.html#rfc.section.3.3.1
-            // Since it is back-channel call (no user interaction) claimToken must contain all cliams that are used in RPT Authorization Policy Script
-            // in our case cliamsToken is idToken. Please obtain id_token with all claims that are required by RPT script.
-            String idToken = null; // todo id token with all claims that are used by RPT Authorization Policy script.
+            //No need for claims token. See comments on issue https://github.com/GluuFederation/SCIM-Client/issues/22
             String claimTokenFormat = "http://openid.net/specs/openid-connect-core-1_0.html#IDToken";
+            String authzHeader="Bearer " + umaAat.getAccessToken();
 
-            UmaTokenService tokenService = UmaClientFactory.instance().createTokenService(umaMetaDataUrl);
-            UmaTokenResponse rptResponse = tokenService.requestRpt("Bearer " + umaAat.getAccessToken(), GrantType.OXAUTH_UMA_TICKET.getValue(),
-                    ticket, idToken, claimTokenFormat, null, null, null);
+            //UmaMetadata metadata=UmaClientFactory.instance().createMetadataService(umaMetaDataUrl).getMetadata();
+            UmaTokenService tokenService = UmaClientFactory.instance().createTokenService(umaMetadata);
+            UmaTokenResponse rptResponse = tokenService.requestRpt(authzHeader, GrantType.OXAUTH_UMA_TICKET.getValue(), ticket, null, claimTokenFormat, null, null, null);
 
-            if (rptResponse == null) {
+            if (rptResponse == null)
                 throw new ScimInitializationException("UMA RPT token response is invalid");
-            }
-            if (StringUtils.isBlank(rptResponse.getAccessToken())) {
+            else
+            if (StringUtils.isBlank(rptResponse.getAccessToken()))
                 throw new ScimInitializationException("UMA RPT is invalid");
-            }
-
-            return rptResponse.getAccessToken();*/
-return null;
-        } catch (Exception ex) {
+System.out.println("@obtainAuthorizedRpt "+ ticket + " - " + rptResponse.getAccessToken());
+            return rptResponse.getAccessToken();
+        }
+        catch (Exception ex) {
             throw new ScimInitializationException(ex.getMessage(), ex);
         }
     }
