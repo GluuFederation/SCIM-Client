@@ -1,5 +1,6 @@
 package gluu.scim2.client.factory;
 
+import gluu.scim2.client.RPInfo;
 import gluu.scim2.client.ScimClient;
 import gluu.scim2.client.TestModeScimClient;
 import gluu.scim2.client.UmaScimClient;
@@ -13,7 +14,8 @@ public class ScimClientFactory {
 
     public static ScimClient getClient(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
         SecurityProviderUtility.installBCProvider();
-        return new UmaScimClient(domain, umaMetaDataUrl, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+        RPInfo info=new RPInfo(umaAatClientId, umaAatClientKeyId, umaAatClientJksPath, umaAatClientJksPassword);
+        return new UmaScimClient(domain, umaMetaDataUrl, info);
     }
 
     /**
