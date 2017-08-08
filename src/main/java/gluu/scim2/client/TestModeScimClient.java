@@ -124,16 +124,12 @@ public class TestModeScimClient extends AbstractScimClient {
     }
 
     @Override
-    protected void prepareRequest(){
-    }
-
-    @Override
     protected String getAuthenticationHeader(){
         return "Bearer " + access_token;
     }
 
     @Override
-    protected boolean authorize(BaseClientResponse response){
+    protected boolean authorizeIfNeeded(BaseClientResponse response){
         /*
         This method is called if the attempt to use the service returned forbidden (status = 403), so here we check if
         client expired to generate a new one & ask for another token, or else leave it that way (forbidden)
