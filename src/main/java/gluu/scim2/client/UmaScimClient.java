@@ -5,7 +5,14 @@
  */
 package gluu.scim2.client;
 
-import gluu.scim.client.exception.ScimInitializationException;
+import java.util.Calendar;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.lang.StringUtils;
 import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.xdi.oxauth.client.TokenRequest;
@@ -15,16 +22,12 @@ import org.xdi.oxauth.client.uma.wrapper.UmaClient;
 import org.xdi.oxauth.model.common.AuthenticationMethod;
 import org.xdi.oxauth.model.common.GrantType;
 import org.xdi.oxauth.model.crypto.OxAuthCryptoProvider;
-import org.xdi.oxauth.model.uma.PermissionTicket;
 import org.xdi.oxauth.model.uma.UmaMetadata;
 import org.xdi.oxauth.model.uma.UmaTokenResponse;
 import org.xdi.oxauth.model.uma.wrapper.Token;
 import org.xdi.util.StringHelper;
 
-import javax.ws.rs.core.Response;
-import java.util.Calendar;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
+import gluu.scim.client.exception.ScimInitializationException;
 
 // import org.xdi.oxauth.model.util.JwtUtil;
 
@@ -53,6 +56,7 @@ public class UmaScimClient extends AbstractScimClient {
     private long umaAatAccessTokenExpiration = 0l; // When the "accessToken" will expire;
 
     private final ReentrantLock lock = new ReentrantLock();
+    private Pattern permissionTicketMatcher = Pattern.compile("ticket=\"(.+)\"");
 
     public UmaScimClient(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
         super(domain);
@@ -75,18 +79,28 @@ public class UmaScimClient extends AbstractScimClient {
 
     @Override
     protected boolean authorize(BaseClientResponse response) {
-        if (response.getStatus() != Response.Status.FORBIDDEN.getStatusCode())
+        if (response.getStatus() != Response.Status.UNAUTHORIZED.getStatusCode())
             return false;
 
         // Forbidden : RPT is not authorized yet
-        PermissionTicket permissionTicket = null;
+        String permissionTicketResponse = null;
         try {
-            permissionTicket = (PermissionTicket) response.getEntity(PermissionTicket.class);
+        	permissionTicketResponse = response.getHeaderString("WWW-Authenticate");
         } catch (Exception ex) {
-            throw new ScimInitializationException("UMA ticket is invalid", ex);
+            throw new ScimInitializationException("UMA permissions response is invalid", ex);
         }
+        
+        String permissionTicket = null;
+		Matcher m = permissionTicketMatcher.matcher(permissionTicketResponse);
+		if (m.find()) {
+			permissionTicket = m.group(1);
+		}
+		
+		if (StringHelper.isEmpty(permissionTicket)) {
+			return false;
+		}
 
-        return obtainAuthorizedRpt(permissionTicket.getTicket());
+        return obtainAuthorizedRpt(permissionTicket);
     }
 
     private void initUmaAuthentication() {
@@ -98,7 +112,7 @@ public class UmaScimClient extends AbstractScimClient {
             try {
                 now = System.currentTimeMillis();
                 if (!isValidToken(now)) {
-                    initUmaRpt();
+                    initUmaAat();
                     Calendar calendar = Calendar.getInstance();
                     if (this.umaAat.getExpiresIn() != null) {
                         calendar.add(Calendar.SECOND, this.umaAat.getExpiresIn());
@@ -119,7 +133,7 @@ public class UmaScimClient extends AbstractScimClient {
 
     }
 
-    private void initUmaRpt() {
+    private void initUmaAat() {
         //the same as gluu.scim.client.auth.UmaScimClientImpl.initAccessToken() !?
         // Remove old tokens
         this.umaAat = null;

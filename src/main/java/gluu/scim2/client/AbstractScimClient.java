@@ -48,7 +48,7 @@ public abstract class AbstractScimClient implements ScimClient {
     protected abstract boolean authorize(BaseClientResponse response);
 
     protected boolean isNeededToAuthorize(BaseClientResponse response) {
-        if (response.getStatus() != Response.Status.FORBIDDEN.getStatusCode())
+        if (response.getStatus() != Response.Status.UNAUTHORIZED.getStatusCode())
             return false;
         try {
             return authorize(response);
