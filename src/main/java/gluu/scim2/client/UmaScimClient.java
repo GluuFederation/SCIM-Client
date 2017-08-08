@@ -170,8 +170,10 @@ public class UmaScimClient extends AbstractScimClient {
             if (StringUtils.isBlank(rptResponse.getAccessToken())) {
                 throw new ScimInitializationException("UMA RPT is invalid");
             }
+            
+            this.rpt = rptResponse.getAccessToken();
 
-            return rptResponse.getAccessToken();
+            return rpt;
         }
         catch (Exception ex) {
             throw new ScimInitializationException(ex.getMessage(), ex);
