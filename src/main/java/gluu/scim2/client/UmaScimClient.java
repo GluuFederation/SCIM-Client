@@ -56,7 +56,6 @@ public class UmaScimClient extends AbstractScimClient {
     private long umaAatAccessTokenExpiration = 0l; // When the "accessToken" will expire;
 
     private final ReentrantLock lock = new ReentrantLock();
-    private Pattern permissionTicketMatcher = Pattern.compile("ticket=\"(.+)\"");
 
     public UmaScimClient(String domain, String umaMetaDataUrl, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
         super(domain);
@@ -74,26 +73,33 @@ public class UmaScimClient extends AbstractScimClient {
 
     @Override
     protected String getAuthenticationHeader() {
-        return "Bearer " + rpt;
+    	if (StringHelper.isEmpty(rpt)) {
+    		return null;
+    	}
+        
+    	return "Bearer " + rpt;
     }
 
     @Override
     protected boolean authorize(BaseClientResponse response) {
-        if (response.getStatus() != Response.Status.UNAUTHORIZED.getStatusCode())
+        if (response.getStatus() != Response.Status.UNAUTHORIZED.getStatusCode()) {
             return false;
+        }
 
         // Forbidden : RPT is not authorized yet
-        String permissionTicketResponse = null;
+        Object permissionTicketResponse = null;
         try {
-        	permissionTicketResponse = response.getHeaderString("WWW-Authenticate");
+        	permissionTicketResponse = response.getResponseHeader("WWW-Authenticate");
         } catch (Exception ex) {
             throw new ScimInitializationException("UMA permissions response is invalid", ex);
         }
         
         String permissionTicket = null;
-		Matcher m = permissionTicketMatcher.matcher(permissionTicketResponse);
-		if (m.find()) {
-			permissionTicket = m.group(1);
+        String[] headerKeyValues = StringHelper.split(permissionTicketResponse.toString(), ",");
+        for (int i = 0; i < headerKeyValues.length; i++) {
+        	if (headerKeyValues[i].startsWith("ticket=")) {
+        		permissionTicket = headerKeyValues[i].substring(7);
+        	}
 		}
 		
 		if (StringHelper.isEmpty(permissionTicket)) {
@@ -194,17 +200,19 @@ public class UmaScimClient extends AbstractScimClient {
         try {
             //No need for claims token. See comments on issue https://github.com/GluuFederation/SCIM-Client/issues/22
             String claimTokenFormat = "http://openid.net/specs/openid-connect-core-1_0.html#IDToken";
-            String authzHeader="Bearer " + umaAat.getAccessToken();
+            String authzHeader = "Bearer " + umaAat.getAccessToken();
 
             UmaTokenService tokenService = UmaClientFactory.instance().createTokenService(umaMetadata);
             UmaTokenResponse rptResponse = tokenService.requestRpt(authzHeader, GrantType.OXAUTH_UMA_TICKET.getValue(), ticket, null, claimTokenFormat, null, null, null);
 
-            if (rptResponse == null)
+            if (rptResponse == null) {
                 throw new ScimInitializationException("UMA RPT token response is invalid");
-            else
-            if (StringUtils.isBlank(rptResponse.getAccessToken()))
+            }
+
+            if (StringUtils.isBlank(rptResponse.getAccessToken())) {
                 throw new ScimInitializationException("UMA RPT is invalid");
-            //System.out.println("@obtainAuthorizedRpt "+ ticket + " - " + rptResponse.getAccessToken());
+            }
+
             return rptResponse.getAccessToken();
         }
         catch (Exception ex) {
