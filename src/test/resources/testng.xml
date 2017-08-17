@@ -14,8 +14,7 @@
 		</classes>
 	</test>
 
-	<test name="SCIM 2 ScimClientGroupWriteOperationsTest test"
-		enabled="true">
+	<test name="SCIM 2 ScimClientGroupWriteOperationsTest test" enabled="true">
 		<classes>
 			<class name="gluu.scim2.client.ScimClientGroupWriteOperationsTest" />
 		</classes>
@@ -27,8 +26,7 @@
 		</classes>
 	</test>
 
-	<test name="SCIM 2 ScimClientPersonWriteOperationsTest test"
-		enabled="true">
+	<test name="SCIM 2 ScimClientPersonWriteOperationsTest test" enabled="true">
 		<classes>
 			<class name="gluu.scim2.client.ScimClientPersonWriteOperationsTest" />
 		</classes>
@@ -80,14 +78,6 @@
 		</classes>
 	</test>
 
-	<test name="SCIM 1.1 EmailSyncTests test" enabled="true">
-		<classes>
-			<class name="gluu.scim.client.EmailSync1Tests"/>
-			<class name="gluu.scim.client.EmailSync2Tests"/>
-			<!--<class name="gluu.scim.client.EmailSyncRetrieveTests"/>-->  <!-- Disabled by default; needs proper test data -->
-		</classes>
-	</test>
-
 	<test name="SCIM 2 EmailSyncTests test" enabled="true">
 		<classes>
 			<class name="gluu.scim2.client.EmailSync1Tests"/>
@@ -98,7 +88,6 @@
 
 	<test name="Person Required Params test" enabled="true">
 		<classes>
-			<class name="gluu.scim.client.PersonRequiredParamsTests"/>
 			<class name="gluu.scim2.client.PersonRequiredParamsTests"/>
 		</classes>
 	</test>
@@ -109,7 +98,7 @@
 		</classes>
 	</test>
 
-    <!-- SCIM v2 in test mode only. Enable test mode in oxTrust first -->
+    <!-- Tests in test mode only. Enable test mode in oxTrust first! -->
     <test name="Basic test for test-mode" enabled="false">
         <classes>
             <class name="gluu.scim2.client.TestModeTests"/>
