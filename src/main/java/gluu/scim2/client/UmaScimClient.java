@@ -5,11 +5,8 @@
  */
 package gluu.scim2.client;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Response;
 
@@ -18,18 +15,15 @@ import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.xdi.oxauth.client.TokenRequest;
 import org.xdi.oxauth.client.uma.UmaClientFactory;
 import org.xdi.oxauth.client.uma.UmaTokenService;
-import org.xdi.oxauth.client.uma.wrapper.UmaClient;
 import org.xdi.oxauth.model.common.AuthenticationMethod;
 import org.xdi.oxauth.model.common.GrantType;
 import org.xdi.oxauth.model.crypto.OxAuthCryptoProvider;
 import org.xdi.oxauth.model.token.ClientAssertionType;
-import org.xdi.oxauth.model.uma.ClaimTokenFormatType;
 import org.xdi.oxauth.model.uma.UmaMetadata;
 import org.xdi.oxauth.model.uma.UmaTokenResponse;
-import org.xdi.oxauth.model.uma.wrapper.Token;
 import org.xdi.util.StringHelper;
 
-import gluu.scim.client.exception.ScimInitializationException;
+import gluu.scim2.client.exception.ScimInitializationException;
 
 // import org.xdi.oxauth.model.util.JwtUtil;
 
