@@ -2,66 +2,6 @@
 
 <suite name="SCIM-Client" parallel="false">
 
-	<!-- SCIM 1 test cases -->
-
-	<test name="ScimClientRetreivingEntities test" enabled="true">
-		<classes>
-			<class name="gluu.scim.client.ScimClientRetreivingEntitiesTest" />
-		</classes>
-	</test>
-
-	<test name="ScimClientPersonWriteOperations test" enabled="true">
-		<classes>
-			<class name="gluu.scim.client.ScimClientPersonWriteOperationsTest" />
-		</classes>
-	</test>
-
-	<test name="ScimClientGroupWriteOperations test" enabled="true">
-		<classes>
-			<class name="gluu.scim.client.ScimClientGroupWriteOperationsTest" />
-		</classes>
-	</test>
-
-	<test name="ScimClientBulkOperations test" enabled="true">
-		<classes>
-			<class name="gluu.scim.client.ScimClientBulkOperationsTest" />
-		</classes>
-	</test>
-
-	<test name="ScimClientPersonWriteObject test" enabled="true">
-		<classes>
-			<class name="gluu.scim.client.ScimClientPersonWriteObjectTest" />
-		</classes>
-	</test>
-
-	<test name="ScimClientGroupWriteObject test" enabled="true">
-		<classes>
-			<class name="gluu.scim.client.ScimClientGroupWriteObjectTest" />
-		</classes>
-	</test>
-
-	<test name="ExcelMapper test" enabled="true">
-		<classes>
-			<class name="gluu.scim.client.ExcelMapperTest" />
-		</classes>
-	</test>
-
-	<test name="SCIM 1 UserFiltersTests test" enabled="true">
-		<classes>
-			<class name="gluu.scim.client.PersonFiltersMainTests"/>
-			<class name="gluu.scim.client.PersonFiltersNegativeTests"/>
-		</classes>
-	</test>
-
-	<test name="SCIM 1 GroupFiltersTests test" enabled="true">
-		<classes>
-			<class name="gluu.scim.client.GroupFiltersMainTests"/>
-			<class name="gluu.scim.client.GroupFiltersNegativeTests"/>
-		</classes>
-	</test>
-
-	<!-- SCIM 2 test cases -->
-
 	<test name="SCIM 2 UserWebServiceTestCases test" enabled="true">
 		<classes>
 			<class name="gluu.scim2.client.UserWebServiceTestCases" />
