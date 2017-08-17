@@ -1,11 +1,24 @@
 SCIM-Client
 ===========
 
-Simple Cloud Identity Management (SCIM) is a standard REST/JSON API to standardize User and Group CRUD (Create, Read, Update, Delete). For developers and system administrators, it reduces the cost and complexity of user management operations by providing a common user schema and extension model, as well as binding documents to provide patterns for exchanging this schema using standard protocols. 
+SCIM is a specification designed to reduce the complexity of user management operations by providing a common user schema
+and the patterns for exchanging this schema using HTTP in a platform-neutral fashion. The aim of SCIM is achieving
+interoperability, security, and scalability in the context of identity management.
 
-Detailed specifications for SCIM can be found at [http://www.simplecloud.info](http://www.simplecloud.info). 
+You can think of SCIM merely as a REST API with endpoints exposing CRUD functionality (create, update, retrieve and delete).
 
-In Gluu's implementation, we have User, Group and Bulk operations. Below are the Gluu implementations for SCIM:
+This project consists of a ready-to-use Java client to interact with those endpoints.
 
-- [SCIM 1.1 Client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/1.1.0.Final/)
-- [Latest SCIM Client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/2.3.4.Final/)
+Detailed specifications for SCIM can be found at [RFC 7642](https://tools.ietf.org/html/rfc7642),
+[RFC 7643](https://tools.ietf.org/html/rfc7643), and [RFC 7644](https://tools.ietf.org/html/rfc7644).
+
+In Gluu's implementation, we have User, Group and Bulk operations. Below are the links for the latest Gluu implementation
+for SCIM client:
+
+* [SCIM 3.0.2 stable client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/3.0.2/)
+* [SCIM 3.1.0-SNAPSHOT client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/3.1.0-SNAPSHOT)
+
+Recommended reading before using the client:
+
+* [User Management with SCIM](https://www.gluu.org/docs/ce/admin-guide/user-scim/)
+* [SCIM protected by UMA](https://www.gluu.org/docs/ce/admin-guide/scim-uma/)
