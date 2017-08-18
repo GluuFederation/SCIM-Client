@@ -198,7 +198,7 @@ public class UserPatchWebServiceTestCases extends BaseScimTest {
         phone.setValue("654-6509-263-444");
         userAdd.getPhoneNumbers().add(phone);
         org.gluu.oxtrust.model.scim2.Address address = new org.gluu.oxtrust.model.scim2.Address();
-        address.setCountry("USpatch");
+        address.setCountry("US");
         address.setStreetAddress("patch random street");
         address.setLocality("patch Austin");
         address.setPostalCode("65672444");
@@ -255,7 +255,7 @@ public class UserPatchWebServiceTestCases extends BaseScimTest {
         phone.setValue("654-6509-263-444");
         userAdd.getPhoneNumbers().add(phone);
         org.gluu.oxtrust.model.scim2.Address address = new org.gluu.oxtrust.model.scim2.Address();
-        address.setCountry("USpatch");
+        address.setCountry("US");
         address.setStreetAddress("patch random street");
         address.setLocality("patch Austin");
         address.setPostalCode("65672444");
@@ -306,7 +306,7 @@ public class UserPatchWebServiceTestCases extends BaseScimTest {
         phone.setValue("654-6509-263-444");
         userAdd.getPhoneNumbers().add(phone);
         org.gluu.oxtrust.model.scim2.Address address = new org.gluu.oxtrust.model.scim2.Address();
-        address.setCountry("USadd");
+        address.setCountry("US");
         address.setStreetAddress("add random street");
         address.setLocality("add Austin");
         address.setPostalCode("65672444");

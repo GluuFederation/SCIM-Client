@@ -163,7 +163,7 @@ public class EmailSync2Tests extends BaseScimTest {
         address.setLocality("Tonsberg");
         address.setPostalCode("12345");
         address.setRegion("Tonsberg");
-        address.setCountry("Norway");
+        address.setCountry("NO");
         address.setFormatted("Tonsberg, Norway");
         addresses.add(address);
         user.setAddresses(addresses);

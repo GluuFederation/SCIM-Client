@@ -160,7 +160,7 @@ public class EmailSync1Tests extends BaseScimTest {
         address.setLocality("Baku");
         address.setPostalCode("12345");
         address.setRegion("Baku");
-        address.setCountry("Azerbaijan");
+        address.setCountry("AZ");
         address.setFormatted("Baku, Azerbaijan");
         addresses.add(address);
         user.setAddresses(addresses);

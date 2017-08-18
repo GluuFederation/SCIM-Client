@@ -236,7 +236,7 @@ public class UserObjectTests extends BaseScimTest {
         address.setLocality("Havana");
         address.setPostalCode("12345");
         address.setRegion("Cuba");
-        address.setCountry("Cuba");
+        address.setCountry("CU");
         address.setFormatted("Havana, Cuba");
         addresses.add(address);
         user.setAddresses(addresses);
