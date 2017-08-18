@@ -1,11 +1,11 @@
 package gluu.scim2.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import gluu.BaseScimTest;
 import gluu.scim2.client.factory.ScimClientFactory;
-import org.gluu.oxtrust.model.scim2.Constants;
-import org.gluu.oxtrust.model.scim2.ListResponse;
-import org.gluu.oxtrust.model.scim2.Name;
-import org.gluu.oxtrust.model.scim2.User;
+import org.apache.commons.beanutils.BeanUtils;
+import org.gluu.oxtrust.model.scim2.*;
 import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
@@ -15,16 +15,14 @@ import org.testng.annotations.Test;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
 /**
  * Created by jgomer on 2017-07-14.
+ * This class contains cases related to very minor fixes applied to the project, generally focused on single attributes
  */
 public class TestModeTests extends BaseScimTest {
 
@@ -43,23 +41,48 @@ public class TestModeTests extends BaseScimTest {
         }
     }
 
-    //@Test
-    public void retrieveAllUsers() throws IOException {
-        BaseClientResponse<ListResponse> response = client.retrieveAllUsers();
-        assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not get a list of all users, status != 200");
-    }
+    /**
+     * See https://github.com/GluuFederation/SCIM-Client/issues/18
+     * @throws Exception
+     */
+    @Test
+    public void countryISOCode() throws Exception{
 
-    //@Test
-    public void retrieveAllGroups() throws IOException {
-        BaseClientResponse<ListResponse> response = client.retrieveAllGroups();
-        assertEquals(response.getStatus(), Response.Status.OK.getStatusCode(), "Could not get a list of all groups, status != 200");
+        User user = createDummyUser();
+        String newUsrId=user.getId();
+
+        //Update user to add a couple of addresses
+        List<Address> list=new ArrayList<Address>();
+
+        Address addr=new Address();
+        addr.setStreetAddress("random street");
+        addr.setCountry("US");
+        addr.setType(Address.Type.WORK);
+        list.add(addr);
+
+        addr=(Address)BeanUtils.cloneBean(addr);
+        addr.setCountry("Colombia");
+        list.add(addr);
+
+        user.setAddresses(list);
+
+        BaseClientResponse<User> response=client.updateUser(user, newUsrId, new String[]{});
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        //Update address with an ISO code and repeat for success
+        addr.setCountry("CO");
+
+        response=client.updateUser(user, newUsrId, new String[]{});
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        deleteDummyUser(newUsrId);
+
     }
 
     /**
      * See https://github.com/GluuFederation/SCIM-Client/issues/21
      * @throws Exception
      */
-
     @Test
     public void nullMiddleNameUser() throws Exception{
 
