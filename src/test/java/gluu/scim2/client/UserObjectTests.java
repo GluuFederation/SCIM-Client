@@ -24,10 +24,6 @@ import java.util.List;
 import static org.testng.Assert.assertEquals;
 
 /**
- * README:
- *
- * Check first if /install/community-edition-setup/templates/test/scim-client/data/scim-test-data.ldif
- * has been loaded to LDAP.
  *
  * @author Val Pecaoco
  */

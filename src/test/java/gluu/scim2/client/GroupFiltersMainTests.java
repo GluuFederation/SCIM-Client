@@ -25,7 +25,6 @@ import static org.testng.Assert.assertEquals;
  */
 public class GroupFiltersMainTests extends BaseScimTest {
 
-    //TODO: test this
     ScimClient client;
 
     @BeforeTest
@@ -44,7 +43,7 @@ public class GroupFiltersMainTests extends BaseScimTest {
             "displayName pr",
             "displayName ew \"group\"",
             "displayName co \"group\"",
-            GROUP_CORE_SCHEMA_ID + ":member co \"@\""
+            //GROUP_CORE_SCHEMA_ID + ":member co \"@\""     Wrong way to test for members
         };
 
         int startIndex = 1;

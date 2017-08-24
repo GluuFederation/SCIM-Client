@@ -47,7 +47,7 @@ public class UserFiltersMainTests extends BaseScimTest {
             "name[givenName co \"bbb\" and emails[value sw \"bbb\"]]",
             "name[name[givenName sw \"aaaa\"]]",
             "id sw \"@\"",
-            "groups sw \"inum=@\"",
+            //"groups sw \"inum=@\"",
             "externalId sw \"1\"",
             "externalId ew \"3000\"",
             "birthdate ge \"20140101000000Z\" and externalId co \"2\"",
