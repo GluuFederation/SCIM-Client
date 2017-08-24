@@ -98,7 +98,7 @@
         </classes>
     </test>
 
-    <!-- Tests in test mode only. Enable test mode in oxTrust first! -->
+    <!-- Tests run in test mode only. Enable test mode in oxTrust first! -->
     <test name="Basic test for test-mode" enabled="false">
         <classes>
             <class name="gluu.scim2.client.TestModeTests"/>
