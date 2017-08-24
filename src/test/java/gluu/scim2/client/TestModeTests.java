@@ -1,20 +1,16 @@
 package gluu.scim2.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.BeanUtil;
 import gluu.BaseScimTest;
 import gluu.scim2.client.factory.ScimClientFactory;
 import org.apache.commons.beanutils.BeanUtils;
 import org.gluu.oxtrust.model.scim2.*;
 import org.jboss.resteasy.client.core.BaseClientResponse;
-import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.*;
 
 import static org.testng.Assert.assertEquals;
@@ -22,7 +18,7 @@ import static org.testng.Assert.assertNull;
 
 /**
  * Created by jgomer on 2017-07-14.
- * This class contains cases related to very minor fixes applied to the project, generally focused on single attributes
+ * This class contains cases related to minor fixes applied to the project, generally focused on single attributes
  */
 public class TestModeTests extends BaseScimTest {
 
