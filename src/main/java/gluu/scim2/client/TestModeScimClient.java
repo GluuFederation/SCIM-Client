@@ -34,8 +34,10 @@ public class TestModeScimClient extends AbstractScimClient {
     private static final String REDIRECT_URI="http://localhost/";    //a dummy value just to stay in compliance with specs (see redirect uris for native clients)
 
     /**
-     * @param serviceUrl A string denoting the root URL of the protected resource, i.e. something like https://<host:port>/identity/restv1
-     * @param OIDCMetadataUrl
+     * Constructs a TestModeScimClient instance
+     * @param serviceUrl A string denoting the root URL of the protected resource, i.e. something like
+     *                   {@code https://<host:port>/identity/restv1}
+     * @param OIDCMetadataUrl String url of the openId connect metadata document
      */
     public TestModeScimClient(String serviceUrl, String OIDCMetadataUrl) throws Exception {
 
