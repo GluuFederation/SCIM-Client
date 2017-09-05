@@ -16,7 +16,7 @@ In Gluu's implementation, we have User, Group and Bulk operations. Below are the
 for SCIM client:
 
 * [SCIM 3.0.2 stable client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/3.0.2/)
-* [SCIM 3.1.0-SNAPSHOT client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/3.1.0-SNAPSHOT)
+* [SCIM 3.1.0.Final client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/3.1.0.Final)
 
 Recommended reading before using the client:
 
