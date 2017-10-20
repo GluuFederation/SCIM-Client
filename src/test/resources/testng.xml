@@ -1,107 +1,19 @@
 <!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
 
-<suite name="SCIM-Client" parallel="false">
+<!-- Only SCIM v2.0 compliance tests here -->
+<suite name="SCIM-Client v2.0 compliance gaps" parallel="false">
 
-    <test name="UserWebServiceTestCases test" enabled="true">
+    <parameter name="file" value="target/test-classes/testng2.properties" />
+
+    <test name="Delete this please" enabled="false">
         <classes>
-            <class name="gluu.scim2.client.UserWebServiceTestCases" />
+            <class name="gluu.scim2.client.SampleTest" />
         </classes>
     </test>
 
-    <test name="GroupWebServiceTestCase test" enabled="true">
+    <test name="Additional Operation Response Parameters test" enabled="false">
+        <!-- see RFC 7644 section 3.9 -->
         <classes>
-            <class name="gluu.scim2.client.GroupWebServiceTestCase" />
-        </classes>
-    </test>
-
-    <test name="GroupWriteOperations" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.ScimClientGroupWriteOperationsTest" />
-        </classes>
-    </test>
-
-    <test name="RetreivingEntities" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.ScimClientRetreivingEntitiesTest" />
-        </classes>
-    </test>
-
-    <test name="PersonWriteOperations" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.ScimClientPersonWriteOperationsTest" />
-        </classes>
-    </test>
-
-    <test name="BulkOperations" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.ScimClientBulkOperationsTest" />
-        </classes>
-    </test>
-
-    <test name="UserExtensionsJson" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.UserExtensionsJsonTest" />
-        </classes>
-    </test>
-
-    <test name="UserExtensionsObject" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.UserExtensionsObjectTest" />
-        </classes>
-    </test>
-
-    <test name="UserFiltersTests test" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.UserFiltersMainTests"/>
-            <class name="gluu.scim2.client.UserFiltersNegativeTests"/>
-        </classes>
-    </test>
-
-    <test name="GroupFiltersTests test" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.GroupFiltersMainTests"/>
-            <class name="gluu.scim2.client.GroupFiltersNegativeTests"/>
-        </classes>
-    </test>
-
-    <test name="UserObjectTests test" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.UserObjectTests"/>
-            <class name="gluu.scim2.client.UserObjectAttributesFilterTests"/>
-        </classes>
-    </test>
-
-    <test name="GroupObjectTests test" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.GroupObjectTests"/>
-            <class name="gluu.scim2.client.GroupObjectAttributesFilterTests"/>
-        </classes>
-    </test>
-
-    <test name="EmailSyncTests test" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.EmailSync1Tests"/>
-            <class name="gluu.scim2.client.EmailSync2Tests"/>
-            <!--<class name="gluu.scim2.client.EmailSyncRetrieveTests"/>-->  <!-- Disabled by default; needs proper test data -->
-        </classes>
-    </test>
-
-    <test name="Person Required Params test" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.PersonRequiredParamsTests"/>
-        </classes>
-    </test>
-
-    <test name="Person Patch test" enabled="true">
-        <classes>
-            <class name="gluu.scim2.client.UserPatchWebServiceTestCases"/>
-        </classes>
-    </test>
-
-    <!-- Tests run in test mode only. Enable test mode in oxTrust first! -->
-    <test name="Basic test for test-mode" enabled="false">
-        <classes>
-            <class name="gluu.scim2.client.TestModeTests"/>
         </classes>
     </test>
 

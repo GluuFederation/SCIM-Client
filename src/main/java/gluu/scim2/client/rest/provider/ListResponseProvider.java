@@ -1,0 +1,85 @@
+package gluu.scim2.client.rest.provider;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+import org.gluu.oxtrust.model.scim2.BaseScimResource;
+import org.gluu.oxtrust.model.scim2.ListResponse;
+import org.gluu.oxtrust.model.scim2.annotations.Schema;
+import org.gluu.oxtrust.model.scim2.util.IntrospectUtil;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.Provider;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.util.*;
+
+import static org.gluu.oxtrust.model.scim2.Constants.*;
+
+/**
+ * A custom provider for deserialization of ListResponse objects. This allows reading (deserializing) subclasses of
+ * BaseScimResource correctly. A standard way to solve this problem is using polymorphic type handling in jackson but it
+ * pollutes resource classes and also introduces unrecognized attributes in responses that are not part of schema spec
+ * Created by jgomer on 2017-10-20.
+ */
+@Provider
+@Consumes({MEDIA_TYPE_SCIM_JSON, MediaType.APPLICATION_JSON})
+public class ListResponseProvider implements MessageBodyReader<ListResponse> {
+
+    private Logger logger = LogManager.getLogger(getClass());
+
+    private ObjectMapper mapper=new ObjectMapper();
+
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return type.equals(ListResponse.class);
+    }
+
+    public ListResponse readFrom(Class type, Type genericType, Annotation[] annotations, MediaType mediaType,
+                                 MultivaluedMap httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
+
+        InputStreamReader isr = new InputStreamReader(entityStream, Charset.forName("UTF-8"));
+        List<BaseScimResource> resources=new ArrayList<>();
+
+        //we will get a LinkedHashMap here...
+        Map<String, Object> map=mapper.readValue(isr, new TypeReference<Map<String, Object>>(){} );
+        //"remove" what came originally
+        Object branch=map.remove("Resources");
+
+        if (branch!=null) {
+            //Here we assume everything is coming from the server correctly (that is, following the spec) and conversions succeed
+            for (Object resource : (Collection) branch){
+                Map<String, Object> resourceAsMap=(Map<String, Object>) resource;
+                List<String> schemas=(List<String>) resourceAsMap.get("schemas");
+
+                //Guess the real class of the resource by inspecting the schemas in it
+                for (String schema : schemas) {
+                    for (Class<? extends BaseScimResource> cls : IntrospectUtil.allAttrs.keySet()) {
+                        if (cls.getAnnotation(Schema.class).id().equals(schema)) {
+                            //Create the object with the proper class
+                            resources.add(mapper.convertValue(resource, cls));
+                            logger.debug("Found resource of class {} in ListResponse", cls.getSimpleName());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        ListResponse response=mapper.convertValue(map, ListResponse.class);
+        response.setResources(resources);
+
+        return response;
+
+    }
+
+}

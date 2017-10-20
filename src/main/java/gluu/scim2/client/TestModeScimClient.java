@@ -1,13 +1,13 @@
 package gluu.scim2.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jboss.resteasy.client.core.BaseClientResponse;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.xdi.oxauth.client.*;
 import org.xdi.oxauth.model.common.*;
 import org.xdi.oxauth.model.util.Util;
 import org.xdi.oxauth.model.register.ApplicationType;
 
+import javax.ws.rs.core.Response;
 import java.net.URL;
 import java.util.*;
 
@@ -126,16 +126,12 @@ public class TestModeScimClient extends AbstractScimClient {
     }
 
     @Override
-    protected void prepareRequest(){
-    }
-
-    @Override
     protected String getAuthenticationHeader(){
         return "Bearer " + access_token;
     }
 
     @Override
-    protected boolean authorize(BaseClientResponse response){
+    protected boolean authorize(Response response){
         /*
         This method is called if the attempt to use the service returned forbidden (status = 403), so here we check if
         client expired to generate a new one & ask for another token, or else leave it that way (forbidden)

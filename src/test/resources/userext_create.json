@@ -1,0 +1,82 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User",
+    "urn:ietf:params:scim:schemas:extension:gluu:2.0:User"
+  ],
+  "urn:ietf:params:scim:schemas:extension:gluu:2.0:User": {
+    "scimCustomFirst": "[1000,2000]",
+    "scimCustomSecond": [
+      "2016-02-23T15:35:22Z"
+    ],
+    "scimCustomThird": null
+  },
+  "externalId": "scimclient",
+  "userName": "userjson.add2.username",
+  "name": {
+    "givenName": "json",
+    "familyName": "json",
+    "middleName": "N/A",
+    "honorificPrefix": "N/A",
+    "honorificSuffix": "N/A"
+  },
+  "displayName": "json json",
+  "nickName": "json",
+  "profileUrl": "http://www.gluu.org/",
+  "emails": [
+    {
+      "value": "json@gluu.org",
+      "type": "work",
+      "primary": "true"
+    },
+    {
+      "value": "json2@gluu.org",
+      "type": "home",
+      "primary": "false"
+    }
+  ],
+  "addresses": [
+    {
+      "type": "work",
+      "streetAddress": "621 East 6th Street Suite 200",
+      "locality": "Austin",
+      "region": "TX",
+      "postalCode": "78701",
+      "country": "US",
+      "formatted": "621 East 6th Street Suite 200  Austin , TX 78701 US",
+      "primary": "true"
+    }
+  ],
+  "phoneNumbers": [
+    {
+      "value": "646-345-2346",
+      "type": "work"
+    }
+  ],
+  "ims": [
+    {
+      "value": "nynytest_user",
+      "type": "Skype"
+    }
+  ],
+  "userType": "CEO",
+  "title": "CEO",
+  "preferredLanguage": "en-us",
+  "locale": "en_US",
+  "active": "true",
+  "password": "secret",
+  "roles": [
+    {
+      "value": "Owner"
+    }
+  ],
+  "entitlements": [
+    {
+      "value": "full access"
+    }
+  ],
+  "x509Certificates": [
+    {
+      "value": "MII..."
+    }
+  ]
+}

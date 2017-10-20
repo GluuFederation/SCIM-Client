@@ -25,16 +25,18 @@ import org.xdi.util.StringHelper;
 
 import gluu.scim2.client.exception.ScimInitializationException;
 
-// import org.xdi.oxauth.model.util.JwtUtil;
-
 /**
  * SCIM UMA client
  *
  * @author Yuriy Movchan
  * @author Yuriy Zabrovarnyy
+ * Updated by jgomer on 2017-10-19
  */
-public class UmaScimClient extends AbstractScimClient {
-
+public abstract class UmaScimClient extends AbstractScimClient {
+    public UmaScimClient(String abc){
+        super(abc);
+    }
+/*
     private static final long serialVersionUID = 7099883500099353832L;
 
     // UMA
@@ -155,7 +157,7 @@ public class UmaScimClient extends AbstractScimClient {
             //No need for claims token. See comments on issue https://github.com/GluuFederation/SCIM-Client/issues/22
 
             UmaTokenService tokenService = UmaClientFactory.instance().createTokenService(umaMetadata);
-            UmaTokenResponse rptResponse = tokenService.requestJwtAuthorizationRpt(ClientAssertionType.JWT_BEARER.toString(), tokenRequest.getClientAssertion(), GrantType.OXAUTH_UMA_TICKET.getValue(), ticket, null, null/*ClaimTokenFormatType.ID_TOKEN.getValue()*/, null, null, null);
+            UmaTokenResponse rptResponse = tokenService.requestJwtAuthorizationRpt(ClientAssertionType.JWT_BEARER.toString(), tokenRequest.getClientAssertion(), GrantType.OXAUTH_UMA_TICKET.getValue(), ticket, null, null, null, null, null); //ClaimTokenFormatType.ID_TOKEN.getValue()
 
             if (rptResponse == null) {
                 throw new ScimInitializationException("UMA RPT token response is invalid");
@@ -181,4 +183,5 @@ public class UmaScimClient extends AbstractScimClient {
             throw new ScimInitializationException(ex.getMessage(), ex);
         }
     }
+    */
 }
