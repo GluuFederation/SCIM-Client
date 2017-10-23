@@ -1,9 +1,17 @@
 package gluu.scim2.client;
 
+import gluu.scim2.client.factory.ScimClientFactory;
+import gluu.scim2.client.rest.ClientSideService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeSuite;
+import org.xdi.oxauth.client.service.ClientFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +33,9 @@ public class BaseTest {
     private static final Charset DEFAULT_CHARSET=Charset.forName("UTF-8");
     private static final String NEW_LINE=System.getProperty("line.separator");
 
-    private Logger logger = LogManager.getLogger(getClass());
+    protected static ClientSideService client=null;
+    protected Logger logger = LogManager.getLogger(getClass());
+    protected ObjectMapper mapper=new ObjectMapper();
 
     private String decodeFileValue(String value){
 
@@ -64,6 +74,32 @@ public class BaseTest {
         prop.forEach((Object key, Object value) -> parameters.put(key.toString(), decodeFileValue(value.toString())));
         // Override test parameters
         context.getSuite().getXmlSuite().setParameters(parameters);
+
+        if (client==null) {
+            setupClient(context.getSuite().getXmlSuite().getParameters());
+            mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+        }
+    }
+
+    private void setupClient(Map<String, String> params) throws Exception{
+
+        logger.info("Initializing client...");
+        boolean testMode= StringUtils.isNotEmpty(System.getProperty("testmode"));
+        if (testMode)
+            //client=ScimClientFactory.getTestClient(params.get("domainURL"), params.get("OIDCMetadataUrl"));
+            client=ScimClientFactory.getDummyClient(params.get("domainURL"));
+        else
+            client=ScimClientFactory.getClient(
+                    params.get("domainURL"),
+                    params.get("umaMetaDataUrl"),
+                    params.get("umaAatClientId"),
+                    params.get("umaAatClientJksPath"),
+                    params.get("umaAatClientJksPassword"),
+                    params.get("umaAatClientKeyId"));
+    }
+
+    public UserResource getDeepCloneUsr(UserResource bean) throws Exception{
+        return mapper.readValue(mapper.writeValueAsString(bean), UserResource.class);
     }
 
 }
