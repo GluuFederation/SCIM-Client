@@ -67,7 +67,7 @@ public class ListResponseProvider implements MessageBodyReader<ListResponse> {
                         if (cls.getAnnotation(Schema.class).id().equals(schema)) {
                             //Create the object with the proper class
                             resources.add(mapper.convertValue(resource, cls));
-                            logger.debug("Found resource of class {} in ListResponse", cls.getSimpleName());
+                            logger.trace("Found resource of class {} in ListResponse", cls.getSimpleName());
                             break;
                         }
                     }
