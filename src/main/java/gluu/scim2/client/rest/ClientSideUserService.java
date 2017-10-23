@@ -23,7 +23,18 @@ public interface ClientSideUserService extends UserService {
             String jsonUser,
             @QueryParam(QUERY_PARAM_ATTRIBUTES) String attributesArray,
             @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsArray,
-            @HeaderParam("Authorization") String authorization) throws Exception;
-    //Always pass null for authorization param (see gluu.scim2.client.AbstractScimClient.invoke())
+            @HeaderParam("Authorization") String authorization);
+
+    @Path("/scim/v2/Users/{id}")
+    @PUT
+    @Consumes({MEDIA_TYPE_SCIM_JSON, MediaType.APPLICATION_JSON})
+    @Produces({MEDIA_TYPE_SCIM_JSON + UTF8_CHARSET_FRAGMENT, MediaType.APPLICATION_JSON + UTF8_CHARSET_FRAGMENT})
+    @HeaderParam("Accept") @DefaultValue(MEDIA_TYPE_SCIM_JSON)
+    Response updateUser(
+            String jsonUser,
+            @PathParam("id") String id,
+            @QueryParam(QUERY_PARAM_ATTRIBUTES) String attrsList,
+            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList,
+            @HeaderParam("Authorization") String authorization);
 
 }
