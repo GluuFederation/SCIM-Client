@@ -11,9 +11,31 @@
         </classes>
     </test>
 
-    <test name="Additional Operation Response Parameters test" enabled="false">
-        <!-- see RFC 7644 section 3.9 -->
+    <test name="Service Provider Configuration Endpoints Test" enabled="false">
+        <!-- section 4 RFC 7644 -->
         <classes>
+            <class name="gluu.scim2.client.servicemeta.ServiceProviderConfigTest" />
+            <class name="gluu.scim2.client.servicemeta.ResourceTypesTest" />
+            <class name="gluu.scim2.client.servicemeta.SchemasTest" />
+        </classes>
+    </test>
+
+    <test name="Minimalist resources Test" enabled="false">
+        <classes>
+            <class name="gluu.scim2.client.singleresource.MinimalUserTest" />
+            <class name="gluu.scim2.client.singleresource.MinimalGroupTest" />
+        </classes>
+    </test>
+
+    <test name="User Resource Test" enabled="true">
+        <classes>
+            <class name="gluu.scim2.client.singleresource.AverageUserTest" />
+        </classes>
+    </test>
+
+    <test name="Fido Devices Test" enabled="false">
+        <classes>
+            <class name="gluu.scim2.client.singleresource.FidoDeviceTest" />
         </classes>
     </test>
 
