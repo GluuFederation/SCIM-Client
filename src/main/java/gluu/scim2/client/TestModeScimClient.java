@@ -1,5 +1,7 @@
 package gluu.scim2.client;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.xdi.oxauth.client.*;
@@ -15,6 +17,8 @@ import java.util.*;
  * Created by jgomer on 2017-07-13.
  */
 public class TestModeScimClient extends AbstractScimClient {
+
+    private Logger logger = LogManager.getLogger(getClass());
 
     //private String authz_code;
     //private String authzEndpoint;
@@ -97,7 +101,7 @@ public class TestModeScimClient extends AbstractScimClient {
         //String id_token=response.getIdToken();      //this is null
         //refresh_token = response.getRefreshToken(); //this is null
         access_token=getTokens(grant).getAccessToken();
-        System.out.println("tokens: " + access_token);
+        logger.debug("Got token: " + access_token);
 
     }
 
@@ -143,7 +147,7 @@ public class TestModeScimClient extends AbstractScimClient {
             return (access_token!=null);
         }
         catch (Exception e){
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return false;   //do not make an additional attempt, e.g. getAuthenticationHeader is not called once more
         }
     }
