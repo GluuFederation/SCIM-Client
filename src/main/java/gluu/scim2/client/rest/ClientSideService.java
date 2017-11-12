@@ -1,6 +1,9 @@
 package gluu.scim2.client.rest;
 
+import org.gluu.oxtrust.model.scim2.SearchRequest;
+
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static org.gluu.oxtrust.model.scim2.Constants.*;
@@ -34,5 +37,13 @@ public interface ClientSideService extends ClientSideUserService, ClientSideGrou
     @Produces(MEDIA_TYPE_SCIM_JSON + UTF8_CHARSET_FRAGMENT)
     @HeaderParam("Accept") @DefaultValue(MEDIA_TYPE_SCIM_JSON)
     Response getSchemas();
+
+    @Path("/scim/v2/.search")
+    @POST
+    @Consumes({MEDIA_TYPE_SCIM_JSON, MediaType.APPLICATION_JSON})
+    @Produces({MEDIA_TYPE_SCIM_JSON + UTF8_CHARSET_FRAGMENT, MediaType.APPLICATION_JSON + UTF8_CHARSET_FRAGMENT})
+    @HeaderParam("Accept") @DefaultValue(MEDIA_TYPE_SCIM_JSON)
+    Response searchResourcesPost(SearchRequest searchRequest,
+                                        @HeaderParam("Authorization") String authorization);
 
 }
