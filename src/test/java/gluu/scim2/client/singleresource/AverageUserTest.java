@@ -1,9 +1,8 @@
 package gluu.scim2.client.singleresource;
 
-import gluu.scim2.client.BaseTest;
+import gluu.scim2.client.UserBaseTest;
 import org.gluu.oxtrust.model.scim2.user.Group;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
-import org.testng.Assert;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
@@ -14,26 +13,20 @@ import java.util.Arrays;
 
 import static javax.ws.rs.core.Response.Status.*;
 
+import static org.testng.Assert.*;
+
 /**
  * Created by jgomer on 2017-10-22.
  */
-public class AverageUserTest extends BaseTest {
+public class AverageUserTest extends UserBaseTest {
 
     private UserResource user;
-    private static final Class<UserResource> usrClass=UserResource.class;
 
     @Parameters("user_average_create")
     @Test
     public void create(String json){
-
         logger.debug("Creating user from json...");
-        Response response=client.createUser(json, null, null, null);
-        Assert.assertEquals(response.getStatus(), CREATED.getStatusCode());
-
-        user=response.readEntity(usrClass);
-        Assert.assertNotNull(user.getMeta());
-        logger.debug("User created with id {}", user.getId());
-
+        user=createUserFromJson(json);
     }
 
     @Parameters("user_average_update")
@@ -42,11 +35,11 @@ public class AverageUserTest extends BaseTest {
 
         logger.debug("Updating user {} with json", user.getUserName());
         Response response=client.updateUser(json, user.getId(), null, null, null);
-        Assert.assertEquals(response.getStatus(), OK.getStatusCode());
+        assertEquals(response.getStatus(), OK.getStatusCode());
 
         user=response.readEntity(usrClass);
-        Assert.assertTrue(user.getRoles().size()>0);
-        Assert.assertTrue(user.getPhoneNumbers().size()>1);
+        assertTrue(user.getRoles().size()>0);
+        assertTrue(user.getPhoneNumbers().size()>1);
         logger.debug("Updated user {}", user.getName().getGivenName());
 
     }
@@ -66,17 +59,22 @@ public class AverageUserTest extends BaseTest {
 
         logger.debug("Updating user {}", clone.getUserName());
         Response response=client.updateUser(clone, clone.getId(), null, null, null);
-        Assert.assertEquals(response.getStatus(), OK.getStatusCode());
+        assertEquals(response.getStatus(), OK.getStatusCode());
 
         user=response.readEntity(usrClass);
-        Assert.assertNotNull(user.getPreferredLanguage());
-        Assert.assertEquals(user.getPreferredLanguage(), clone.getPreferredLanguage());
-        Assert.assertEquals(user.getPhoneNumbers().size(), clone.getPhoneNumbers().size());
-        Assert.assertTrue(user.getAddresses().size()>0);
-        Assert.assertNull(user.getRoles());
-        Assert.assertNull(user.getGroups());
+        assertNotNull(user.getPreferredLanguage());
+        assertEquals(user.getPreferredLanguage(), clone.getPreferredLanguage());
+        assertEquals(user.getPhoneNumbers().size(), clone.getPhoneNumbers().size());
+        assertTrue(user.getAddresses().size()>0);
+        assertNull(user.getRoles());
+        assertNull(user.getGroups());
         logger.debug("Updated user {}", user.getName().getGivenName());
 
+    }
+
+    @Test(dependsOnMethods="updateWithObject")
+    public void delete(){
+        deleteUser(user);
     }
 
 }

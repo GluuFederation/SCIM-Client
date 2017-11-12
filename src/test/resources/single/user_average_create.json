@@ -15,7 +15,7 @@
     {
       "value": "bjane@gluu.org",
       "type": "work",
-      "primary": "true"
+      "primary": true
     }
   ],
   "addresses": [
@@ -26,7 +26,7 @@
       "region": "BO",
       "postalCode": "54321",
       "country": "CO",
-      "primary": "true"
+      "primary": true
     }
   ],
   "phoneNumbers": [
@@ -36,6 +36,6 @@
     }
   ],
   "locale": "es_ES",
-  "active": "true",
+  "active": true,
   "password": "secret"
 }

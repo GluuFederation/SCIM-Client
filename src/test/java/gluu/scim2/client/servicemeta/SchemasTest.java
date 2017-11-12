@@ -7,7 +7,6 @@ import org.gluu.oxtrust.model.scim2.annotations.Schema;
 import org.gluu.oxtrust.model.scim2.fido.FidoDeviceResource;
 import org.gluu.oxtrust.model.scim2.group.GroupResource;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
-import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -17,6 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.gluu.oxtrust.model.scim2.Constants.USER_EXT_SCHEMA_ID;
+
+import static org.testng.Assert.*;
 
 /**
  * Created by jgomer on 2017-10-21.
@@ -33,14 +34,14 @@ public class SchemasTest extends BaseTest {
 
     @Test
     public void checkSchemasExistence() {
-        Assert.assertTrue(listResponse.getTotalResults() > 0);
+        assertTrue(listResponse.getTotalResults() > 0);
 
         List<String> schemas = new ArrayList<>();
         List<Class<? extends BaseScimResource>> classes = Arrays.asList(UserResource.class, GroupResource.class, FidoDeviceResource.class);
         classes.stream().forEach(cls -> schemas.add(cls.getAnnotation(Schema.class).id()));
         schemas.add(USER_EXT_SCHEMA_ID);
 
-        listResponse.getResources().forEach(res -> Assert.assertTrue(schemas.contains(res.getId())));
+        listResponse.getResources().forEach(res -> assertTrue(schemas.contains(res.getId())));
     }
 
 }
