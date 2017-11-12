@@ -6,12 +6,12 @@
 package gluu.scim2.client;
 
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.resteasy.client.core.BaseClientResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xdi.oxauth.client.TokenRequest;
 import org.xdi.oxauth.client.uma.UmaClientFactory;
 import org.xdi.oxauth.client.uma.UmaTokenService;
@@ -32,13 +32,11 @@ import gluu.scim2.client.exception.ScimInitializationException;
  * @author Yuriy Zabrovarnyy
  * Updated by jgomer on 2017-10-19
  */
-public abstract class UmaScimClient extends AbstractScimClient {
-    public UmaScimClient(String abc){
-        super(abc);
-    }
-/*
+public class UmaScimClient extends AbstractScimClient {
+
     private static final long serialVersionUID = 7099883500099353832L;
 
+    private Logger logger = LogManager.getLogger(getClass());
     // UMA
     private String rpt;
 
@@ -46,10 +44,6 @@ public abstract class UmaScimClient extends AbstractScimClient {
     private String umaAatClientKeyId;
     private String umaAatClientJksPath;
     private String umaAatClientJksPassword;
-
-    private long umaAatAccessTokenExpiration = 0l; // When the "accessToken" will expire;
-
-    private final ReentrantLock lock = new ReentrantLock();
 
     public UmaScimClient(String domain, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
         super(domain);
@@ -60,52 +54,87 @@ public abstract class UmaScimClient extends AbstractScimClient {
     }
 
     @Override
-    protected void prepareRequest() {
-    }
-
-    @Override
     protected String getAuthenticationHeader() {
-    	if (StringHelper.isEmpty(rpt)) {
-    		return null;
-    	}
-        
-    	return "Bearer " + rpt;
+    	return StringHelper.isEmpty(rpt) ?  null : "Bearer " + rpt;
     }
 
     @Override
-    protected boolean authorize(BaseClientResponse response) {
-        if (response.getStatus() != Response.Status.UNAUTHORIZED.getStatusCode()) {
-            return false;
+    protected boolean authorize(Response response) {
+
+        boolean value = false;
+
+        if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+
+            try {
+                String permissionTicketResponse = response.getHeaderString("WWW-Authenticate");
+                String permissionTicket = null;
+                String asUri = null;
+
+                String[] headerKeyValues = StringHelper.split(permissionTicketResponse, ",");
+                for (String headerKeyValue : headerKeyValues) {
+                    if (headerKeyValue.startsWith("ticket=")) {
+                        permissionTicket = headerKeyValue.substring(7);
+                    }
+                    if (headerKeyValue.startsWith("as_uri=")) {
+                        asUri = headerKeyValue.substring(7);
+                    }
+                }
+                value= !StringHelper.isEmpty(asUri) && !StringHelper.isEmpty(permissionTicket) && obtainAuthorizedRpt(asUri, permissionTicket);
+            }
+            catch (Exception e) {
+                throw new ScimInitializationException(e.getMessage(), e);
+            }
         }
 
-        // Forbidden : RPT is not authorized yet
-        Object permissionTicketResponse = null;
-        try {
-        	permissionTicketResponse = response.getResponseHeader("WWW-Authenticate");
-        } catch (Exception ex) {
-            throw new ScimInitializationException("UMA permissions response is invalid", ex);
-        }
-        
-        String permissionTicket = null;
-        String asUri = null;
-        String[] headerKeyValues = StringHelper.split(permissionTicketResponse.toString(), ",");
-        for (int i = 0; i < headerKeyValues.length; i++) {
-        	if (headerKeyValues[i].startsWith("ticket=")) {
-        		permissionTicket = headerKeyValues[i].substring(7);
-        	}
-        	if (headerKeyValues[i].startsWith("as_uri=")) {
-        		asUri = headerKeyValues[i].substring(7);
-        	}
-		}
-		
-		if (StringHelper.isEmpty(asUri) || StringHelper.isEmpty(permissionTicket)) {
-			return false;
-		}
-
-        return obtainAuthorizedRpt(asUri, permissionTicket);
+        return value;
     }
 
-    private TokenRequest getAuthorizationTokerRequest(UmaMetadata umaMetadata) {
+    private boolean obtainAuthorizedRpt(String asUri, String ticket) {
+
+        try {
+            return StringUtils.isNotBlank(getAuthorizedRpt(asUri, ticket));
+        }
+        catch (Exception e) {
+            throw new ScimInitializationException(e.getMessage(), e);
+        }
+
+    }
+
+    private String getAuthorizedRpt(String asUri, String ticket) {
+
+        try {
+        	// Get metadata configuration
+        	UmaMetadata umaMetadata = UmaClientFactory.instance().createMetadataService(asUri).getMetadata();
+            if (umaMetadata == null) {
+                throw new ScimInitializationException(String.format("Failed to load valid UMA metadata configuration from: %s", asUri));
+            }
+
+        	TokenRequest tokenRequest = getAuthorizationTokenRequest(umaMetadata);
+            //No need for claims token. See comments on issue https://github.com/GluuFederation/SCIM-Client/issues/22
+
+            UmaTokenService tokenService = UmaClientFactory.instance().createTokenService(umaMetadata);
+            UmaTokenResponse rptResponse = tokenService.requestJwtAuthorizationRpt(ClientAssertionType.JWT_BEARER.toString(), tokenRequest.getClientAssertion(), GrantType.OXAUTH_UMA_TICKET.getValue(), ticket, null, null, null, null, null); //ClaimTokenFormatType.ID_TOKEN.getValue()
+
+            if (rptResponse == null) {
+                throw new ScimInitializationException("UMA RPT token response is invalid");
+            }
+
+            if (StringUtils.isBlank(rptResponse.getAccessToken())) {
+                throw new ScimInitializationException("UMA RPT is invalid");
+            }
+            
+            this.rpt = rptResponse.getAccessToken();
+
+            return rpt;
+        }
+        catch (Exception ex) {
+            throw new ScimInitializationException(ex.getMessage(), ex);
+        }
+
+    }
+
+    private TokenRequest getAuthorizationTokenRequest(UmaMetadata umaMetadata) {
+
         try {
             if (StringHelper.isEmpty(umaAatClientJksPath) || StringHelper.isEmpty(umaAatClientJksPassword)) {
                 throw new ScimInitializationException("UMA JKS keystore path or password is empty");
@@ -140,48 +169,11 @@ public abstract class UmaScimClient extends AbstractScimClient {
             tokenRequest.setAudience(umaMetadata.getTokenEndpoint());
 
             return tokenRequest;
-        } catch (Exception ex) {
-            throw new ScimInitializationException("Failed to get client token", ex);
-        }
-    }
-
-    private String getAuthorizedRpt(String asUri, String ticket) {
-        try {
-        	// Get metadata configuration
-        	UmaMetadata umaMetadata = UmaClientFactory.instance().createMetadataService(asUri).getMetadata();
-            if (umaMetadata == null) {
-                throw new ScimInitializationException(String.format("Failed to load valid UMA metadata configuration from: %s", asUri));
-            }
-
-        	TokenRequest tokenRequest = getAuthorizationTokerRequest(umaMetadata);
-            //No need for claims token. See comments on issue https://github.com/GluuFederation/SCIM-Client/issues/22
-
-            UmaTokenService tokenService = UmaClientFactory.instance().createTokenService(umaMetadata);
-            UmaTokenResponse rptResponse = tokenService.requestJwtAuthorizationRpt(ClientAssertionType.JWT_BEARER.toString(), tokenRequest.getClientAssertion(), GrantType.OXAUTH_UMA_TICKET.getValue(), ticket, null, null, null, null, null); //ClaimTokenFormatType.ID_TOKEN.getValue()
-
-            if (rptResponse == null) {
-                throw new ScimInitializationException("UMA RPT token response is invalid");
-            }
-
-            if (StringUtils.isBlank(rptResponse.getAccessToken())) {
-                throw new ScimInitializationException("UMA RPT is invalid");
-            }
-            
-            this.rpt = rptResponse.getAccessToken();
-
-            return rpt;
         }
         catch (Exception ex) {
-            throw new ScimInitializationException(ex.getMessage(), ex);
+            throw new ScimInitializationException("Failed to get client token", ex);
         }
+
     }
 
-    private boolean obtainAuthorizedRpt(String asUri, String ticket) {
-        try {
-            return StringUtils.isNotBlank(getAuthorizedRpt(asUri, ticket));
-        } catch (Exception ex) {
-            throw new ScimInitializationException(ex.getMessage(), ex);
-        }
-    }
-    */
 }
