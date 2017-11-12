@@ -60,6 +60,7 @@ public abstract class AbstractScimClient implements InvocationHandler {
 
             args[i]=getAuthenticationHeader();
             response=(Response) method.invoke(scimService, args);
+
             if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
                 if (authorize(response)) {
                     args[i] = getAuthenticationHeader();

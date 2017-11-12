@@ -48,14 +48,16 @@ public class ListResponseProvider implements MessageBodyReader<ListResponse> {
                                  MultivaluedMap httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
 
         InputStreamReader isr = new InputStreamReader(entityStream, Charset.forName("UTF-8"));
-        List<BaseScimResource> resources=new ArrayList<>();
+        List<BaseScimResource> resources=null;
 
         //we will get a LinkedHashMap here...
-        Map<String, Object> map=mapper.readValue(isr, new TypeReference<Map<String, Object>>(){} );
+        Map<String, Object> map=mapper.readValue(isr, new TypeReference<Map<String, Object>>(){});
         //"remove" what came originally
         Object branch=map.remove("Resources");
 
         if (branch!=null) {
+
+            resources=new ArrayList<>();
             //Here we assume everything is coming from the server correctly (that is, following the spec) and conversions succeed
             for (Object resource : (Collection) branch){
                 Map<String, Object> resourceAsMap=(Map<String, Object>) resource;

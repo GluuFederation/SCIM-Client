@@ -137,7 +137,7 @@ public class TestModeScimClient extends AbstractScimClient {
     @Override
     protected boolean authorize(Response response){
         /*
-        This method is called if the attempt to use the service returned forbidden (status = 403), so here we check if
+        This method is called if the attempt to use the service returned unauthorized (status = 401), so here we check if
         client expired to generate a new one & ask for another token, or else leave it that way (forbidden)
          */
         try {
