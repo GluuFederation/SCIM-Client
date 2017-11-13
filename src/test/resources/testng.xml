@@ -31,15 +31,22 @@
         </classes>
     </test>
 
-    <test name="Multiple Resources Test" enabled="false">
-        <classes>
-            <class name="gluu.scim2.client.search.MultipleResourcesSearch" />
-        </classes>
-    </test>
-
     <test name="Fido Devices Test" enabled="false">
         <classes>
             <class name="gluu.scim2.client.singleresource.FidoDeviceTest" />
+        </classes>
+    </test>
+
+    <test name="Attributes query param tests" enabled="false">
+        <classes>
+            <class name="gluu.scim2.client.singleresource.QueryParamRetrievalTest" />
+            <class name="gluu.scim2.client.singleresource.QueryParamCreateUpdateTest" />
+        </classes>
+    </test>
+
+    <test name="Multiple Resources Test" enabled="false">
+        <classes>
+            <class name="gluu.scim2.client.search.MultipleResourcesSearch" />
         </classes>
     </test>
 

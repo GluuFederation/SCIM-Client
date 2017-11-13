@@ -1,0 +1,176 @@
+package gluu.scim2.client.singleresource;
+
+import gluu.scim2.client.UserBaseTest;
+import org.gluu.oxtrust.model.scim2.Constants;
+import org.gluu.oxtrust.model.scim2.user.Email;
+import org.gluu.oxtrust.model.scim2.user.UserResource;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+
+import static javax.ws.rs.core.Response.Status.*;
+
+import static org.testng.Assert.*;
+
+/**
+ * Created by jgomer on 2017-11-12.
+ */
+public class QueryParamCreateUpdateTest extends UserBaseTest {
+
+    private UserResource user;
+
+    @Parameters("user_full_create")
+    @Test
+    public void create1(String json){
+        logger.debug("Creating user from json...");
+
+        String include="displayName, emails.value, password, nickName, urn:ietf:params:scim:schemas:core:2.0:User:name.givenName, " +
+                "preferredLanguage, userName, urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomSecond, " +
+                "urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomThird";
+        Response response=client.createUser(json, include, null, null);
+        assertEquals(response.getStatus(), CREATED.getStatusCode());
+
+        user=response.readEntity(usrClass);
+        execAssertions(user);
+
+    }
+
+    @Test(dependsOnMethods = "create1")
+    public void delete1(){
+        deleteUser(user);
+    }
+
+    @Parameters("user_full_create")
+    @Test(dependsOnMethods = "delete1")
+    public void create2(String json){
+        logger.debug("Creating user from json...");
+
+        String exclude="schemas, id, externalId, name.honorificPrefix, name.honorificSuffix, name.formatted, name.familyName, name.middleName, " +
+                "profileUrl, emails.display, emails.primary, emails.type, preferredLanguage, addresses, phoneNumbers, ims, userType, title, active, " +
+                "roles, entitlements, x509Certificates, urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomFirst";
+        Response response=client.createUser(json, null, exclude, null);
+        assertEquals(response.getStatus(), CREATED.getStatusCode());
+
+        user=response.readEntity(usrClass);
+        execAssertions(user);
+
+    }
+
+    @Test(dependsOnMethods = "create2")
+    public void update1() throws Exception{
+
+        //Change some attributes existing in user object
+        UserResource cheapClone=getDeepCloneUsr(user);
+        cheapClone.getName().setGivenName("Bavara");
+        cheapClone.setNickName("Cloned");
+
+        String rndString=Double.toString(Math.random());
+        Map<String, Object> custAttrs=cheapClone.getExtendedAttributes();
+        custAttrs=(Map<String, Object>) custAttrs.get(Constants.USER_EXT_SCHEMA_ID);
+        custAttrs.put("scimCustomFirst", rndString);
+
+        String include="userName, name.givenName, nickName, urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomFirst";
+        Response response=client.updateUser(cheapClone, cheapClone.getId(), include, null, null);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        user=response.readEntity(usrClass);
+
+        assertNull(user.getDisplayName());
+        assertEquals(user.getName().getGivenName(), cheapClone.getName().getGivenName());
+        assertEquals(user.getNickName(), cheapClone.getNickName());
+
+        custAttrs=user.getExtendedAttributes();
+        custAttrs=(Map<String, Object>) custAttrs.get(Constants.USER_EXT_SCHEMA_ID);
+        assertNull(custAttrs.get("scimCustomSecond"));
+        assertNull(custAttrs.get("scimCustomThird"));
+
+        assertEquals(custAttrs.get("scimCustomFirst"), rndString);
+
+    }
+
+    @Test(dependsOnMethods = "update1")
+    public void update2() throws Exception{
+
+        UserResource cheapClone=getDeepCloneUsr(user);
+        cheapClone.setEmails(Collections.emptyList());
+        cheapClone.setAddresses(Collections.emptyList());
+        cheapClone.setPhoneNumbers(Collections.emptyList());
+        cheapClone.setIms(Collections.emptyList());
+        cheapClone.setRoles(Collections.emptyList());
+        cheapClone.setEntitlements(Collections.emptyList());
+        cheapClone.setX509Certificates(Collections.emptyList());
+
+        String exclude="urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomFirst, urn:ietf:params:scim:schemas:core:2.0:User:active, " +
+                "urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomSecond, externalId, userName, name, " +
+                "urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomThird, userType, title, profileUrl";
+
+        Response response=client.updateUser(cheapClone, cheapClone.getId(), null, exclude, null);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        user=response.readEntity(usrClass);
+
+        assertNotNull(user.getDisplayName());
+        assertNotNull(user.getNickName());
+
+        //Verify excluded are not present
+        //Custom attributes is never null (the member is initialized as an empty map in BaseScimResource)
+        assertEquals(user.getExtendedAttributes().size(), 0);
+        assertNull(user.getExternalId());
+        assertNull(user.getUserName());
+        assertNull(user.getName());
+        assertNull(user.getProfileUrl());
+        assertNull(user.getUserType());
+        assertNull(user.getTitle());
+        assertNull(user.getActive());
+
+        //Verify update took place really
+        assertNull(user.getEmails());
+        assertNull(user.getAddresses());
+        assertNull(user.getPhoneNumbers());
+        assertNull(user.getIms());
+        assertNull(user.getRoles());
+        assertNull(user.getEntitlements());
+        assertNull(user.getX509Certificates());
+
+    }
+
+    @Test(dependsOnMethods = "update2")
+    public void delete(){
+        deleteUser(user);
+    }
+
+    private void execAssertions(UserResource user){
+        //Verify "ALWAYS" attribs were retrieved
+        assertNotNull(user.getSchemas());
+        assertNotNull(user.getId());
+
+        //Verify no password was retrieved
+        assertNull(user.getPassword());
+
+        //Verify preferredLanguage is null (not provided in Json originally)
+        assertNull(user.getPreferredLanguage());
+
+        //Verify all others are present
+        assertNotNull(user.getUserName());
+        assertNotNull(user.getDisplayName());
+        assertNotNull(user.getNickName());
+        assertNotNull(user.getName().getGivenName());
+
+        //Verify cust attrs are there
+        Map<String, Object> custAttrs=user.getExtendedAttributes();
+        custAttrs=(Map<String, Object>) custAttrs.get(Constants.USER_EXT_SCHEMA_ID);
+        assertNotNull(custAttrs.get("scimCustomSecond"));
+        assertNotNull(custAttrs.get("scimCustomThird"));
+
+        //Verify e-mails were retrieved
+        assertNotNull(user.getEmails());
+        assertTrue(user.getEmails().stream().map(Email::getValue).map(Optional::ofNullable).allMatch(Optional::isPresent));
+
+    }
+
+}
