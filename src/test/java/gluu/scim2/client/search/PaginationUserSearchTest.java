@@ -19,7 +19,7 @@ import static org.testng.Assert.*;
  *
  * Created by jgomer on 2017-10-26.
  */
-public class PaginationUserSearchText extends UserBaseTest {
+public class PaginationUserSearchTest extends UserBaseTest {
 
     private ListResponse listResponse;
     private SearchRequest sr;

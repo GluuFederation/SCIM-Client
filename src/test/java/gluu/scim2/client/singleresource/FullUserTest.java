@@ -28,9 +28,8 @@ public class FullUserTest extends UserBaseTest {
         user=createUserFromJson(json);
 
         //Confirm extension info is there
-        Map<String, Object> custAttrs=user.getExtendedAttributes();
+        Map<String, Object> custAttrs=user.getExtendedAttributes(USER_EXT_SCHEMA_ID);
         //assertEquals(custAttrs.keySet().size(),1);
-        custAttrs=(Map<String, Object>)custAttrs.get(USER_EXT_SCHEMA_ID);
 
         assertNotNull(custAttrs.get("scimCustomFirst"));
         assertTrue(custAttrs.get("scimCustomFirst") instanceof String);
@@ -51,8 +50,8 @@ public class FullUserTest extends UserBaseTest {
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
-        Map<String, Object> custAttrs1=(Map<String, Object>)user.getExtendedAttributes().get(USER_EXT_SCHEMA_ID);
-        Map<String, Object> custAttrs2=(Map<String, Object>)other.getExtendedAttributes().get(USER_EXT_SCHEMA_ID);
+        Map<String, Object> custAttrs1=user.getExtendedAttributes(USER_EXT_SCHEMA_ID);
+        Map<String, Object> custAttrs2=other.getExtendedAttributes(USER_EXT_SCHEMA_ID);
 
         //Verify scimCustomFirst changed
         assertNotEquals(custAttrs1.get("scimCustomFirst"), custAttrs2.get("scimCustomFirst"));

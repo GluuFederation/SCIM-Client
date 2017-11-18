@@ -1,7 +1,6 @@
 package gluu.scim2.client.singleresource;
 
 import gluu.scim2.client.UserBaseTest;
-import org.gluu.oxtrust.model.scim2.Constants;
 import org.gluu.oxtrust.model.scim2.user.Email;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.testng.annotations.Parameters;
@@ -16,6 +15,8 @@ import java.util.Optional;
 import static javax.ws.rs.core.Response.Status.*;
 
 import static org.testng.Assert.*;
+
+import static org.gluu.oxtrust.model.scim2.Constants.*;
 
 /**
  * Created by jgomer on 2017-11-12.
@@ -70,8 +71,7 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
         cheapClone.setNickName("Cloned");
 
         String rndString=Double.toString(Math.random());
-        Map<String, Object> custAttrs=cheapClone.getExtendedAttributes();
-        custAttrs=(Map<String, Object>) custAttrs.get(Constants.USER_EXT_SCHEMA_ID);
+        Map<String, Object> custAttrs=cheapClone.getExtendedAttributes(USER_EXT_SCHEMA_ID);
         custAttrs.put("scimCustomFirst", rndString);
 
         String include="userName, name.givenName, nickName, urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomFirst";
@@ -84,8 +84,7 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
         assertEquals(user.getName().getGivenName(), cheapClone.getName().getGivenName());
         assertEquals(user.getNickName(), cheapClone.getNickName());
 
-        custAttrs=user.getExtendedAttributes();
-        custAttrs=(Map<String, Object>) custAttrs.get(Constants.USER_EXT_SCHEMA_ID);
+        custAttrs=user.getExtendedAttributes(USER_EXT_SCHEMA_ID);
         assertNull(custAttrs.get("scimCustomSecond"));
         assertNull(custAttrs.get("scimCustomThird"));
 
@@ -162,8 +161,7 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
         assertNotNull(user.getName().getGivenName());
 
         //Verify cust attrs are there
-        Map<String, Object> custAttrs=user.getExtendedAttributes();
-        custAttrs=(Map<String, Object>) custAttrs.get(Constants.USER_EXT_SCHEMA_ID);
+        Map<String, Object> custAttrs=user.getExtendedAttributes(USER_EXT_SCHEMA_ID);
         assertNotNull(custAttrs.get("scimCustomSecond"));
         assertNotNull(custAttrs.get("scimCustomThird"));
 

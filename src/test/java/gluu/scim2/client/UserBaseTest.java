@@ -7,6 +7,8 @@ import javax.ws.rs.core.Response;
 
 import static javax.ws.rs.core.Response.Status.*;
 
+import static org.testng.Assert.*;
+
 /**
  * Created by jgomer on 2017-10-23.
  */
@@ -17,10 +19,10 @@ public class UserBaseTest extends BaseTest {
     public UserResource createUserFromJson(String json){
 
         Response response=client.createUser(json, null, null, null);
-        Assert.assertEquals(response.getStatus(), CREATED.getStatusCode());
+        assertEquals(response.getStatus(), CREATED.getStatusCode());
 
         UserResource user=response.readEntity(usrClass);
-        Assert.assertNotNull(user.getMeta());
+        assertNotNull(user.getMeta());
         logger.debug("User created with id {}", user.getId());
 
         return user;
@@ -30,7 +32,7 @@ public class UserBaseTest extends BaseTest {
 
         logger.debug("Deleting user {}", user.getUserName());
         Response response=client.deleteUser(user.getId(), null);
-        Assert.assertEquals(response.getStatus(), NO_CONTENT.getStatusCode());
+        assertEquals(response.getStatus(), NO_CONTENT.getStatusCode());
         response.close();
         logger.debug("deleted");
 

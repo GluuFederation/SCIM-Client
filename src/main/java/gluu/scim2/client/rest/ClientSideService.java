@@ -10,13 +10,13 @@ import static org.gluu.oxtrust.model.scim2.Constants.*;
 
 /**
  * Created by jgomer on 2017-09-04.
- * This is a mashup of interfaces so that a proxy to access the service can be built, see
+ * This is a mashup of interfaces so that a proxy to access the service can be built, see gluu.scim2.client.factory.ScimClientFactory
  * The ClientSide-prefixed interfaces add some methods to actual server side interfaces that allow a more accurate
  * testing of SCIM standard conformance
  *
  * IMPORTANT NOTES!!!
- * - Always pass null for the authorization param if the method to invoke has such parameter (the true value is "injected"
- *   automatically - see gluu.scim2.client.AbstractScimClient.invoke )
+ * - Always pass null for the authorization param if the method to invoke has such parameter (the actual value is
+ * "injected" automatically - see gluu.scim2.client.AbstractScimClient.invoke)
  */
 public interface ClientSideService extends ClientSideUserService, ClientSideGroupService, ClientSideFidoDeviceService {
 

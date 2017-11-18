@@ -86,8 +86,8 @@ public class BaseTest {
     private void setupClient(Map<String, String> params) throws Exception{
 
         logger.info("Initializing client...");
-        boolean testMode= StringUtils.isNotEmpty(System.getProperty("testmode"));
 
+        boolean testMode=Boolean.parseBoolean(System.getProperty("testmode"));
         ScimClientFactory<ClientSideService> factory=new ScimClientFactory<>(ClientSideService.class);
         /*
          To get a simpler client (not one that supports all possible operations as in this case), you can use as class

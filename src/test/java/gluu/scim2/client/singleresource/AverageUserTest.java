@@ -2,6 +2,7 @@ package gluu.scim2.client.singleresource;
 
 import gluu.scim2.client.UserBaseTest;
 import org.gluu.oxtrust.model.scim2.user.Group;
+import org.gluu.oxtrust.model.scim2.user.PhoneNumber;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -10,6 +11,7 @@ import javax.ws.rs.core.Response;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static javax.ws.rs.core.Response.Status.*;
 
@@ -40,6 +42,12 @@ public class AverageUserTest extends UserBaseTest {
         user=response.readEntity(usrClass);
         assertTrue(user.getRoles().size()>0);
         assertTrue(user.getPhoneNumbers().size()>1);
+
+        //Attest there is at most ONE primary phone number despite any data passed
+        long primaryTrueCount=user.getPhoneNumbers().stream().map(pn -> pn.getPrimary()==null ? false : pn.getPrimary()).
+                filter(Boolean::booleanValue).count();
+        assertTrue(primaryTrueCount < 2);
+
         logger.debug("Updated user {}", user.getName().getGivenName());
 
     }
@@ -68,6 +76,7 @@ public class AverageUserTest extends UserBaseTest {
         assertTrue(user.getAddresses().size()>0);
         assertNull(user.getRoles());
         assertNull(user.getGroups());
+
         logger.debug("Updated user {}", user.getName().getGivenName());
 
     }
