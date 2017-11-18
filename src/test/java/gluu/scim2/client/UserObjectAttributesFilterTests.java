@@ -7,6 +7,8 @@ package gluu.scim2.client;
 
 import gluu.BaseScimTest;
 import gluu.scim2.client.factory.ScimClientFactory;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxtrust.model.scim2.*;
 import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.joda.time.DateTime;
@@ -82,8 +84,7 @@ public class UserObjectAttributesFilterTests extends BaseScimTest {
 
         System.out.println("userRetrieved.getId() = " + userRetrieved.getId());
         System.out.println("userRetrieved.getDisplayName() = " + userRetrieved.getDisplayName());
-        //TODO: fix
-        /*
+
         Set<String> schemas = userRetrieved.getSchemas();
         assertTrue(schemas.contains(Constants.USER_EXT_SCHEMA_ID));
 
@@ -100,8 +101,9 @@ public class UserObjectAttributesFilterTests extends BaseScimTest {
         System.out.println("##### (Deserialization) dateList.get(0) = " + dateList.get(0));
         System.out.println("##### (Deserialization) dateList.get(1) = " + dateList.get(1));
         System.out.println("##### (Deserialization) dateList.get(2) = " + dateList.get(2));
-        */
+
         System.out.println("LEAVING testRetrieveNewUser..." + "\n");
+
     }
 
     @Test(groups = "c", dependsOnGroups = "b")
@@ -277,7 +279,7 @@ public class UserObjectAttributesFilterTests extends BaseScimTest {
         Extension.Builder extensionBuilder = new Extension.Builder(Constants.USER_EXT_SCHEMA_ID);
         extensionBuilder.setField("scimCustomFirst", "Capa");
         extensionBuilder.setFieldAsList("scimCustomSecond",
-                Arrays.asList(new Date[]{new DateTime("1969-01-01T03:35:22Z").toDate(), new DateTime("1900-01-01T09:00:00Z").toDate(), new DateTime("2016-06-01T01:52:05Z").toDate()}));
+                Arrays.asList(new DateTime("1969-01-01T03:35:22Z").toDate(), new DateTime("1920-01-01T09:00:00Z").toDate(), new DateTime("2016-06-01T01:52:05Z").toDate()));
         extensionBuilder.setField("scimCustomThird", new BigDecimal(1000));
         user.addExtension(extensionBuilder.build());
 
