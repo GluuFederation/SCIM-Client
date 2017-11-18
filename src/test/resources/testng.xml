@@ -26,7 +26,7 @@
             <class name="gluu.scim2.client.singleresource.AverageUserTest" />
             <class name="gluu.scim2.client.search.SimpleSearchUserTest" />
             <class name="gluu.scim2.client.search.ComplexSearchUserTest" />
-            <class name="gluu.scim2.client.search.PaginationUserSearchText" />
+            <class name="gluu.scim2.client.search.PaginationUserSearchTest" />
             <class name="gluu.scim2.client.singleresource.FullUserTest" />
         </classes>
     </test>
@@ -55,6 +55,7 @@
             <class name="gluu.scim2.client.patch.PatchReplaceUserTest" />
             <class name="gluu.scim2.client.patch.PatchAddUserTest" />
             <class name="gluu.scim2.client.patch.PatchDeleteUserTest" />
+            <class name="gluu.scim2.client.patch.PatchGroupTest" />
             <class name="gluu.scim2.client.patch.PatchUserExtTest" />
         </classes>
     </test>

@@ -1,6 +1,7 @@
 package gluu.scim2.client.rest;
 
 import org.gluu.oxtrust.ws.rs.scim2.GroupService;
+import org.gluu.oxtrust.ws.rs.scim2.PATCH;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -36,4 +37,16 @@ public interface ClientSideGroupService extends GroupService {
             @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList,
             @HeaderParam("Authorization") String authorization);
 
+
+    @Path("/scim/v2/Groups/{id}")
+    @PATCH
+    @Consumes({MEDIA_TYPE_SCIM_JSON, MediaType.APPLICATION_JSON})
+    @Produces({MEDIA_TYPE_SCIM_JSON + UTF8_CHARSET_FRAGMENT, MediaType.APPLICATION_JSON + UTF8_CHARSET_FRAGMENT})
+    @HeaderParam("Accept") @DefaultValue(MEDIA_TYPE_SCIM_JSON)
+    Response patchGroup(
+            String jsonPatch,
+            @PathParam("id") String id,
+            @QueryParam(QUERY_PARAM_ATTRIBUTES) String attrsList,
+            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList,
+            @HeaderParam("Authorization") String authorization);
 }
