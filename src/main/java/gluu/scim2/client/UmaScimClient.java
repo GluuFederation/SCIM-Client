@@ -32,7 +32,7 @@ import gluu.scim2.client.exception.ScimInitializationException;
  * @author Yuriy Zabrovarnyy
  * Updated by jgomer on 2017-10-19
  */
-public class UmaScimClient extends AbstractScimClient {
+public class UmaScimClient<T> extends AbstractScimClient<T> {
 
     private static final long serialVersionUID = 7099883500099353832L;
 
@@ -45,8 +45,8 @@ public class UmaScimClient extends AbstractScimClient {
     private String umaAatClientJksPath;
     private String umaAatClientJksPassword;
 
-    public UmaScimClient(String domain, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
-        super(domain);
+    public UmaScimClient(Class<T> serviceClass, String domain, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
+        super(domain, serviceClass);
         this.umaAatClientId = umaAatClientId;
         this.umaAatClientJksPath = umaAatClientJksPath;
         this.umaAatClientJksPassword = umaAatClientJksPassword;

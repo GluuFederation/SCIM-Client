@@ -3,8 +3,8 @@ package gluu.scim2.client.factory;
 import gluu.scim2.client.TestModeScimClient;
 import gluu.scim2.client.UmaScimClient;
 import gluu.scim2.client.DummyClient;
+import gluu.scim2.client.rest.ClientSideService;
 import org.xdi.oxauth.model.util.SecurityProviderUtility;
-//import org.xdi.oxauth.model.util.SecurityProviderUtility;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -13,20 +13,22 @@ import java.lang.reflect.Proxy;
  * Created by eugeniuparvan on 2/20/17.
  * Updated by jgomer on 2017-07-13
  */
-public class ScimClientFactory<T> {
+public class ScimClientFactory {
 
-    private Class<T> serviceInterface;
-    private Class<?> interfaces[];
+    private static Class<ClientSideService> defaultInterface;
 
-    public ScimClientFactory(Class <T> interfaceClass){
+    static {
         SecurityProviderUtility.installBCProvider();
-        serviceInterface=interfaceClass;
-        interfaces=new Class<?>[]{serviceInterface};
+        defaultInterface=ClientSideService.class;
     }
 
-    public T getClient(String domain, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
-        InvocationHandler handler = new UmaScimClient(domain, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
-        return serviceInterface.cast(Proxy.newProxyInstance(serviceInterface.getClassLoader(), interfaces, handler));
+    public static <T> T getClient(Class <T> interfaceClass, String domain, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
+        InvocationHandler handler = new UmaScimClient<>(interfaceClass, domain, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
+        return typedProxy(interfaceClass, handler);
+    }
+
+    public static ClientSideService getClient(String domain, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
+        return getClient(defaultInterface, domain, umaAatClientId, umaAatClientJksPath, umaAatClientJksPassword, umaAatClientKeyId);
     }
 
     /**
@@ -37,14 +39,22 @@ public class ScimClientFactory<T> {
      * @throws Exception Instantiation abnormality
      * @since 3.1.0
      */
-    public T getTestClient(String domain, String OIDCMetadataUrl) throws Exception {
-        InvocationHandler handler = new TestModeScimClient(domain, OIDCMetadataUrl);
-        return serviceInterface.cast(Proxy.newProxyInstance(serviceInterface.getClassLoader(), interfaces, handler));
+    public static <T> T getTestClient(Class <T> interfaceClass, String domain, String OIDCMetadataUrl) throws Exception {
+        InvocationHandler handler = new TestModeScimClient<>(interfaceClass, domain, OIDCMetadataUrl);
+        return typedProxy(interfaceClass, handler);
     }
 
-    public T getDummyClient(String domain) throws Exception{
-        InvocationHandler handler = new DummyClient(domain);
-        return serviceInterface.cast(Proxy.newProxyInstance(serviceInterface.getClassLoader(), interfaces, handler));
+    public static ClientSideService getTestClient(String domain, String OIDCMetadataUrl) throws Exception {
+        return getTestClient(defaultInterface, domain, OIDCMetadataUrl);
+    }
+
+    public static ClientSideService getDummyClient(String domain) throws Exception{
+        InvocationHandler handler = new DummyClient<>(defaultInterface, domain);
+        return typedProxy(defaultInterface, handler);
+    }
+
+    private static <T> T typedProxy(Class <T> interfaceClass, InvocationHandler handler){
+        return interfaceClass.cast(Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class<?>[]{interfaceClass}, handler));
     }
 
 }

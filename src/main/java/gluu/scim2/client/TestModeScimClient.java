@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * Created by jgomer on 2017-07-13.
  */
-public class TestModeScimClient extends AbstractScimClient {
+public class TestModeScimClient<T> extends AbstractScimClient<T> {
 
     private Logger logger = LogManager.getLogger(getClass());
 
@@ -43,9 +43,9 @@ public class TestModeScimClient extends AbstractScimClient {
      *                   {@code https://<host:port>/identity/restv1}
      * @param OIDCMetadataUrl String url of the openId connect metadata document
      */
-    public TestModeScimClient(String serviceUrl, String OIDCMetadataUrl) throws Exception {
+    public TestModeScimClient(Class<T> serviceClass, String serviceUrl, String OIDCMetadataUrl) throws Exception {
 
-        super(serviceUrl);
+        super(serviceUrl, serviceClass);
 
         //Extract token, registration, and authz endpoints from metadata URL
         JsonNode tree=mapper.readTree(new URL(OIDCMetadataUrl));
