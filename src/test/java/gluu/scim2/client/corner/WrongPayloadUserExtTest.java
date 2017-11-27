@@ -18,7 +18,7 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     @Parameters({"wrong_user_ext_create_1"})
     @Test
     public void createWrongCustAttrs1(String json){
-        Response response=client.createUser(json, null, null, null);
+        Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
         response.close();
     }
@@ -26,7 +26,7 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     @Parameters("wrong_user_ext_create_2")
     @Test
     public void createWrongCustAttrs2(String json){
-        Response response=client.createUser(json, null, null, null);
+        Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
         response.close();
     }
@@ -34,7 +34,7 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     @Parameters("wrong_user_ext_create_3")
     @Test
     public void createWrongCustAttrs3(String json){
-        Response response=client.createUser(json, null, null, null);
+        Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
         response.close();
     }
@@ -42,7 +42,7 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     @Parameters("wrong_user_ext_create_4")
     @Test
     public void createWrongCustAttrs4(String json){
-        Response response=client.createUser(json, null, null, null);
+        Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
         response.close();
     }
@@ -50,7 +50,7 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     @Parameters("wrong_user_ext_create_5")
     @Test
     public void createWrongCustAttrs5(String json){
-        Response response=client.createUser(json, null, null, null);
+        Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
         response.close();
     }
@@ -58,7 +58,7 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     @Parameters("wrong_user_ext_create_6")
     @Test
     public void createWrongCustAttrs6(String json){
-        Response response=client.createUser(json, null, null, null);
+        Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
         response.close();
     }

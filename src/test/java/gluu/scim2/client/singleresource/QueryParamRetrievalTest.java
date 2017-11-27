@@ -29,7 +29,7 @@ public class QueryParamRetrievalTest extends UserBaseTest {
         logger.debug("Retrieving test users...");
         String include="displayName, externalId";
 
-        Response response=client.searchUsers("displayName co \"test\"", null, null, null, null, include, null, null);
+        Response response=client.searchUsers("displayName co \"test\"", null, null, null, null, include, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse = response.readEntity(ListResponse.class);
@@ -49,7 +49,7 @@ public class QueryParamRetrievalTest extends UserBaseTest {
         logger.debug("Retrieving test users...");
         String exclude="displayName, externalId, name, addresses, emails";
 
-        Response response=client.searchUsers("displayName co \"test\"", null, null, null, null, null, exclude, null);
+        Response response=client.searchUsers("displayName co \"test\"", null, null, null, null, null, exclude);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse = response.readEntity(ListResponse.class);
@@ -74,7 +74,7 @@ public class QueryParamRetrievalTest extends UserBaseTest {
     public void singleRetrieval(){
 
         String include="active";
-        Response response=client.getUserById(user.getId(), include, null, null);
+        Response response=client.getUserById(user.getId(), include, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         user=response.readEntity(usrClass);
@@ -91,7 +91,7 @@ public class QueryParamRetrievalTest extends UserBaseTest {
     public void singleRetrievalExcluding() {
 
         String exclude="id, externalId";
-        Response response=client.getUserById(user.getId(), null, exclude, null);
+        Response response=client.getUserById(user.getId(), null, exclude);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         user=response.readEntity(usrClass);

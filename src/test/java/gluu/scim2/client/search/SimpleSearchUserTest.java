@@ -34,7 +34,7 @@ public class SimpleSearchUserTest extends UserBaseTest {
         logger.debug("Searching user with attribute locale = {} using GET verb", locale);
 
         Response response=client.searchUsers("locale eq \"" + locale + "\"",
-                null, null, null, null, null, null, null);
+                null, null, null, null, null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse=response.readEntity(ListResponse.class);
@@ -54,7 +54,7 @@ public class SimpleSearchUserTest extends UserBaseTest {
 
         SearchRequest sr=new SearchRequest();
         sr.setFilter("name.givenName eq \""+ givenName + "\"");
-        Response response=client.searchUsersPost(sr, null);
+        Response response=client.searchUsersPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse=response.readEntity(ListResponse.class);
@@ -75,7 +75,7 @@ public class SimpleSearchUserTest extends UserBaseTest {
 
         SearchRequest sr=new SearchRequest();
         sr.setFilter("emails.value ew \"" + host + "\"");
-        Response response=client.searchUsersPost(sr, null);
+        Response response=client.searchUsersPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse=response.readEntity(ListResponse.class);
@@ -92,7 +92,7 @@ public class SimpleSearchUserTest extends UserBaseTest {
 
         logger.debug("Calculating the total number of users");
         //Pass count=0 so no results are retrieved (only total)
-        Response response=client.searchUsers("userName pr", null, null, null, 0, null, null, null);
+        Response response=client.searchUsers("userName pr", null, null, null, 0, null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse=response.readEntity(ListResponse.class);
@@ -103,7 +103,7 @@ public class SimpleSearchUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnGroups = "search")
+    @Test(dependsOnGroups = "search", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }

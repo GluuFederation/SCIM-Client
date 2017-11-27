@@ -2,8 +2,8 @@ package gluu.scim2.client.patch;
 
 import gluu.scim2.client.UserBaseTest;
 
-import org.gluu.oxtrust.model.scim2.PatchOperation;
-import org.gluu.oxtrust.model.scim2.PatchRequest;
+import org.gluu.oxtrust.model.scim2.patch.PatchOperation;
+import org.gluu.oxtrust.model.scim2.patch.PatchRequest;
 import org.gluu.oxtrust.model.scim2.user.PhoneNumber;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.gluu.oxtrust.model.scim2.util.DateUtil;
@@ -41,7 +41,7 @@ public class PatchUserExtTest extends UserBaseTest {
     @Test(dependsOnMethods = "create")
     public void patchJson(String patchRequest){
 
-        Response response = client.patchUser(patchRequest, user.getId(), null, null, null);
+        Response response = client.patchUser(patchRequest, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
@@ -83,7 +83,7 @@ public class PatchUserExtTest extends UserBaseTest {
         PatchRequest pr=new PatchRequest();
         pr.setOperations(Collections.singletonList(operation));
 
-        Response response=client.patchUser(pr, user.getId(), null, null, null);
+        Response response=client.patchUser(pr, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
@@ -99,7 +99,7 @@ public class PatchUserExtTest extends UserBaseTest {
 
     }
 
-    //@Test(dependsOnMethods = "patchObject")
+    @Test(dependsOnMethods = "patchObject", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }

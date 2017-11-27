@@ -30,7 +30,7 @@ public class FidoDeviceTest extends BaseTest {
     public void search(){
 
         logger.debug("Searching all fido devices");
-        Response response=client.searchDevices("application pr", null, null, null, null, null, null, null);
+        Response response=client.searchDevices("application pr", null, null, null, null, null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse=response.readEntity(ListResponse.class);
@@ -45,7 +45,7 @@ public class FidoDeviceTest extends BaseTest {
     public void retrieve(){
 
         logger.debug("Retrieving same device by id");
-        Response response=client.getDeviceById(device.getId(), device.getUserId(), null, null, null);
+        Response response=client.getDeviceById(device.getId(), device.getUserId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         FidoDeviceResource same=response.readEntity(fidoClass);
@@ -66,7 +66,7 @@ public class FidoDeviceTest extends BaseTest {
         String json=mapper.writeValueAsString(clone);
 
         logger.debug("Updating device with json");
-        Response response=client.updateDevice(json, device.getId(), null, null, null);
+        Response response=client.updateDevice(json, device.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         FidoDeviceResource updated=response.readEntity(fidoClass);
@@ -79,7 +79,7 @@ public class FidoDeviceTest extends BaseTest {
     public void updateWithObject() throws Exception{
 
         logger.debug("Updating device to original attributes");
-        Response response=client.updateDevice(device, device.getId(), null, null, null);
+        Response response=client.updateDevice(device, device.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         FidoDeviceResource updated=response.readEntity(fidoClass);
@@ -91,11 +91,11 @@ public class FidoDeviceTest extends BaseTest {
 
     }
 
-    @Test(dependsOnMethods = "updateWithObject")
+    @Test(dependsOnMethods = "updateWithObject", alwaysRun = true)
     public void delete(){
 
         logger.debug("Deleting device");
-        Response response=client.deleteDevice(device.getId(), null);
+        Response response=client.deleteDevice(device.getId());
         assertEquals(response.getStatus(), NO_CONTENT.getStatusCode());
         response.close();
 

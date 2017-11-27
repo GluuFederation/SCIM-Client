@@ -18,7 +18,7 @@ public class UserBaseTest extends BaseTest {
 
     public UserResource createUserFromJson(String json){
 
-        Response response=client.createUser(json, null, null, null);
+        Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), CREATED.getStatusCode());
 
         UserResource user=response.readEntity(usrClass);
@@ -31,7 +31,7 @@ public class UserBaseTest extends BaseTest {
     public void deleteUser(UserResource user){
 
         logger.debug("Deleting user {}", user.getUserName());
-        Response response=client.deleteUser(user.getId(), null);
+        Response response=client.deleteUser(user.getId());
         assertEquals(response.getStatus(), NO_CONTENT.getStatusCode());
         response.close();
         logger.debug("deleted");

@@ -24,7 +24,7 @@ public class MinimalGroupTest extends BaseTest {
     public void create(String json){
 
         logger.debug("Creating mimimal group from json...");
-        Response response = client.createGroup(json, null, null, null);
+        Response response = client.createGroup(json, null, null);
         assertEquals(response.getStatus(), CREATED.getStatusCode());
 
         group=response.readEntity(groupClass);
@@ -38,7 +38,7 @@ public class MinimalGroupTest extends BaseTest {
     public void update(String json){
 
         logger.debug("Updating group {} with json", group.getDisplayName());
-        Response response=client.updateGroup(json, group.getId(), null, null, null);
+        Response response=client.updateGroup(json, group.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         GroupResource updated=response.readEntity(groupClass);
@@ -48,11 +48,11 @@ public class MinimalGroupTest extends BaseTest {
 
     }
 
-    @Test(dependsOnMethods="update")
+    @Test(dependsOnMethods="update", alwaysRun = true)
     public void delete(){
 
         logger.debug("Deleting group {}", group.getDisplayName());
-        Response response=client.deleteUser(group.getId(), null);
+        Response response=client.deleteGroup(group.getId());
         assertEquals(response.getStatus(), NO_CONTENT.getStatusCode());
         response.close();
         logger.debug("deleted");

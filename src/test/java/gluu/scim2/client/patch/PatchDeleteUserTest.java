@@ -30,7 +30,7 @@ public class PatchDeleteUserTest extends UserBaseTest{
     @Test(dependsOnMethods = "create")
     public void delete1(String patchRequest){
 
-        Response response = client.patchUser(patchRequest, user.getId(), null, null, null);
+        Response response = client.patchUser(patchRequest, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
@@ -43,7 +43,7 @@ public class PatchDeleteUserTest extends UserBaseTest{
         assertNotNull(other.getAddresses().get(0).getStreetAddress());
     }
 
-    @Test(dependsOnMethods = "delete1")
+    @Test(dependsOnMethods = "delete1", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }

@@ -8,10 +8,6 @@ import org.testng.annotations.Test;
 
 import javax.ws.rs.core.Response;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import static javax.ws.rs.core.Response.Status.*;
 
 import static org.testng.Assert.*;
@@ -33,7 +29,7 @@ public class PatchAddUserTest extends UserBaseTest{
     @Parameters({"user_patchadd"})
     @Test(dependsOnMethods = "create",  groups = "A")
     public void jsonPatch(String patchRequest){
-        Response response = client.patchUser(patchRequest, user.getId(), null, null, null);
+        Response response = client.patchUser(patchRequest, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
@@ -47,7 +43,7 @@ public class PatchAddUserTest extends UserBaseTest{
         assertTrue(other.getRoles().size()>0);
     }
 
-    @Test(dependsOnMethods = "jsonPatch")
+    @Test(dependsOnMethods = "jsonPatch", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }

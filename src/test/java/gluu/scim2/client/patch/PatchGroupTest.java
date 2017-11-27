@@ -4,6 +4,8 @@ import gluu.scim2.client.BaseTest;
 import org.gluu.oxtrust.model.scim2.*;
 import org.gluu.oxtrust.model.scim2.group.GroupResource;
 import org.gluu.oxtrust.model.scim2.group.Member;
+import org.gluu.oxtrust.model.scim2.patch.PatchOperation;
+import org.gluu.oxtrust.model.scim2.patch.PatchRequest;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.gluu.oxtrust.model.scim2.util.ScimResourceUtil;
 import org.testng.annotations.Parameters;
@@ -38,7 +40,7 @@ public class PatchGroupTest extends BaseTest{
     public void create(String json){
 
         logger.debug("Creating group from json...");
-        Response response = client.createGroup(json, null, null, null);
+        Response response = client.createGroup(json, null, null);
         assertEquals(response.getStatus(), CREATED.getStatusCode());
 
         group=response.readEntity(groupCls);
@@ -48,7 +50,7 @@ public class PatchGroupTest extends BaseTest{
     @Test(dependsOnMethods = "create")
     public void patch1(String jsonPatch){
 
-        Response response=client.patchGroup(jsonPatch, group.getId(), null, null, null);
+        Response response=client.patchGroup(jsonPatch, group.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         GroupResource newerGroup=response.readEntity(groupCls);
@@ -86,7 +88,7 @@ public class PatchGroupTest extends BaseTest{
         PatchRequest pr=new PatchRequest();
         pr.setOperations(Collections.singletonList(operation));
 
-        Response response=client.patchGroup(pr, group.getId(), null, null, null);
+        Response response=client.patchGroup(pr, group.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         group=response.readEntity(groupCls);
@@ -102,9 +104,9 @@ public class PatchGroupTest extends BaseTest{
 
     }
 
-    @Test(dependsOnMethods = "patch2")
+    @Test(dependsOnMethods = "patch2", alwaysRun = true)
     public void delete(){
-        Response response=client.deleteGroup(group.getId(), null);
+        Response response=client.deleteGroup(group.getId());
         assertEquals(response.getStatus(), NO_CONTENT.getStatusCode());
         response.close();
 
@@ -114,7 +116,7 @@ public class PatchGroupTest extends BaseTest{
 
         SearchRequest sr=new SearchRequest();
         sr.setFilter(String.format("displayName co \"%s\"", displayNamePattern));
-        Response response=client.searchUsersPost(sr, null);
+        Response response=client.searchUsersPost(sr);
         ListResponse listResponse=response.readEntity(ListResponse.class);
         return listResponse.getResources().stream().map(usrClass::cast).collect(Collectors.toList());
 

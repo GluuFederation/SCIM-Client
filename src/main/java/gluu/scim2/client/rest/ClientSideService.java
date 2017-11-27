@@ -24,18 +24,21 @@ public interface ClientSideService extends ClientSideUserService, ClientSideGrou
     @GET
     @Produces(MEDIA_TYPE_SCIM_JSON + UTF8_CHARSET_FRAGMENT)
     @HeaderParam("Accept") @DefaultValue(MEDIA_TYPE_SCIM_JSON)
+    @FreelyAccessible
     Response getServiceProviderConfig();
 
     @Path("/scim/v2/ResourceTypes")
     @GET
     @Produces(MEDIA_TYPE_SCIM_JSON + UTF8_CHARSET_FRAGMENT)
     @HeaderParam("Accept") @DefaultValue(MEDIA_TYPE_SCIM_JSON)
+    @FreelyAccessible
     Response getResourceTypes();
 
     @Path("/scim/v2/Schemas")
     @GET
     @Produces(MEDIA_TYPE_SCIM_JSON + UTF8_CHARSET_FRAGMENT)
     @HeaderParam("Accept") @DefaultValue(MEDIA_TYPE_SCIM_JSON)
+    @FreelyAccessible
     Response getSchemas();
 
     @Path("/scim/v2/.search")
@@ -43,7 +46,13 @@ public interface ClientSideService extends ClientSideUserService, ClientSideGrou
     @Consumes({MEDIA_TYPE_SCIM_JSON, MediaType.APPLICATION_JSON})
     @Produces({MEDIA_TYPE_SCIM_JSON + UTF8_CHARSET_FRAGMENT, MediaType.APPLICATION_JSON + UTF8_CHARSET_FRAGMENT})
     @HeaderParam("Accept") @DefaultValue(MEDIA_TYPE_SCIM_JSON)
-    Response searchResourcesPost(SearchRequest searchRequest,
-                                        @HeaderParam("Authorization") String authorization);
+    Response searchResourcesPost(SearchRequest searchRequest);
+
+    @Path("/scim/v2/.search")
+    @POST
+    @Consumes({MEDIA_TYPE_SCIM_JSON, MediaType.APPLICATION_JSON})
+    @Produces({MEDIA_TYPE_SCIM_JSON + UTF8_CHARSET_FRAGMENT, MediaType.APPLICATION_JSON + UTF8_CHARSET_FRAGMENT})
+    @HeaderParam("Accept") @DefaultValue(MEDIA_TYPE_SCIM_JSON)
+    Response searchResourcesPost(String searchRequestJson);
 
 }

@@ -32,7 +32,7 @@ public class PaginationUserSearchTest extends UserBaseTest {
         sr.setFilter("name.familyName co \"filter\"");
         sr.setAttributes("meta.location");
 
-        Response response = client.searchUsersPost(sr, null);
+        Response response = client.searchUsersPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         //Store for further comparison
@@ -48,7 +48,7 @@ public class PaginationUserSearchTest extends UserBaseTest {
         sr.setStartIndex(1);
         sr.setCount(listResponse.getTotalResults());
 
-        Response response = client.searchUsersPost(sr, null);
+        Response response = client.searchUsersPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse anotherLR = response.readEntity(ListResponse.class);
@@ -72,7 +72,7 @@ public class PaginationUserSearchTest extends UserBaseTest {
             sr.setStartIndex(startIndex);
             sr.setCount(ipp);
 
-            Response response = client.searchUsersPost(sr, null);
+            Response response = client.searchUsersPost(sr);
             assertEquals(response.getStatus(), OK.getStatusCode());
 
             ListResponse anotherLR = response.readEntity(ListResponse.class);
@@ -102,7 +102,7 @@ public class PaginationUserSearchTest extends UserBaseTest {
         sr.setStartIndex(null);
         sr.setCount(0);
 
-        Response response = client.searchUsersPost(sr, null);
+        Response response = client.searchUsersPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse anotherLR = response.readEntity(ListResponse.class);
@@ -121,7 +121,7 @@ public class PaginationUserSearchTest extends UserBaseTest {
         sr.setStartIndex(null);
         sr.setCount(1+existing);
 
-        Response response = client.searchUsersPost(sr, null);
+        Response response = client.searchUsersPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse anotherLR = response.readEntity(ListResponse.class);

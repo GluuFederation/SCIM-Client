@@ -30,7 +30,7 @@ public class MinimalUserTest extends UserBaseTest {
     public void update(String json){
 
         logger.debug("Updating user {} with json", user.getUserName());
-        Response response=client.updateUser(json, user.getId(), null, null, null);
+        Response response=client.updateUser(json, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         user=response.readEntity(usrClass);
@@ -40,7 +40,7 @@ public class MinimalUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods="update")
+    @Test(dependsOnMethods="update", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }

@@ -46,7 +46,7 @@ public class FullUserTest extends UserBaseTest {
     public void update(String json){
 
         logger.debug("Updating user {} with json", user.getUserName());
-        Response response=client.updateUser(json, user.getId(), null, null, null);
+        Response response=client.updateUser(json, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
@@ -86,7 +86,7 @@ public class FullUserTest extends UserBaseTest {
         user.setPreferredLanguage("en-us");
         user.setLocale("en_US");
 
-        Response response=client.updateUser(user, user.getId(), "preferredLanguage, locale", null, null);
+        Response response=client.updateUser(user, user.getId(), "preferredLanguage, locale", null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         user=response.readEntity(usrClass);
@@ -95,7 +95,7 @@ public class FullUserTest extends UserBaseTest {
 
     }
 
-    //@Test(dependsOnMethods = "updateNonExisting")
+    @Test(dependsOnMethods = "updateNonExisting", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }

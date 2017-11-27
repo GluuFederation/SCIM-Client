@@ -20,7 +20,7 @@ public class WrongPayloadUserTest extends UserBaseTest {
     @Parameters({"wrong_user_create_1"})
     @Test(groups = "A")
     public void createWrongAttrs1(String json){
-        Response response=client.createUser(json, null, null, null);
+        Response response=client.createUser(json, null, null);
         assertNotEquals(response.getStatus(), CREATED.getStatusCode());
         response.close();
     }
@@ -28,7 +28,7 @@ public class WrongPayloadUserTest extends UserBaseTest {
     @Parameters({"wrong_user_create_2"})
     @Test(groups = "A")
     public void createWrongAttrs2(String json){
-        Response response=client.createUser(json, null, null, null);
+        Response response=client.createUser(json, null, null);
         assertNotEquals(response.getStatus(), CREATED.getStatusCode());
         response.close();
     }
@@ -36,7 +36,7 @@ public class WrongPayloadUserTest extends UserBaseTest {
     @Parameters({"wrong_user_create_3"})
     @Test(groups = "A")
     public void createWrongAttrs3(String json){
-        Response response=client.createUser(json, null, null, null);
+        Response response=client.createUser(json, null, null);
         assertNotEquals(response.getStatus(), CREATED.getStatusCode());
         response.close();
     }
@@ -51,12 +51,12 @@ public class WrongPayloadUserTest extends UserBaseTest {
     @Test(dependsOnMethods = "create")
     public void updateWrongId(){
         user.setActive(true);
-        Response response=client.updateUser(user, "not an id", null, null, null);
+        Response response=client.updateUser(user, "not an id", null, null);
         assertNotEquals(response.getStatus(), CREATED.getStatusCode());
         response.close();
     }
 
-    @Test(dependsOnMethods = "updateWrongId")
+    @Test(dependsOnMethods = "updateWrongId", alwaysRun = true)
     public void delete() {
         deleteUser(user);
     }

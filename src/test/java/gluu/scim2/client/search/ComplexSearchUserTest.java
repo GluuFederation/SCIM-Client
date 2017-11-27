@@ -44,7 +44,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
 
         SearchRequest sr=new SearchRequest();
         sr.setFilter("nickName pr or ims.value eq \"" + ims + "\"");
-        Response response=client.searchUsersPost(sr, null);
+        Response response=client.searchUsersPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse=response.readEntity(ListResponse.class);
@@ -80,7 +80,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
         sr.setAttributes(attrList.toString().replaceFirst("\\[","").replaceFirst("]",""));
         sr.setCount(count);
 
-        Response response=client.searchUsersPost(sr, null);
+        Response response=client.searchUsersPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse=response.readEntity(ListResponse.class);
@@ -150,7 +150,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
         sr.setExcludedAttributes(attrList.toString().replaceFirst("\\[","").replaceFirst("]",""));
         sr.setCount(count);
 
-        Response response=client.searchUsersPost(sr, null);
+        Response response=client.searchUsersPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse=response.readEntity(ListResponse.class);
@@ -184,7 +184,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
         }
     }
 
-    @Test(dependsOnGroups = "search")
+    @Test(dependsOnGroups = "search", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }

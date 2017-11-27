@@ -36,7 +36,7 @@ public class AverageUserTest extends UserBaseTest {
     public void updateWithJson(String json){
 
         logger.debug("Updating user {} with json", user.getUserName());
-        Response response=client.updateUser(json, user.getId(), null, null, null);
+        Response response=client.updateUser(json, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         user=response.readEntity(usrClass);
@@ -66,7 +66,7 @@ public class AverageUserTest extends UserBaseTest {
         clone.setGroups(Arrays.asList(group));  //will be ignored: group membership changes MUST be applied via /Groups endpoint
 
         logger.debug("Updating user {}", clone.getUserName());
-        Response response=client.updateUser(clone, clone.getId(), null, null, null);
+        Response response=client.updateUser(clone, clone.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         user=response.readEntity(usrClass);
@@ -81,7 +81,7 @@ public class AverageUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods="updateWithObject")
+    @Test(dependsOnMethods="updateWithObject", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }

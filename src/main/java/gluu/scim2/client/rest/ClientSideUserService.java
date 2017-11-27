@@ -1,7 +1,7 @@
 package gluu.scim2.client.rest;
 
 import org.gluu.oxtrust.ws.rs.scim2.PATCH;
-import org.gluu.oxtrust.ws.rs.scim2.UserService;
+import org.gluu.oxtrust.ws.rs.scim2.IUserWebService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -12,8 +12,7 @@ import static org.gluu.oxtrust.model.scim2.Constants.*;
 /**
  * Created by jgomer on 2017-09-14.
  */
-
-public interface ClientSideUserService extends UserService {
+public interface ClientSideUserService extends IUserWebService, CloseableClient {
 
     @Path("/scim/v2/Users")
     @POST
@@ -22,9 +21,8 @@ public interface ClientSideUserService extends UserService {
     @HeaderParam("Accept") @DefaultValue(MEDIA_TYPE_SCIM_JSON)
     Response createUser(
             String jsonUser,
-            @QueryParam(QUERY_PARAM_ATTRIBUTES) String attributesArray,
-            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsArray,
-            @HeaderParam("Authorization") String authorization);
+            @QueryParam(QUERY_PARAM_ATTRIBUTES) String attrsList,
+            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList);
 
     @Path("/scim/v2/Users/{id}")
     @PUT
@@ -35,8 +33,7 @@ public interface ClientSideUserService extends UserService {
             String jsonUser,
             @PathParam("id") String id,
             @QueryParam(QUERY_PARAM_ATTRIBUTES) String attrsList,
-            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList,
-            @HeaderParam("Authorization") String authorization);
+            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList);
 
     @Path("/scim/v2/Users/{id}")
     @PATCH
@@ -47,7 +44,6 @@ public interface ClientSideUserService extends UserService {
             String jsonPatch,
             @PathParam("id") String id,
             @QueryParam(QUERY_PARAM_ATTRIBUTES) String attrsList,
-            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList,
-            @HeaderParam("Authorization") String authorization);
+            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList);
 
 }

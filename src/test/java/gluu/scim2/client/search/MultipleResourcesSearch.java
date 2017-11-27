@@ -3,6 +3,7 @@ package gluu.scim2.client.search;
 import gluu.scim2.client.BaseTest;
 import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.gluu.oxtrust.model.scim2.SearchRequest;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.Response;
@@ -18,7 +19,30 @@ public class MultipleResourcesSearch extends BaseTest {
     private SearchRequest sr;
     private ListResponse listResponse;
 
+    @Parameters({"search_multiple_1","search_multiple_2"})
     @Test
+    public void searchJSon(String json1, String json2){
+
+        Response response=client.searchResourcesPost(json1);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        ListResponse anotherLR=response.readEntity(ListResponse.class);
+        //Verify it has results
+        assertTrue(anotherLR.getTotalResults()>0);
+
+        response=client.searchResourcesPost(json2);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        ListResponse anotherLR2 =response.readEntity(ListResponse.class);
+
+        assertEquals(anotherLR.getTotalResults(), anotherLR2.getTotalResults());
+        assertNull(anotherLR2.getResources());
+        assertEquals(anotherLR2.getItemsPerPage(), 0);   //unassigned
+        assertEquals(anotherLR2.getStartIndex(), 0); //unassigned
+
+    }
+
+    @Test(dependsOnMethods = "searchJson")
     public void search1(){
 
         //Build up a request
@@ -27,7 +51,7 @@ public class MultipleResourcesSearch extends BaseTest {
         sr.setStartIndex(1);
         sr.setFilter("displayName co \"1111\" or displayName co \"group\"");    //Aimed at having both users and groups
 
-        Response response = client.searchResourcesPost(sr, null);
+        Response response = client.searchResourcesPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         listResponse=response.readEntity(ListResponse.class);
@@ -43,7 +67,7 @@ public class MultipleResourcesSearch extends BaseTest {
         //Move forward the start index
         sr.setStartIndex(2);
 
-        Response response = client.searchResourcesPost(sr, null);
+        Response response = client.searchResourcesPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse anotherLR=response.readEntity(ListResponse.class);
@@ -60,7 +84,7 @@ public class MultipleResourcesSearch extends BaseTest {
         //Move the start index to the last item
         sr.setStartIndex(listResponse.getTotalResults());
 
-        Response response = client.searchResourcesPost(sr, null);
+        Response response = client.searchResourcesPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse anotherLR=response.readEntity(ListResponse.class);
@@ -76,7 +100,7 @@ public class MultipleResourcesSearch extends BaseTest {
         //Verify there are no results when start index is greater than the number of available results
         sr.setStartIndex(listResponse.getTotalResults()+1);
 
-        Response response = client.searchResourcesPost(sr, null);
+        Response response = client.searchResourcesPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse anotherLR=response.readEntity(ListResponse.class);
@@ -92,7 +116,7 @@ public class MultipleResourcesSearch extends BaseTest {
         sr.setStartIndex(null); //Means 1
         sr.setCount(0);     //Returns no resources, only total
 
-        Response response = client.searchResourcesPost(sr, null);
+        Response response = client.searchResourcesPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse anotherLR=response.readEntity(ListResponse.class);
@@ -110,7 +134,7 @@ public class MultipleResourcesSearch extends BaseTest {
         sr.setStartIndex(5);    //Irrelevant since no results will be returned
         sr.setCount(0);     //Returns no resources, only total
 
-        Response response = client.searchResourcesPost(sr, null);
+        Response response = client.searchResourcesPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse anotherLR=response.readEntity(ListResponse.class);

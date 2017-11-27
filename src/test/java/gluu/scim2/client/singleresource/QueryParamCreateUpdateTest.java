@@ -33,7 +33,7 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
         String include="displayName, emails.value, password, nickName, urn:ietf:params:scim:schemas:core:2.0:User:name.givenName, " +
                 "preferredLanguage, userName, urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomSecond, " +
                 "urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomThird";
-        Response response=client.createUser(json, include, null, null);
+        Response response=client.createUser(json, include, null);
         assertEquals(response.getStatus(), CREATED.getStatusCode());
 
         user=response.readEntity(usrClass);
@@ -41,7 +41,7 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods = "create1")
+    @Test(dependsOnMethods = "create1", alwaysRun = true)
     public void delete1(){
         deleteUser(user);
     }
@@ -54,7 +54,7 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
         String exclude="schemas, id, externalId, name.honorificPrefix, name.honorificSuffix, name.formatted, name.familyName, name.middleName, " +
                 "profileUrl, emails.display, emails.primary, emails.type, preferredLanguage, addresses, phoneNumbers, ims, userType, title, active, " +
                 "roles, entitlements, x509Certificates, urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomFirst";
-        Response response=client.createUser(json, null, exclude, null);
+        Response response=client.createUser(json, null, exclude);
         assertEquals(response.getStatus(), CREATED.getStatusCode());
 
         user=response.readEntity(usrClass);
@@ -75,7 +75,7 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
         custAttrs.put("scimCustomFirst", rndString);
 
         String include="userName, name.givenName, nickName, urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomFirst";
-        Response response=client.updateUser(cheapClone, cheapClone.getId(), include, null, null);
+        Response response=client.updateUser(cheapClone, cheapClone.getId(), include, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         user=response.readEntity(usrClass);
@@ -108,7 +108,7 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
                 "urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomSecond, externalId, userName, name, " +
                 "urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomThird, userType, title, profileUrl";
 
-        Response response=client.updateUser(cheapClone, cheapClone.getId(), null, exclude, null);
+        Response response=client.updateUser(cheapClone, cheapClone.getId(), null, exclude);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         user=response.readEntity(usrClass);
@@ -138,7 +138,7 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods = "update2")
+    @Test(dependsOnMethods = "update2", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }

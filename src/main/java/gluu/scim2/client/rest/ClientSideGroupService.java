@@ -1,6 +1,6 @@
 package gluu.scim2.client.rest;
 
-import org.gluu.oxtrust.ws.rs.scim2.GroupService;
+import org.gluu.oxtrust.ws.rs.scim2.IGroupWebService;
 import org.gluu.oxtrust.ws.rs.scim2.PATCH;
 
 import javax.ws.rs.*;
@@ -12,7 +12,7 @@ import static org.gluu.oxtrust.model.scim2.Constants.*;
 /**
  * Created by jgomer on 2017-09-14.
  */
-public interface ClientSideGroupService extends GroupService {
+public interface ClientSideGroupService extends IGroupWebService, CloseableClient {
 
     @Path("/scim/v2/Groups")
     @POST
@@ -22,8 +22,7 @@ public interface ClientSideGroupService extends GroupService {
     Response createGroup(
             String jsonGroup,
             @QueryParam(QUERY_PARAM_ATTRIBUTES) String attrsList,
-            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList,
-            @HeaderParam("Authorization") String authorization);
+            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList);
 
     @Path("/scim/v2/Groups/{id}")
     @PUT
@@ -34,9 +33,7 @@ public interface ClientSideGroupService extends GroupService {
             String jsonGroup,
             @PathParam("id") String id,
             @QueryParam(QUERY_PARAM_ATTRIBUTES) String attrsList,
-            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList,
-            @HeaderParam("Authorization") String authorization);
-
+            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList);
 
     @Path("/scim/v2/Groups/{id}")
     @PATCH
@@ -47,6 +44,6 @@ public interface ClientSideGroupService extends GroupService {
             String jsonPatch,
             @PathParam("id") String id,
             @QueryParam(QUERY_PARAM_ATTRIBUTES) String attrsList,
-            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList,
-            @HeaderParam("Authorization") String authorization);
+            @QueryParam(QUERY_PARAM_EXCLUDED_ATTRS) String excludedAttrsList);
+
 }

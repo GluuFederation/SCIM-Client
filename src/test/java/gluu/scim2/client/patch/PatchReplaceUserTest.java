@@ -1,8 +1,8 @@
 package gluu.scim2.client.patch;
 
 import gluu.scim2.client.UserBaseTest;
-import org.gluu.oxtrust.model.scim2.PatchOperation;
-import org.gluu.oxtrust.model.scim2.PatchRequest;
+import org.gluu.oxtrust.model.scim2.patch.PatchOperation;
+import org.gluu.oxtrust.model.scim2.patch.PatchRequest;
 import org.gluu.oxtrust.model.scim2.user.Address;
 import org.gluu.oxtrust.model.scim2.user.InstantMessagingAddress;
 import org.gluu.oxtrust.model.scim2.user.PhoneNumber;
@@ -39,7 +39,7 @@ public class PatchReplaceUserTest extends UserBaseTest {
     @Test(dependsOnMethods = "create", groups = "A")
     public void jsonNoPathPatch1(String patchRequest){
 
-        Response response = client.patchUser(patchRequest, user.getId(), null, null, null);
+        Response response = client.patchUser(patchRequest, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
@@ -67,7 +67,7 @@ public class PatchReplaceUserTest extends UserBaseTest {
     @Test(dependsOnMethods = "jsonNoPathPatch1")
     public void jsonNoPathPatch2(String patchRequest){
 
-        Response response = client.patchUser(patchRequest, user.getId(), null, null, null);
+        Response response = client.patchUser(patchRequest, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
@@ -104,7 +104,7 @@ public class PatchReplaceUserTest extends UserBaseTest {
     @Test(dependsOnMethods = "jsonNoPathPatch2")
     public void jsonPathPatch1(String patchRequest){
 
-        Response response = client.patchUser(patchRequest, user.getId(), null, null, null);
+        Response response = client.patchUser(patchRequest, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
@@ -129,7 +129,7 @@ public class PatchReplaceUserTest extends UserBaseTest {
     @Test(dependsOnMethods = "jsonPathPatch1")
     public void jsonPathPatch2(String patchRequest){
 
-        Response response = client.patchUser(patchRequest, user.getId(), null, null, null);
+        Response response = client.patchUser(patchRequest, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
@@ -175,7 +175,7 @@ public class PatchReplaceUserTest extends UserBaseTest {
         PatchRequest pr=new PatchRequest();
         pr.setOperations(Collections.singletonList(op));
 
-        Response response = client.patchUser(pr, user.getId(), null, null, null);
+        Response response = client.patchUser(pr, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
@@ -188,7 +188,7 @@ public class PatchReplaceUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods = "objectPatch")
+    @Test(dependsOnMethods = "objectPatch", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }
