@@ -15,10 +15,8 @@ Detailed specifications for SCIM can be found at [RFC 7642](https://tools.ietf.o
 In Gluu's implementation, we have User, Group and Bulk operations. Below are the links for the latest Gluu implementation
 for SCIM client:
 
-* [SCIM 3.0.2 stable client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/3.0.2/)
-* [SCIM 3.1.2-SNAPSHOT client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/3.1.2-SNAPSHOT)
+* [SCIM 3.1.1 stable client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/3.1.2.Final/)
 
 Recommended reading before using the client:
 
-* [User Management with SCIM](https://www.gluu.org/docs/ce/admin-guide/user-scim/)
-* [SCIM protected by UMA](https://www.gluu.org/docs/ce/admin-guide/scim-uma/)
+* [User Management with SCIM](https://www.gluu.org/docs/ce/user-management/scim2/)
