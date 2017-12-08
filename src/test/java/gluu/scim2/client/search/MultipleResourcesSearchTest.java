@@ -14,14 +14,14 @@ import static org.testng.Assert.*;
 /**
  * Created by jgomer on 2017-10-26.
  */
-public class MultipleResourcesSearch extends BaseTest {
+public class MultipleResourcesSearchTest extends BaseTest {
 
     private SearchRequest sr;
     private ListResponse listResponse;
 
     @Parameters({"search_multiple_1","search_multiple_2"})
     @Test
-    public void searchJSon(String json1, String json2){
+    public void searchJson(String json1, String json2){
 
         Response response=client.searchResourcesPost(json1);
         assertEquals(response.getStatus(), OK.getStatusCode());
