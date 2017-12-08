@@ -46,7 +46,7 @@
 
     <test name="Multiple Resources Test" enabled="false">
         <classes>
-            <class name="gluu.scim2.client.search.MultipleResourcesSearch" />
+            <class name="gluu.scim2.client.search.MultipleResourcesSearchTest" />
         </classes>
     </test>
 
@@ -64,6 +64,13 @@
         <classes>
             <class name="gluu.scim2.client.corner.WrongPayloadUserExtTest" />
             <class name="gluu.scim2.client.corner.WrongPayloadUserTest" />
+        </classes>
+    </test>
+
+    <test name="Bulk operations" enabled="true">
+        <classes>
+            <class name="gluu.scim2.client.bulk.UsersBulkTest" />
+            <!--class name="gluu.scim2.client.bulk.GroupsBulkTest" /-->
         </classes>
     </test>
 
