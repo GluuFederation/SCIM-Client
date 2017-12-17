@@ -192,4 +192,5 @@ public class PatchReplaceUserTest extends UserBaseTest {
     public void delete(){
         deleteUser(user);
     }
+
 }

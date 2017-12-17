@@ -57,6 +57,7 @@
             <class name="gluu.scim2.client.patch.PatchDeleteUserTest" />
             <class name="gluu.scim2.client.patch.PatchGroupTest" />
             <class name="gluu.scim2.client.patch.PatchUserExtTest" />
+            <class name="gluu.scim2.client.patch.PatchValueFilterUserTest" />
         </classes>
     </test>
 
@@ -67,10 +68,10 @@
         </classes>
     </test>
 
-    <test name="Bulk operations" enabled="true">
+    <test name="Bulk operations" enabled="false">
         <classes>
             <class name="gluu.scim2.client.bulk.UsersBulkTest" />
-            <!--class name="gluu.scim2.client.bulk.GroupsBulkTest" /-->
+            <class name="gluu.scim2.client.bulk.GroupsBulkTest" />
         </classes>
     </test>
 
