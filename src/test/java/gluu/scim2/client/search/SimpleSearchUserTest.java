@@ -9,6 +9,8 @@ import org.testng.annotations.Test;
 
 import javax.ws.rs.core.Response;
 
+import java.time.Instant;
+
 import static javax.ws.rs.core.Response.Status.*;
 
 import static org.testng.Assert.*;
@@ -27,13 +29,14 @@ public class SimpleSearchUserTest extends UserBaseTest {
         user=createUserFromJson(json);
     }
 
-    @Test(dependsOnMethods="create")
+    @Test(dependsOnMethods="create", groups = "search")
     public void searchSimpleAttrGet(){
 
+        String isoDateString=user.getMeta().getCreated();
         String locale=user.getLocale();
-        logger.debug("Searching user with attribute locale = {} using GET verb", locale);
+        logger.debug("Searching user with attribute locale = {} and created date >= {} using GET verb", locale, isoDateString);
 
-        Response response=client.searchUsers("locale eq \"" + locale + "\"",
+        Response response=client.searchUsers(String.format("locale eq \"%s\" and meta.created ge \"%s\"", locale, isoDateString),
                 null, null, null, null, null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
@@ -46,7 +49,7 @@ public class SimpleSearchUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods="create")
+    @Test(dependsOnMethods="create", groups = "search")
     public void searchComplexAttrPost(){
 
         String givenName=user.getName().getGivenName();
@@ -66,15 +69,15 @@ public class SimpleSearchUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods="create")
+    @Test(dependsOnMethods="create", groups = "search")
     public void searchComplexMultivaluedPost(){
 
         String ghost = user.getEmails().get(0).getValue();
         final String host = ghost.substring(ghost.indexOf("@")+1);
-        logger.debug("Searching user with attribute emails.value like {} using POST verb", host);
+        logger.debug("Searching user with attribute emails.value like {} or phone numbers with type unassigned or value containing '+' using POST verb", host);
 
         SearchRequest sr=new SearchRequest();
-        sr.setFilter("emails.value ew \"" + host + "\"");
+        sr.setFilter("emails[value ew \"" + host + "\"] or urn:ietf:params:scim:schemas:core:2.0:User:phoneNumbers[value co \"+\" or type eq null]");
         Response response=client.searchUsersPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
@@ -100,6 +103,22 @@ public class SimpleSearchUserTest extends UserBaseTest {
 
         assertTrue(listResponse.getTotalResults()>0);
         logger.debug("There are {} users!", listResponse.getTotalResults());
+
+    }
+
+    @Test(dependsOnMethods = "create", groups ="search")
+    public void searchNoMatches(){
+
+        String nowIsoDateTimeString=Instant.ofEpochMilli(System.currentTimeMillis()).toString();
+
+        SearchRequest sr=new SearchRequest();
+        sr.setFilter(String.format("urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomThird eq 1 and displayName eq \"%s\" " +
+                "and addresses[postalCode ne null or type eq null] and meta.lastModified gt \"%s\"", "test", nowIsoDateTimeString));
+        Response response=client.searchUsersPost(sr);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        ListResponse listResponse=response.readEntity(ListResponse.class);
+        assertNull(listResponse.getResources());
 
     }
 
