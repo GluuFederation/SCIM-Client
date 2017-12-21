@@ -54,6 +54,16 @@ public abstract class AbstractScimClient<T> implements InvocationHandler {
         ClientMap.update(client, null);
     }
 
+    private Response invokeServiceMethod(Method method, Object[] args) throws ReflectiveOperationException{
+
+        logger.trace("Sending service request for method {}", method.getName());
+        Response response = (Response) method.invoke(scimService, args);
+        logger.trace("Received response entity was{} buffered", response.bufferEntity() ? "" : " not");
+        logger.trace("Response status code was {}", response.getStatus());
+        return response;
+
+    }
+
     /**
      * All client invocations are "intercepted and dispatched" here
      * @param proxy
@@ -77,19 +87,17 @@ public abstract class AbstractScimClient<T> implements InvocationHandler {
 
             //Set authorization header if needed
             if (unprotected!=null){
-                logger.trace("Sending request with no authorization header for method {}", methodName);
-                response = (Response) method.invoke(scimService, args);
+                response = invokeServiceMethod(method, args);
             }
             else{
-                logger.trace("Sending protected request for method {}", methodName);
                 ClientMap.update(client, getAuthenticationHeader());
-                response = (Response) method.invoke(scimService, args);
+                response = invokeServiceMethod(method, args);
 
                 if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
                     if (authorize(response)) {
-                        logger.trace("Second attempt of request (former received unauthorized response code)");
+                        logger.trace("Trying second attempt of request (former received unauthorized response code)");
                         ClientMap.update(client, getAuthenticationHeader());
-                        response = (Response) method.invoke(scimService, args);
+                        response = invokeServiceMethod(method, args);
                     }
                     else
                         logger.error("Could not get access token for current request: {}", methodName);

@@ -20,7 +20,6 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     public void createWrongCustAttrs1(String json){
         Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
-        response.close();
     }
 
     @Parameters("wrong_user_ext_create_2")
@@ -28,7 +27,6 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     public void createWrongCustAttrs2(String json){
         Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
-        response.close();
     }
 
     @Parameters("wrong_user_ext_create_3")
@@ -36,7 +34,6 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     public void createWrongCustAttrs3(String json){
         Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
-        response.close();
     }
 
     @Parameters("wrong_user_ext_create_4")
@@ -44,7 +41,6 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     public void createWrongCustAttrs4(String json){
         Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
-        response.close();
     }
 
     @Parameters("wrong_user_ext_create_5")
@@ -52,7 +48,6 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     public void createWrongCustAttrs5(String json){
         Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
-        response.close();
     }
 
     @Parameters("wrong_user_ext_create_6")
@@ -60,7 +55,6 @@ public class WrongPayloadUserExtTest extends UserBaseTest {
     public void createWrongCustAttrs6(String json){
         Response response=client.createUser(json, null, null);
         assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
-        response.close();
     }
 
 }

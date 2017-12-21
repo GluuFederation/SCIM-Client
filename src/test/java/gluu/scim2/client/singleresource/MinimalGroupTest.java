@@ -54,7 +54,6 @@ public class MinimalGroupTest extends BaseTest {
         logger.debug("Deleting group {}", group.getDisplayName());
         Response response=client.deleteGroup(group.getId());
         assertEquals(response.getStatus(), NO_CONTENT.getStatusCode());
-        response.close();
         logger.debug("deleted");
 
     }

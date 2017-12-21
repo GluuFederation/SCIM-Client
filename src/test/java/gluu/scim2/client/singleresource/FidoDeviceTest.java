@@ -97,8 +97,7 @@ public class FidoDeviceTest extends BaseTest {
         logger.debug("Deleting device");
         Response response=client.deleteDevice(device.getId());
         assertEquals(response.getStatus(), NO_CONTENT.getStatusCode());
-        response.close();
-
+        logger.debug("deleted");
     }
 
 }

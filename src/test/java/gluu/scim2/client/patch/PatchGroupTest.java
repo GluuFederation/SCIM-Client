@@ -108,8 +108,6 @@ public class PatchGroupTest extends BaseTest{
     public void delete(){
         Response response=client.deleteGroup(group.getId());
         assertEquals(response.getStatus(), NO_CONTENT.getStatusCode());
-        response.close();
-
     }
 
     private List<UserResource> getTestUsers(String displayNamePattern){

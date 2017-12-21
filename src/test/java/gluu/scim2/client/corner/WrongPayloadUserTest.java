@@ -22,7 +22,6 @@ public class WrongPayloadUserTest extends UserBaseTest {
     public void createWrongAttrs1(String json){
         Response response=client.createUser(json, null, null);
         assertNotEquals(response.getStatus(), CREATED.getStatusCode());
-        response.close();
     }
 
     @Parameters({"wrong_user_create_2"})
@@ -30,7 +29,6 @@ public class WrongPayloadUserTest extends UserBaseTest {
     public void createWrongAttrs2(String json){
         Response response=client.createUser(json, null, null);
         assertNotEquals(response.getStatus(), CREATED.getStatusCode());
-        response.close();
     }
 
     @Parameters({"wrong_user_create_3"})
@@ -38,7 +36,6 @@ public class WrongPayloadUserTest extends UserBaseTest {
     public void createWrongAttrs3(String json){
         Response response=client.createUser(json, null, null);
         assertNotEquals(response.getStatus(), CREATED.getStatusCode());
-        response.close();
     }
 
     @Parameters("user_minimal_create")
@@ -53,7 +50,6 @@ public class WrongPayloadUserTest extends UserBaseTest {
         user.setActive(true);
         Response response=client.updateUser(user, "not an id", null, null);
         assertNotEquals(response.getStatus(), CREATED.getStatusCode());
-        response.close();
     }
 
     @Test(dependsOnMethods = "updateWrongId", alwaysRun = true)

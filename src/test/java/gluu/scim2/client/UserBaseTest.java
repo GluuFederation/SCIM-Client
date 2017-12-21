@@ -33,7 +33,6 @@ public class UserBaseTest extends BaseTest {
         logger.debug("Deleting user {}", user.getUserName());
         Response response=client.deleteUser(user.getId());
         assertEquals(response.getStatus(), NO_CONTENT.getStatusCode());
-        response.close();
         logger.debug("deleted");
 
     }
