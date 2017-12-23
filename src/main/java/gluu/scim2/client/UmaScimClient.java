@@ -26,8 +26,14 @@ import org.xdi.util.StringHelper;
 import gluu.scim2.client.exception.ScimInitializationException;
 
 /**
- * SCIM UMA client
- *
+ * Instances of this class contain the necessary logic to handle the authorization processes required by a client of SCIM
+ * service in UMA mode of protection. For more information on SCIM protected by UMA 2.0 visit the
+ * <a href="https://www.gluu.org/docs/ce/user-management/scim2/">SCIM 2.0 docs page</a>.
+ * <p><b>Note:</b> Do not instantiate this class in your code. To interact with the service, call the corresponding method in
+ * class {@link gluu.scim2.client.factory.ScimClientFactory ScimClientFactory} that returns a proxy object wrapping this client
+ * @param <T> Type parameter of superclass
+ */
+/*
  * @author Yuriy Movchan
  * @author Yuriy Zabrovarnyy
  * Updated by jgomer on 2017-10-19
@@ -37,7 +43,7 @@ public class UmaScimClient<T> extends AbstractScimClient<T> {
     private static final long serialVersionUID = 7099883500099353832L;
 
     private Logger logger = LogManager.getLogger(getClass());
-    // UMA
+
     private String rpt;
 
     private String umaAatClientId;
@@ -45,6 +51,16 @@ public class UmaScimClient<T> extends AbstractScimClient<T> {
     private String umaAatClientJksPath;
     private String umaAatClientJksPassword;
 
+    /**
+     * Constructs a UmaScimClient object with the specified parameters and service contract
+     * @param serviceClass The service interface the underlying resteasy proxy client will adhere to. This proxy is used
+     *                     internally to execute all requests to the service
+     * @param domain The root URL of the SCIM service. Usually in the form {@code https://your.gluu-server.com/identity/restv1}
+     * @param umaAatClientId Requesting party Client Id
+     * @param umaAatClientJksPath Path to requesting party jks file in local filesystem
+     * @param umaAatClientJksPassword Keystore password
+     * @param umaAatClientKeyId Key Id in the keystore. Pass an empty string to use the first key in keystore
+     */
     public UmaScimClient(Class<T> serviceClass, String domain, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
         super(domain, serviceClass);
         this.umaAatClientId = umaAatClientId;
@@ -53,13 +69,24 @@ public class UmaScimClient<T> extends AbstractScimClient<T> {
         this.umaAatClientKeyId = umaAatClientKeyId;
     }
 
+    /**
+     * Builds a string suitable for being passed as an authorization header. It does so by prefixing the current Requesting
+     * Party Token this object has with the word "Bearer ".
+     * @return String built or null if this instance has no RPT yet
+     */
     @Override
-    protected String getAuthenticationHeader() {
+    String getAuthenticationHeader() {
     	return StringHelper.isEmpty(rpt) ?  null : "Bearer " + rpt;
     }
 
+    /**
+     * Recomputes a new RPT according to UMA workflow if the response passed as parameter has status code 401 (unauthorized).
+     * @param response A Response object corresponding to the request obtained in the previous call to a service method
+     * @return If the parameter passed has a status code different to 401, it returns false. Otherwise it returns the success
+     * of the attempt made to get a new RPT
+     */
     @Override
-    protected boolean authorize(Response response) {
+    boolean authorize(Response response) {
 
         boolean value = false;
 

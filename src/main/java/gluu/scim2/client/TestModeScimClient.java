@@ -1,3 +1,8 @@
+/*
+ * SCIM-Client is available under the MIT License (2008). See http://opensource.org/licenses/MIT for full text.
+ *
+ * Copyright (c) 2017, Gluu
+ */
 package gluu.scim2.client;
 
 import org.apache.logging.log4j.LogManager;
@@ -14,9 +19,19 @@ import java.net.URL;
 import java.util.*;
 
 /**
+ * Instances of this class contain the necessary logic to handle the authorization processes required by a client of SCIM
+ * service in test mode. For more information on test mode visit the
+ * <a href="https://www.gluu.org/docs/ce/user-management/scim2/">SCIM 2.0 docs page</a>.
+ * <p><b>Note:</b> Do not instantiate this class in your code. To interact with the service, call the corresponding method in
+ * class {@link gluu.scim2.client.factory.ScimClientFactory ScimClientFactory} that returns a proxy object wrapping this client
+ * @param <T> Type parameter of superclass
+ */
+/*
  * Created by jgomer on 2017-07-13.
  */
 public class TestModeScimClient<T> extends AbstractScimClient<T> {
+
+    private static final long serialVersionUID = 3141592672017122134L;
 
     private Logger logger = LogManager.getLogger(getClass());
 
@@ -38,10 +53,12 @@ public class TestModeScimClient<T> extends AbstractScimClient<T> {
     private static final String REDIRECT_URI="http://localhost/";    //a dummy value just to stay in compliance with specs (see redirect uris for native clients)
 
     /**
-     * Constructs a TestModeScimClient instance
-     * @param serviceUrl A string denoting the root URL of the protected resource, i.e. something like
-     *                   {@code https://<host:port>/identity/restv1}
-     * @param OIDCMetadataUrl String url of the openId connect metadata document
+     * Constructs a TestModeScimClient object with the specified parameters and service contract
+     * @param serviceClass The service interface the underlying resteasy proxy client will adhere to. This proxy is used
+     *                     internally to execute all requests to the service
+     * @param serviceUrl The root URL of the SCIM service. Usually in the form {@code https://your.gluu-server.com/identity/restv1}
+     * @param OIDCMetadataUrl URL of authorization servers' metadata document. Usually in the form {@code https://your.gluu-server.com/.well-known/openid-configuration}
+     * @throws Exception If there was a problem contacting the authorization server to initialize this object
      */
     public TestModeScimClient(Class<T> serviceClass, String serviceUrl, String OIDCMetadataUrl) throws Exception {
 
@@ -129,13 +146,24 @@ public class TestModeScimClient<T> extends AbstractScimClient<T> {
 
     }
 
+    /**
+     * Builds a string suitable for being passed as an authorization header. It does so by prefixing the current access
+     * token this object has with the word "Bearer "
+     * @return String built
+     */
     @Override
-    protected String getAuthenticationHeader(){
+    String getAuthenticationHeader(){
         return "Bearer " + access_token;
     }
 
+    /**
+     * Gets a new access token from the authorization server
+     * @param response This parameter is not used in practice: there is no need to inspect this value in a setting of
+     *                 test mode
+     * @return A boolean value indicating the operation was successful
+     */
     @Override
-    protected boolean authorize(Response response){
+    boolean authorize(Response response){
         /*
         This method is called if the attempt to use the service returned unauthorized (status = 401), so here we check if
         client expired to generate a new one & ask for another token, or else leave it that way (forbidden)

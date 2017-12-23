@@ -1,3 +1,8 @@
+/*
+ * SCIM-Client is available under the MIT License (2008). See http://opensource.org/licenses/MIT for full text.
+ *
+ * Copyright (c) 2017, Gluu
+ */
 package gluu.scim2.client.rest.provider;
 
 import org.apache.logging.log4j.LogManager;
@@ -6,8 +11,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.gluu.oxtrust.model.scim2.BaseScimResource;
 import org.gluu.oxtrust.model.scim2.ListResponse;
-import org.gluu.oxtrust.model.scim2.annotations.Schema;
 import org.gluu.oxtrust.model.scim2.util.IntrospectUtil;
+import org.gluu.oxtrust.model.scim2.util.ScimResourceUtil;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -27,8 +32,14 @@ import java.util.*;
 import static org.gluu.oxtrust.model.scim2.Constants.*;
 
 /**
- * A custom provider for deserialization of ListResponse objects. This allows reading (deserializing) subclasses of
- * BaseScimResource correctly. A standard way to solve this problem is using polymorphic type handling in jackson but it
+ * A custom provider for deserialization of {@link org.gluu.oxtrust.model.scim2.ListResponse org.gluu.oxtrust.model.scim2.ListResponse}
+ * objects.
+ * This allows reading (deserializing) subclasses of {@link org.gluu.oxtrust.model.scim2.BaseScimResource org.gluu.oxtrust.model.scim2.BaseScimResource}
+ * correctly.
+ * <p>Developers do not need to manipulate this class for their SCIM applications.</p>
+ */
+/*
+ * A standard way to solve this problem is using polymorphic type handling in jackson but it
  * pollutes resource classes and also introduces unrecognized attributes in responses that are not part of schema spec
  * Created by jgomer on 2017-10-20.
  */
@@ -66,7 +77,7 @@ public class ListResponseProvider implements MessageBodyReader<ListResponse> {
                 //Guess the real class of the resource by inspecting the schemas in it
                 for (String schema : schemas) {
                     for (Class<? extends BaseScimResource> cls : IntrospectUtil.allAttrs.keySet()) {
-                        if (cls.getAnnotation(Schema.class).id().equals(schema)) {
+                        if (ScimResourceUtil.getSchemaAnnotation(cls).id().equals(schema)) {
                             //Create the object with the proper class
                             resources.add(mapper.convertValue(resource, cls));
                             logger.trace("Found resource of class {} in ListResponse", cls.getSimpleName());
