@@ -15,8 +15,7 @@ import static org.testng.Assert.*;
 
 /**
  * NOTES:
- * Before running this test, first register at least one devices via the FIDO API (e.g., Super Gluu, u2f, etc.)
- * and fill up the values for userId attribute (the inum of device owner)
+ * Before running this test, first register at least one device via the FIDO API (u2f preferably).
  *
  * Created by jgomer on 2017-10-21.
  * Based on former Val Pecaoco's gluu.scim2.client.fido.FidoDevicesObjectTests
@@ -62,7 +61,7 @@ public class FidoDeviceTest extends BaseTest {
         FidoDeviceResource clone=(FidoDeviceResource) BeanUtils.cloneBean(device);
 
         clone.setDisplayName(Double.toString(Math.random()));
-        clone.setStatus("compromised");
+        clone.setNickname("compromised");
         String json=mapper.writeValueAsString(clone);
 
         logger.debug("Updating device with json");
@@ -71,7 +70,7 @@ public class FidoDeviceTest extends BaseTest {
 
         FidoDeviceResource updated=response.readEntity(fidoClass);
         assertNotEquals(updated.getDisplayName(), device.getDisplayName());
-        assertEquals(updated.getStatus(), "compromised");
+        assertEquals(updated.getNickname(), "compromised");
 
     }
 
@@ -85,13 +84,28 @@ public class FidoDeviceTest extends BaseTest {
         FidoDeviceResource updated=response.readEntity(fidoClass);
 
         //Naively compare (property-to-property) the original and new object. It's feasible since all of them are strings
-        for (String path : IntrospectUtil.allAttrs.get(fidoClass))
-            if (!path.startsWith("meta"))   //Exclude metas since they diverge
-                assertEquals(BeanUtils.getProperty(updated, path), BeanUtils.getProperty(device, path));
+        for (String path : IntrospectUtil.allAttrs.get(fidoClass)){
+            String val=BeanUtils.getProperty(device, path);
+            //Exclude metas since they diverge and skip if original attribute was null (when passing null for an update, server ignores)
+            if (!path.startsWith("meta") && val!=null)
+                assertEquals(BeanUtils.getProperty(updated, path), val);
+        }
+
+        //Update an immutable attribute (originally null)
+        assertNull(updated.getDeviceData());
+        updated.setDeviceData("Dummy device data");
+        response=client.updateDevice(updated, updated.getId(), null, null);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        updated=response.readEntity(fidoClass);
+        assertNotNull(updated.getDeviceData());
+
+        //NOTE: if you don't see device data attribute for this device in LDAP is because the attribute is marked as being
+        //ignored upon update (see org.gluu.oxtrust.model.fido.GluuCustomFidoDevice)
 
     }
 
-    @Test(dependsOnMethods = "updateWithObject", alwaysRun = true)
+    //@Test(dependsOnMethods = "updateWithObject", alwaysRun = true)
     public void delete(){
 
         logger.debug("Deleting device");
