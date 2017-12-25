@@ -104,7 +104,44 @@ public class PatchGroupTest extends BaseTest{
 
     }
 
-    @Test(dependsOnMethods = "patch2", alwaysRun = true)
+    @Test(dependsOnMethods = "patch2")
+    public void patch3(){
+
+        Member members[]=group.getMembers().toArray(new Member[0]);
+
+        //Try modifying one of the members. This should fail because of mutability
+        PatchOperation operation=new PatchOperation();
+        operation.setOperation("replace");
+        operation.setPath(String.format("members[value eq \"%s\"].value", members[0].getValue()));
+        operation.setValue(members[1].getValue());
+
+        PatchRequest pr=new PatchRequest();
+        pr.setOperations(Collections.singletonList(operation));
+
+        Response response=client.patchGroup(pr, group.getId(), null, null);
+        assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
+
+        //Try modifying one of the members. This should not fail ...
+        operation.setValue(members[0].getValue());
+        response=client.patchGroup(pr, group.getId(), null, null);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        //Try deleting value subattribute. This should fail ...
+        operation.setOperation("remove");
+        response=client.patchGroup(pr, group.getId(), null, null);
+        assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
+
+        //Try removing one of the members. This should not fail ...
+        operation.setPath(String.format("members[value eq \"%s\"]", members[0].getValue()));
+        response=client.patchGroup(pr, group.getId(), null, null);
+        group=response.readEntity(GroupResource.class);
+
+        assertEquals(response.getStatus(), OK.getStatusCode());
+        assertEquals(members.length-1, group.getMembers().size());
+
+    }
+
+    @Test(dependsOnMethods = "patch3", alwaysRun = true)
     public void delete(){
         Response response=client.deleteGroup(group.getId());
         assertEquals(response.getStatus(), NO_CONTENT.getStatusCode());
