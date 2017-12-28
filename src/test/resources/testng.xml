@@ -55,9 +55,9 @@
             <class name="gluu.scim2.client.patch.PatchReplaceUserTest" />
             <class name="gluu.scim2.client.patch.PatchAddUserTest" />
             <class name="gluu.scim2.client.patch.PatchDeleteUserTest" />
-            <class name="gluu.scim2.client.patch.PatchGroupTest" />
             <class name="gluu.scim2.client.patch.PatchUserExtTest" />
             <class name="gluu.scim2.client.patch.PatchValueFilterUserTest" />
+            <class name="gluu.scim2.client.patch.PatchGroupTest" />
         </classes>
     </test>
 
@@ -65,6 +65,7 @@
         <classes>
             <class name="gluu.scim2.client.corner.WrongPayloadUserExtTest" />
             <class name="gluu.scim2.client.corner.WrongPayloadUserTest" />
+            <class name="gluu.scim2.client.corner.WrongPayloadUserPatchTest" />
         </classes>
     </test>
 
