@@ -7,7 +7,7 @@ package gluu.scim2.client.servicemeta;
 
 import gluu.scim2.client.BaseTest;
 import org.gluu.oxtrust.model.scim2.annotations.Schema;
-import org.gluu.oxtrust.model.scim2.provider.ServiceProviderConfig;
+import org.gluu.oxtrust.model.scim2.provider.config.ServiceProviderConfig;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
