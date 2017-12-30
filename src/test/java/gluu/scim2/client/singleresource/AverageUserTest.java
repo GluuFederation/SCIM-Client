@@ -7,7 +7,6 @@ package gluu.scim2.client.singleresource;
 
 import gluu.scim2.client.UserBaseTest;
 import org.gluu.oxtrust.model.scim2.user.Group;
-import org.gluu.oxtrust.model.scim2.user.PhoneNumber;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -16,7 +15,6 @@ import javax.ws.rs.core.Response;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
 
 import static javax.ws.rs.core.Response.Status.*;
 

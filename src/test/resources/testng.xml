@@ -28,6 +28,7 @@
             <class name="gluu.scim2.client.search.ComplexSearchUserTest" />
             <class name="gluu.scim2.client.search.PaginationUserSearchTest" />
             <class name="gluu.scim2.client.singleresource.FullUserTest" />
+            <class name="gluu.scim2.client.multipleresource.GroupAssignUserTest" />
         </classes>
     </test>
 
