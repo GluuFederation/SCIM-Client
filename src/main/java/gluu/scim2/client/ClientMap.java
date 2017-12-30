@@ -40,7 +40,7 @@ public class ClientMap {
 
     /**
      * Removes a client from the map and then calls its close method to free resources.
-     * @param client
+     * @param client Client to remove
      */
     public static void remove(Client client){
         //Frees the resources associated to this RestEasy client

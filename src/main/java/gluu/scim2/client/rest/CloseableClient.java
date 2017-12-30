@@ -8,7 +8,7 @@ package gluu.scim2.client.rest;
 import javax.ws.rs.GET;
 
 /**
- * This interface exhibits only one method ({@link #close() close}). This is used by {@link gluu.scim2.client.AbstractScimClient AbstractScimClient}
+ * This interface exhibits only one method: {@link #close() close}. This is used by {@link gluu.scim2.client.AbstractScimClient AbstractScimClient}
  * as a workaround method to allow clients obtained via {@link gluu.scim2.client.factory.ScimClientFactory ScimClientFactory}
  * to be closeable.
  * <p>Existing Java standard interfaces like Closeable or Autocloseable are not suitable since the {@link #close() close}
