@@ -7,6 +7,7 @@ package gluu.scim2.client.patch;
 
 import gluu.scim2.client.UserBaseTest;
 
+import org.gluu.oxtrust.model.scim2.CustomAttributes;
 import org.gluu.oxtrust.model.scim2.patch.PatchOperation;
 import org.gluu.oxtrust.model.scim2.patch.PatchRequest;
 import org.gluu.oxtrust.model.scim2.user.PhoneNumber;
@@ -50,19 +51,19 @@ public class PatchUserExtTest extends UserBaseTest {
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
-
-        Map<String, Object> custAttrs=other.getExtendedAttributes(USER_EXT_SCHEMA_ID);
+        //For help on usage of org.gluu.oxtrust.model.scim2.CustomAttributes class, read its api docs (oxtrust-scim maven project)
+        CustomAttributes custAttrs=other.getCustomAttributes(USER_EXT_SCHEMA_ID);
 
         //Verify new items appeared in scimCustomSecond
-        Collection scimCustomSecond=(Collection)custAttrs.get("scimCustomSecond");
+        List<Date> scimCustomSecond=custAttrs.getValues("scimCustomSecond", Date.class);
         assertEquals(scimCustomSecond.size(), 6);
 
         //Verify change in value of scimCustomThird
-        Integer scimCustomThird=(Integer)custAttrs.get("scimCustomThird");
-        assertEquals(new Integer(1), scimCustomThird);
+        int scimCustomThird=custAttrs.getValue("scimCustomThird", Integer.class);
+        assertEquals(1, scimCustomThird);
 
         //Verify scimCustomFirst disappeared
-        assertNull(custAttrs.get("scimCustomFirst"));
+        assertNull(custAttrs.getValue("scimCustomFirst", String.class));
 
         //Verify some others disappeared too
         assertNull(other.getAddresses().get(0).getType());
@@ -92,15 +93,12 @@ public class PatchUserExtTest extends UserBaseTest {
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
-        Map<String, Object> custAttrs=other.getExtendedAttributes(USER_EXT_SCHEMA_ID);
+        CustomAttributes custAttrs=other.getCustomAttributes(USER_EXT_SCHEMA_ID);
 
         //Verify different dates appeared in scimCustomSecond
-        List<String> scimCustomSecond=(List<String>) custAttrs.get("scimCustomSecond");
+        List<Date> scimCustomSecond=custAttrs.getValues("scimCustomSecond", Date.class);
         assertEquals(scimCustomSecond.size(), someDates.size());
-
-        String aStrDate=scimCustomSecond.get(0);    //This is coming in ISO format with offset (see DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-        long instant=Instant.from(OffsetDateTime.parse(aStrDate)).toEpochMilli();
-        assertEquals(now, instant);
+        assertEquals(now, scimCustomSecond.get(0).getTime());
 
     }
 

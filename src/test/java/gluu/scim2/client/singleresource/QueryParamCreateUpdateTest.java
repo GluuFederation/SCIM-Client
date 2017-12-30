@@ -6,6 +6,7 @@
 package gluu.scim2.client.singleresource;
 
 import gluu.scim2.client.UserBaseTest;
+import org.gluu.oxtrust.model.scim2.CustomAttributes;
 import org.gluu.oxtrust.model.scim2.user.Email;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.testng.annotations.Parameters;
@@ -14,6 +15,7 @@ import org.testng.annotations.Test;
 import javax.ws.rs.core.Response;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
@@ -76,8 +78,9 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
         cheapClone.setNickName("Cloned");
 
         String rndString=Double.toString(Math.random());
-        Map<String, Object> custAttrs=cheapClone.getExtendedAttributes(USER_EXT_SCHEMA_ID);
-        custAttrs.put("scimCustomFirst", rndString);
+        //For help on usage of org.gluu.oxtrust.model.scim2.CustomAttributes class, read its api docs (oxtrust-scim maven project)
+        CustomAttributes custAttrs=cheapClone.getCustomAttributes(USER_EXT_SCHEMA_ID);
+        custAttrs.setAttribute("scimCustomFirst", rndString);
 
         String include="userName, name.givenName, nickName, urn:ietf:params:scim:schemas:extension:gluu:2.0:User:scimCustomFirst";
         Response response=client.updateUser(cheapClone, cheapClone.getId(), include, null);
@@ -89,11 +92,10 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
         assertEquals(user.getName().getGivenName(), cheapClone.getName().getGivenName());
         assertEquals(user.getNickName(), cheapClone.getNickName());
 
-        custAttrs=user.getExtendedAttributes(USER_EXT_SCHEMA_ID);
-        assertNull(custAttrs.get("scimCustomSecond"));
-        assertNull(custAttrs.get("scimCustomThird"));
-
-        assertEquals(custAttrs.get("scimCustomFirst"), rndString);
+        custAttrs=user.getCustomAttributes(USER_EXT_SCHEMA_ID);
+        assertNull(custAttrs.getValues("scimCustomSecond", Date.class));
+        assertNull(custAttrs.getValue("scimCustomThird", Integer.class));
+        assertEquals(custAttrs.getValue("scimCustomFirst", String.class), rndString);
 
     }
 
@@ -122,8 +124,7 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
         assertNotNull(user.getNickName());
 
         //Verify excluded are not present
-        //Custom attributes is never null (the member is initialized as an empty map in BaseScimResource)
-        assertEquals(user.getExtendedAttributes().size(), 0);
+        assertNull(user.getCustomAttributes(USER_EXT_SCHEMA_ID));
         assertNull(user.getExternalId());
         assertNull(user.getUserName());
         assertNull(user.getName());
@@ -166,9 +167,9 @@ public class QueryParamCreateUpdateTest extends UserBaseTest {
         assertNotNull(user.getName().getGivenName());
 
         //Verify cust attrs are there
-        Map<String, Object> custAttrs=user.getExtendedAttributes(USER_EXT_SCHEMA_ID);
-        assertNotNull(custAttrs.get("scimCustomSecond"));
-        assertNotNull(custAttrs.get("scimCustomThird"));
+        CustomAttributes custAttrs=user.getCustomAttributes(USER_EXT_SCHEMA_ID);
+        assertNotNull(custAttrs.getValues("scimCustomSecond", Date.class));
+        assertNotNull(custAttrs.getValue("scimCustomThird", Integer.class));
 
         //Verify e-mails were retrieved
         assertNotNull(user.getEmails());
