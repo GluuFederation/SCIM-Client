@@ -40,7 +40,7 @@ import static org.gluu.oxtrust.model.scim2.Constants.*;
  */
 /*
  * A standard way to solve this problem is using polymorphic type handling in jackson but it
- * pollutes resource classes and also introduces unrecognized attributes in responses that are not part of schema spec
+ * pollutes resource classes and also might introduce unrecognized attributes in responses that are not part of schema spec
  * Created by jgomer on 2017-10-20.
  */
 @Provider
@@ -71,7 +71,7 @@ public class ListResponseProvider implements MessageBodyReader<ListResponse> {
             resources=new ArrayList<>();
             //Here we assume everything is coming from the server correctly (that is, following the spec) and conversions succeed
             for (Object resource : (Collection) branch){
-                Map<String, Object> resourceAsMap=(Map<String, Object>) resource;
+                Map<String, Object> resourceAsMap=IntrospectUtil.strObjMap(resource);
                 List<String> schemas=(List<String>) resourceAsMap.get("schemas");
 
                 //Guess the real class of the resource by inspecting the schemas in it
