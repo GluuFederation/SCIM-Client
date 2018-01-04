@@ -5,550 +5,127 @@
  */
 package gluu.scim2.client;
 
-import gluu.scim2.client.jackson.ScimContextResolver;
-import gluu.scim2.client.jackson.ScimProvider;
-import gluu.scim2.client.rest.ScimService;
-import org.apache.commons.lang.StringUtils;
-import org.gluu.oxtrust.model.scim2.*;
-import org.gluu.oxtrust.model.scim2.fido.FidoDevice;
-import org.gluu.oxtrust.model.scim2.provider.ResourceType;
-import org.gluu.oxtrust.model.scim2.provider.ServiceProviderConfig;
-import org.gluu.oxtrust.model.scim2.schema.extension.UserExtensionSchema;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.client.core.BaseClientResponse;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import gluu.scim2.client.rest.FreelyAccessible;
+import gluu.scim2.client.rest.provider.AuthorizationInjectionFilter;
+import gluu.scim2.client.rest.provider.ListResponseProvider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
 import javax.ws.rs.core.Response;
-
-import static org.gluu.oxtrust.model.scim2.Constants.MAX_COUNT;
+import java.io.Serializable;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 /**
- * SCIM default client
- *
- * @author Yuriy Movchan Date: 08/23/2013
+ * The base class for specific SCIM clients.
+ * <p>Upon initialization, this class internally creates a RestEasy proxy client based on parameters passed. This proxy
+ * is used to invoke the operations the service offers. The exact methods that can be called are driven by the interface
+ * class passed in the constructor.</p>
+ * <p>When a service method is invoked through an instance obtained by any of the factory methods of
+ * {@link gluu.scim2.client.factory.ScimClientFactory ScimClientFactory}, the call is dispatched by the {@link #invoke(Object, Method, Object[]) invoke}
+ * method of this class, which properly handles the authorization details in conjuction with the filter
+ * {@link gluu.scim2.client.rest.provider.AuthorizationInjectionFilter AuthorizationInjectionFilter}.</p>
+ * <p>Concrete subclasses of this class must provide {@link #getAuthenticationHeader() getAuthenticationHeader} and
+ * {@link #authorize(Response) authorize} methods that must implement specific ways to obtain access tokens depending
+ * on how the SCIM service is being protected.</p>
+ * @param <T> The type of the internal RestEasy proxy used by this class. This is the same type that
+ * {@link gluu.scim2.client.factory.ScimClientFactory ScimClientFactory} methods return.
  */
-public abstract class AbstractScimClient implements ScimClient {
+/*
+ * @author Yuriy Movchan Date: 08/23/2013
+ * Re-engineered by jgomer on 2017-09-14.
+ */
+public abstract class AbstractScimClient<T> implements InvocationHandler, Serializable {
 
     private static final long serialVersionUID = 9098930517944520482L;
 
-    private ScimService scimService;
+    private Logger logger = LogManager.getLogger(getClass());
 
-    public AbstractScimClient(String domain) {
-        ResteasyProviderFactory resteasyProviderFactory = ResteasyProviderFactory.getInstance();
-        resteasyProviderFactory.registerProvider(ScimContextResolver.class);
-        resteasyProviderFactory.registerProvider(ScimProvider.class);
-        this.scimService = ProxyFactory.create(ScimService.class, ProxyFactory.createUri(domain), ClientRequest.getDefaultExecutor(), resteasyProviderFactory);
+    //All method calls using scimService (with exception of close) will return a javax.ws.rs.core.Response object.
+    //The underlying data can be read using the readEntity method
+    private T scimService;
+
+    private ResteasyClient client;
+
+    AbstractScimClient(String domain, Class<T> serviceClass){
+        /*
+         Configures a proxy to interact with the service using the new JAX-RS 2.0 Client API, see section
+         "Resteasy Proxy Framework" of RESTEasy JAX-RS user guide
+         */
+        client = new ResteasyClientBuilder().build();
+        ResteasyWebTarget target = client.target(domain);
+
+        scimService = target.proxy(serviceClass);
+        target.register(ListResponseProvider.class);
+        target.register(AuthorizationInjectionFilter.class);
+
+        ClientMap.update(client, null);
     }
 
-    protected abstract void prepareRequest();
+    /*
+     * The actual call to service methods is done here. Note that the response is buffered so the underlying input
+     * stream is fully consumed, so there is no need to create finally blocks with close(). Also, the readEntity method
+     * can be called any number of times. For instance, the "raw" response can be inspected by using readEntity(String.class)
+     */
+    private Response invokeServiceMethod(Method method, Object[] args) throws ReflectiveOperationException{
 
-    protected abstract String getAuthenticationHeader();
+        logger.trace("Sending service request for method {}", method.getName());
+        Response response = (Response) method.invoke(scimService, args);
+        logger.trace("Received response entity was{} buffered", response.bufferEntity() ? "" : " not");
+        logger.trace("Response status code was {}", response.getStatus());
+        return response;
 
-    protected abstract boolean authorize(BaseClientResponse response);
-
-    protected boolean isNeededToAuthorize(BaseClientResponse response) {
-        if (response.getStatus() != Response.Status.UNAUTHORIZED.getStatusCode()) {
-            return false;
-        }
-        try {
-            return authorize(response);
-        } finally {
-            response.releaseConnection(); // close InputStream
-        }
     }
 
-    @Override
-    public final BaseClientResponse<ServiceProviderConfig> retrieveServiceProviderConfig() {
-        BaseClientResponse<ServiceProviderConfig> response = null;
-        prepareRequest();
-        try {
-            response = scimService.retrieveServiceProviderConfig(getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.retrieveServiceProviderConfig(getAuthenticationHeader());
+    /**
+     * This method is the single point of dispatch for any and all the requests made to the service. It takes care of
+     * requesting access tokens when necessary and make them available when requests are bound to be issued.
+     * <p>As with all methods of this class and its subclasses, invoke is not called directly by developers: the calls are
+     * triggered when the objects returned by factory methods of {@link gluu.scim2.client.factory.ScimClientFactory ScimClientFactory}
+     * are manipulated.</p>
+     * @return The response associated to the invocation (normally a javax.ws.rs.core.Response instance)
+     */
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable{
+
+        String methodName=method.getName();
+
+        if (methodName.equals("close")) {
+            logger.info("Closing RestEasy client");
+            ClientMap.remove(client);
+            return null;
+        }
+        else{
+            Response response;
+            FreelyAccessible unprotected=method.getAnnotation(FreelyAccessible.class);
+
+            //Set authorization header if needed
+            if (unprotected!=null){
+                response = invokeServiceMethod(method, args);
+            }
+            else{
+                ClientMap.update(client, getAuthenticationHeader());
+                response = invokeServiceMethod(method, args);
+
+                if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+                    if (authorize(response)) {
+                        logger.trace("Trying second attempt of request (former received unauthorized response code)");
+                        ClientMap.update(client, getAuthenticationHeader());
+                        response = invokeServiceMethod(method, args);
+                    }
+                    else
+                        logger.error("Could not get access token for current request: {}", methodName);
+                }
+            }
             return response;
-        } finally {
-            finalize(response);
         }
+
     }
 
-    @Override
-    public final BaseClientResponse<ResourceType> retrieveResourceTypes() {
-        BaseClientResponse<ResourceType> response = null;
-        prepareRequest();
-        try {
-            response = scimService.retrieveResourceTypes(getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.retrieveResourceTypes(getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
+    abstract String getAuthenticationHeader();
 
-    @Override
-    @Deprecated
-    public final BaseClientResponse<User> retrievePerson(String id, String mediaType) {
-        return retrieveUser(id, new String[]{});
-    }
+    abstract boolean authorize(Response response);
 
-    @Override
-    public final BaseClientResponse<User> retrieveUser(String id, String[] attributesArray) {
-        BaseClientResponse<User> response = null;
-        prepareRequest();
-
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.retrieveUser(id, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.retrieveUser(id, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public final BaseClientResponse<User> createPerson(User user, String mediaType) {
-        return createUser(user, new String[]{});
-    }
-
-    @Override
-    public final BaseClientResponse<User> createUser(User user, String[] attributesArray) {
-        BaseClientResponse<User> response = null;
-        prepareRequest();
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.createUser(user, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.createUser(user, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public final BaseClientResponse<User> updatePerson(User user, String id, String mediaType) {
-        return updateUser(user, id, new String[]{});
-    }
-
-    @Override
-    public final BaseClientResponse<User> updateUser(User user, String id, String[] attributesArray) {
-        BaseClientResponse<User> response = null;
-        prepareRequest();
-
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.updateUser(user, id, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.updateUser(user, id, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse deletePerson(String id) {
-        BaseClientResponse response = null;
-        prepareRequest();
-        try {
-            response = scimService.deletePerson(id, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.deletePerson(id, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public final BaseClientResponse<Group> retrieveGroup(String id, String mediaType) {
-        return retrieveGroup(id, new String[]{});
-    }
-
-    @Override
-    public final BaseClientResponse<Group> retrieveGroup(String id, String[] attributesArray) {
-        BaseClientResponse<Group> response = null;
-        prepareRequest();
-
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.retrieveGroup(id, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.retrieveGroup(id, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public final BaseClientResponse<Group> createGroup(Group group, String mediaType) {
-        return createGroup(group, new String[]{});
-    }
-
-    @Override
-    public final BaseClientResponse<Group> createGroup(Group group, String[] attributesArray) {
-        BaseClientResponse<Group> response = null;
-        prepareRequest();
-
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.createGroup(group, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.createGroup(group, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public final BaseClientResponse<Group> updateGroup(Group group, String id, String mediaType) {
-        return updateGroup(group, id, new String[]{});
-    }
-
-    @Override
-    public final BaseClientResponse<Group> updateGroup(Group group, String id, String[] attributesArray) {
-        BaseClientResponse<Group> response = null;
-        prepareRequest();
-
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.updateGroup(group, id, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.updateGroup(group, id, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse deleteGroup(String id) {
-        BaseClientResponse response = null;
-        prepareRequest();
-
-        try {
-            response = scimService.deleteGroup(id, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.deleteGroup(id, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public final BaseClientResponse<User> createPersonString(String person, String mediaType) {
-
-        BaseClientResponse<User> response = null;
-        prepareRequest();
-
-        try {
-            response = scimService.createPersonString(person, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.createPersonString(person, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public final BaseClientResponse<User> updatePersonString(String person, String id, String mediaType) {
-        BaseClientResponse<User> response = null;
-        prepareRequest();
-
-        try {
-            response = scimService.updatePersonString(person, id, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.updatePersonString(person, id, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public final BaseClientResponse<Group> createGroupString(String group, String mediaType) {
-        BaseClientResponse<Group> response = null;
-        prepareRequest();
-
-        try {
-            response = scimService.createGroupString(group, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.createGroupString(group, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public final BaseClientResponse<Group> updateGroupString(String group, String id, String mediaType) {
-        BaseClientResponse<Group> response = null;
-        prepareRequest();
-
-        try {
-            response = scimService.updateGroupString(group, id, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.updateGroupString(group, id, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse<BulkResponse> processBulkOperation(BulkRequest bulkRequest) {
-        BaseClientResponse<BulkResponse> response = null;
-        prepareRequest();
-
-        try {
-            response = scimService.processBulkOperation(bulkRequest, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.processBulkOperation(bulkRequest, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse<BulkResponse> processBulkOperationString(String bulkRequestString) {
-        BaseClientResponse<BulkResponse> response = null;
-        prepareRequest();
-
-        try {
-            response = scimService.processBulkOperationString(bulkRequestString, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.processBulkOperationString(bulkRequestString, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse<ListResponse> retrieveAllUsers() {
-        return searchUsers("", 1, MAX_COUNT, "", "", new String[]{});
-    }
-
-    @Override
-    public final BaseClientResponse<ListResponse> searchUsers(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) {
-        BaseClientResponse<ListResponse> response = null;
-        prepareRequest();
-
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.searchUsers(filter, startIndex, count, sortBy, sortOrder, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse<ListResponse> searchUsersPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) {
-        BaseClientResponse<ListResponse> response = null;
-        prepareRequest();
-
-        SearchRequest searchRequest = new SearchRequest();
-        searchRequest.setAttributesArray((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null);
-        searchRequest.setCount(count);
-        searchRequest.setFilter(filter);
-        searchRequest.setSortBy(sortBy);
-        searchRequest.setSortOrder(sortOrder);
-        searchRequest.setStartIndex(startIndex);
-
-        try {
-            response = scimService.searchUsersPost(searchRequest, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.searchUsersPost(searchRequest, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse<ListResponse> retrieveAllGroups() {
-        return searchGroups("", 1, MAX_COUNT, "", "", new String[]{});
-    }
-
-    @Override
-    public final BaseClientResponse<ListResponse> searchGroups(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) {
-        BaseClientResponse<ListResponse> response = null;
-        prepareRequest();
-
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.searchGroups(filter, startIndex, count, sortBy, sortOrder, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse<ListResponse> searchGroupsPost(String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) {
-        BaseClientResponse<ListResponse> response = null;
-        prepareRequest();
-
-        SearchRequest searchRequest = new SearchRequest();
-        searchRequest.setAttributesArray((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null);
-        searchRequest.setCount(count);
-        searchRequest.setFilter(filter);
-        searchRequest.setSortBy(sortBy);
-        searchRequest.setSortOrder(sortOrder);
-        searchRequest.setStartIndex(startIndex);
-
-        try {
-            response = scimService.searchGroupsPost(searchRequest, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.searchGroupsPost(searchRequest, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse<UserExtensionSchema> getUserExtensionSchema() {
-        BaseClientResponse<UserExtensionSchema> response = null;
-        try {
-            response = scimService.getUserExtensionSchema(Constants.USER_EXT_SCHEMA_ID);
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse<ListResponse> searchFidoDevices(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) {
-        BaseClientResponse<ListResponse> response = null;
-        prepareRequest();
-
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.searchFidoDevices(userId, filter, startIndex, count, sortBy, sortOrder, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.searchFidoDevices(userId, filter, startIndex, count, sortBy, sortOrder, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse<ListResponse> searchFidoDevicesPost(String userId, String filter, int startIndex, int count, String sortBy, String sortOrder, String[] attributesArray) {
-        BaseClientResponse<ListResponse> response = null;
-        prepareRequest();
-
-        SearchRequest searchRequest = new SearchRequest();
-        searchRequest.setAttributesArray((attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null);
-        searchRequest.setCount(count);
-        searchRequest.setFilter(filter);
-        searchRequest.setSortBy(sortBy);
-        searchRequest.setSortOrder(sortOrder);
-        searchRequest.setStartIndex(startIndex);
-
-        try {
-            response = scimService.searchFidoDevicesPost(userId, searchRequest, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.searchFidoDevicesPost(userId, searchRequest, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse<FidoDevice> retrieveFidoDevice(String id, String userId, String[] attributesArray) {
-        BaseClientResponse<FidoDevice> response = null;
-        prepareRequest();
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.retrieveFidoDevice(id, userId, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.retrieveFidoDevice(id, userId, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse<FidoDevice> updateFidoDevice(FidoDevice fidoDevice, String[] attributesArray) {
-        BaseClientResponse<FidoDevice> response = null;
-        prepareRequest();
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.updateFidoDevice(fidoDevice.getId(), fidoDevice, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.updateFidoDevice(fidoDevice.getId(), fidoDevice, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    @Override
-    public final BaseClientResponse deleteFidoDevice(String id) {
-        BaseClientResponse response = null;
-        prepareRequest();
-        try {
-            response = scimService.deleteFidoDevice(id, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.deleteFidoDevice(id, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-
-    @Override
-    public final BaseClientResponse<User> patchUser(ScimPatchUser scimPatchUser, String id, String[] attributesArray) {
-        BaseClientResponse<User> response = null;
-        prepareRequest();
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.patchUser(id, scimPatchUser, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.patchUser(id, scimPatchUser, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
-    private void finalize(BaseClientResponse response) {
-        if (response == null)
-            return;
-
-        if (response.getReturnType() != null && response.getStatus() >= 200 && response.getStatus() < 300)
-            response.getEntity();
-        response.releaseConnection(); // then close InputStream
-    }
 }
