@@ -1,20 +1,39 @@
+/*
+ * SCIM-Client is available under the MIT License (2008). See http://opensource.org/licenses/MIT for full text.
+ *
+ * Copyright (c) 2017, Gluu
+ */
 package gluu.scim2.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jboss.resteasy.client.core.BaseClientResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.xdi.oxauth.client.*;
 import org.xdi.oxauth.model.common.*;
 import org.xdi.oxauth.model.util.Util;
 import org.xdi.oxauth.model.register.ApplicationType;
 
+import javax.ws.rs.core.Response;
 import java.net.URL;
 import java.util.*;
 
 /**
+ * Instances of this class contain the necessary logic to handle the authorization processes required by a client of SCIM
+ * service in test mode. For more information on test mode visit the
+ * <a href="https://www.gluu.org/docs/ce/user-management/scim2/">SCIM 2.0 docs page</a>.
+ * <p><b>Note:</b> Do not instantiate this class in your code. To interact with the service, call the corresponding method in
+ * class {@link gluu.scim2.client.factory.ScimClientFactory ScimClientFactory} that returns a proxy object wrapping this client
+ * @param <T> Type parameter of superclass
+ */
+/*
  * Created by jgomer on 2017-07-13.
  */
-public class TestModeScimClient extends AbstractScimClient {
+public class TestModeScimClient<T> extends AbstractScimClient<T> {
+
+    private static final long serialVersionUID = 3141592672017122134L;
+
+    private Logger logger = LogManager.getLogger(getClass());
 
     //private String authz_code;
     //private String authzEndpoint;
@@ -34,14 +53,16 @@ public class TestModeScimClient extends AbstractScimClient {
     private static final String REDIRECT_URI="http://localhost/";    //a dummy value just to stay in compliance with specs (see redirect uris for native clients)
 
     /**
-     * Constructs a TestModeScimClient instance
-     * @param serviceUrl A string denoting the root URL of the protected resource, i.e. something like
-     *                   {@code https://<host:port>/identity/restv1}
-     * @param OIDCMetadataUrl String url of the openId connect metadata document
+     * Constructs a TestModeScimClient object with the specified parameters and service contract
+     * @param serviceClass The service interface the underlying resteasy proxy client will adhere to. This proxy is used
+     *                     internally to execute all requests to the service
+     * @param serviceUrl The root URL of the SCIM service. Usually in the form {@code https://your.gluu-server.com/identity/restv1}
+     * @param OIDCMetadataUrl URL of authorization servers' metadata document. Usually in the form {@code https://your.gluu-server.com/.well-known/openid-configuration}
+     * @throws Exception If there was a problem contacting the authorization server to initialize this object
      */
-    public TestModeScimClient(String serviceUrl, String OIDCMetadataUrl) throws Exception {
+    public TestModeScimClient(Class<T> serviceClass, String serviceUrl, String OIDCMetadataUrl) throws Exception {
 
-        super(serviceUrl);
+        super(serviceUrl, serviceClass);
 
         //Extract token, registration, and authz endpoints from metadata URL
         JsonNode tree=mapper.readTree(new URL(OIDCMetadataUrl));
@@ -97,7 +118,7 @@ public class TestModeScimClient extends AbstractScimClient {
         //String id_token=response.getIdToken();      //this is null
         //refresh_token = response.getRefreshToken(); //this is null
         access_token=getTokens(grant).getAccessToken();
-        System.out.println("tokens: " + access_token);
+        logger.debug("Got token: " + access_token);
 
     }
 
@@ -125,19 +146,26 @@ public class TestModeScimClient extends AbstractScimClient {
 
     }
 
+    /**
+     * Builds a string suitable for being passed as an authorization header. It does so by prefixing the current access
+     * token this object has with the word "Bearer "
+     * @return String built
+     */
     @Override
-    protected void prepareRequest(){
-    }
-
-    @Override
-    protected String getAuthenticationHeader(){
+    String getAuthenticationHeader(){
         return "Bearer " + access_token;
     }
 
+    /**
+     * Gets a new access token from the authorization server
+     * @param response This parameter is not used in practice: there is no need to inspect this value in a setting of
+     *                 test mode
+     * @return A boolean value indicating the operation was successful
+     */
     @Override
-    protected boolean authorize(BaseClientResponse response){
+    boolean authorize(Response response){
         /*
-        This method is called if the attempt to use the service returned forbidden (status = 403), so here we check if
+        This method is called if the attempt to use the service returned unauthorized (status = 401), so here we check if
         client expired to generate a new one & ask for another token, or else leave it that way (forbidden)
          */
         try {
@@ -147,7 +175,7 @@ public class TestModeScimClient extends AbstractScimClient {
             return (access_token!=null);
         }
         catch (Exception e){
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return false;   //do not make an additional attempt, e.g. getAuthenticationHeader is not called once more
         }
     }
