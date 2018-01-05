@@ -27,7 +27,7 @@
       "bulkId": "three",
       "data": {
         "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
-        "userName": "scim_test_bjensen_1"
+        "userName": "scim_test_bjensen_3"
       }
     },
     {

@@ -75,12 +75,11 @@ public class BaseTest {
         /*
          To get a simpler client (not one that supports all possible operations as in this case), you can use as class
          parameter any other interface from gluu.scim2.client.rest or org.gluu.oxtrust.ws.rs.scim2 packages. Find an
-         example at test method gluu.scim2.client.SampleTest.smallerClient()
+         example at test method gluu.scim2.client.SampleTest#smallerClient
          */
         if (testMode)
-            //TODO: comment dummy client
-            //client=ScimClientFactory.getTestClient(ClientSideService.class, params.get("domainURL"), params.get("OIDCMetadataUrl"));
-            client=ScimClientFactory.getDummyClient(params.get("domainURL"));
+            client=ScimClientFactory.getTestClient(ClientSideService.class, params.get("domainURL"), params.get("OIDCMetadataUrl"));
+            //client=ScimClientFactory.getDummyClient(params.get("domainURL"));
         else
             client=ScimClientFactory.getClient(
                     ClientSideService.class,
