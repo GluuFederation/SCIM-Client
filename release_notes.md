@@ -4,27 +4,31 @@ SCIM server implementation was updated to adhere more closely to SCIM standard a
 
 ## Stricter validations
 
-Validations applied upon input data are more demanding now. We have added and fine-tuned checks to verify that data that is supposed to represent things like countries, languages, locales, timezones, e-mails, URLs, dates, etc. are syntactically valid and follow the standard recommendations.
+Validations applied upon input data are more demanding now. We have added and fine-tuned checks to verify that data which is supposed to represent things like countries, languages, locales, timezones, e-mails, URLs, dates, etc. are syntactically valid and follow the standard recommendations.
+
 Also we have added business logic to correctly apply the processing rules when it comes to handling read-only and immutable attributes.
 
 ## Broader searches and filter processing tuning
 
-We have added searching capabilities so that now it's possible to make general searches, that is, you can have in your search results a mix of different resource types (Users, groups, etc.).
-The processing of filter expressions used in searches adheres more closely to spec and now it generates more accurate LDAP expressions to run. Not only you can now use filters with string attributes but also any mix of boolean, date, and integer typed attributes.
+We have added searching capabilities so that it's possible to make general searches now, that is, you can have in your search results a mix of different resource types (Users, groups, etc.).
+
+The processing of filter expressions used in searches adheres more closely to spec and now it generates more accurate LDAP expressions to run. Not only you can use filters with string attributes but also any mix of boolean, date, and integer typed attributes.
+
 Additionally if errors are found when parsing expressions, the descriptions returned are helpful to spot where the problem is.
 
 ## Safer modifications of resources via PATCHes
 
-After studying how resource updates work according to the spec, it's easy to notice that PUT may lead to surprising results. Despite our PUT implementation is "relaxed" so it's difficult to get into problematic scenarios, we have added PATCH support which enables developers to be very concise about the changes they want to apply on SCIM resources. Now it's possible to define with precision what will be updated, removed, or added from a resource all in a single operation.
-To learn more about PATCH see section 3.5.2 of RFC 7644. For users of SCIM-Client there is a bunch of [test cases](???) as well.
+After studying how resource updates work according to the spec, it's easy to notice that PUT may lead to surprising results. Despite our PUT implementation is "relaxed" in a way that it's difficult to get into problematic scenarios, we have added PATCH support which enables developers to be concise about the changes they want to apply on SCIM resources. Now it's possible to define with precision what will be updated, removed, or added from a resource all in a single operation.
+
+To learn more about PATCH see section 3.5.2 of RFC 7644. For users of SCIM-Client there is a bunch of [test cases](src/test/java/gluu/scim2/client/patch) as well.
 
 ## More control on what will be returned
 
-Now **all** operations (except for bulk and delete) allow developers to specify the attributes that will be returned for every resource (User, group, etc.) included in a response by means of `attributes` and `excludedAttributes` query params. See section 3.9 of RFC 7644.
+Now **all operations** (except for bulk and delete) allow developers to specify the attributes that will be returned for every resource (User, group, etc.) included in a response by means of `attributes` and `excludedAttributes` query params. See section 3.9 of RFC 7644.
 
 ## More precise error descriptions and message logging
 
-When an anomaly is presented as a result of processing a service request (e.g. a malformed input, attribute mutability conflicts, non-existing resources, etc.), the trace of messages appearing in the log is now more expressive so it's easier to be on the errors trail. The error responses returned by the server are accurate about the cause of errors so ideally instead of checking logs, developers just need to inspect the contents of the reponse.
+When an anomaly is presented as a result of processing a service request (e.g. a malformed input, attribute mutability conflicts, non-existing resources, etc.), the trace of messages appearing in the log is more expressive so it's easier to be on the errors trail. The error responses returned by the server are accurate about the cause of errors so ideally instead of checking logs, developers just need to inspect the contents of the reponse.
 
 To learn more about how error handling is standardized in SCIM, please read section 3.12 of RFC 7644.
 
@@ -42,18 +46,18 @@ In previous implementations we detected a few practices that did not stick appro
 
 ### No group assignments at /Users endpoint
 
-According to spec (see sectin 4.1.2 of RFC 7643) the multi-valued attribute "groups" in User resource "... has a mutability of *readOnly*, and group membership changes MUST be applied via the Group Resource". Mistakenly, our previous implementations allowed developers to do group assignments via POST or PUT in the /Users endpoint.
+According to spec (see section 4.1.2 of RFC 7643) the multi-valued attribute "groups" in User resource "... has a mutability of *readOnly*, and group membership changes MUST be applied via the Group Resource". Mistakenly, our previous implementations allowed developers to do group assignments via POST or PUT in the /Users endpoint.
 
 Please adjust your code so that memberships are only manipulated via /Groups . This is done by passing a list for the Group's attribute called "members". It suffices to supply the "value" subattribute for every member: it will contain the "id" of the User you are trying to assign.
 
 The implementation takes care of updating group and user entries in LDAP accordingly and consistently after every modification. You can use PUT to replace (overwrite) all members of a Group at once, or PATCH to add or remove specific users to the existing members list.
 
-## Adjustments in how attributes are returned
+### Adjustments in how attributes are returned
 
 Two aspects have changed with regards to multi-valued attributes:
 
 * The subattribute *operation* was removed because it is simply not part of the specification. You will not be able to set its value or retrieve it now (even if it was stored in LDAP in the past)
-* When a multi-valued attribute is empty, it is not returned in the response. Previously, any operation (create, retrieve, update, etc...) that returned a resource was showing an empty json list (`[]`) for multi-valued attributes that had no information inside (e.g. a user with no addresses). Update your code to account for the fact that the attribute is not there when it has no info.
+* When a multi-valued attribute is empty, it is not returned in the response. Previously, any operation (create, retrieve, update, etc...) that returned a resource was showing an empty json list `[]` for multi-valued attributes that had no data assigned (e.g. a user with no addresses). Update your code to account for the fact that the attribute will not be there when it has no info.
 
 For single-valued attributes that are not assigned (no data), the same rule applies. The previous implementation returned the attribute with null value in the Json response, like this:
 
@@ -67,7 +71,7 @@ For single-valued attributes that are not assigned (no data), the same rule appl
 
 In current version, the attribute/value pair is not present.
 
-## Bulks not returning resource contents
+### Bulks not returning resource contents
 
 As section 3.7 of RFC 7644 mentions, when a bulk operation is successful the server may elect to omit the response body. We have chosen to do so in contrast to previous implementation that included the complete resource contents back to the client. This allows us to reduce the overhead of Bulk operations.
 
@@ -78,11 +82,11 @@ When the status of an operation is not in the 200-series response, the body of t
 
 As previously mentioned, current SCIM server implementation is revamped with new features. This is also the case for the Java-based "SCIM-Client" project.  The following highlights the most prominent changes and improvements:
 
-* **A simplified and type-safe approach to manipulate custom attributes**. Now it's easier to supply the values of attributes associated to the User extension. To retrieve values, convenience methods are available so there is no need to do casting or call data type constructors manually.
-
 * **Client now mirrors more closely the SCIM protocol**: We have adjusted the (client) API used to interact with the service: Java methods that developers must call to send requests to the service are now quite similar to the operations the SCIM standard itself contains. This is a big advantage: developers familiar with the SCIM spec can start working immediately, while those who are not can start learning about SCIM protocol and schema as they are coding.
 
 * **More Jsonized**: Complementary to the previous aspect, we have grown the number of examples (test cases) that use Json payloads. By glancing through a json file (not written in a single-line `.properties` file) developers can get the grasp of what's happenning in test cases more easily, and at the same time are learning about how requests are physically structured. In other words, getting acquainted with the SCIM spec.
+
+* **A simplified and type-safe approach to manipulate custom attributes**. Now it's easier to supply the values of attributes associated to the User extension. To retrieve values, convenience methods are available so there is no need to do casting or call data type constructors manually.
 
 * **Inclusion of a logging framework**:  We have added *Log4j2* support for a more comfortable debugging experience. In previous versions, the `out.println` approach was used.
 
@@ -245,9 +249,9 @@ If you still need to return a list of all users in LDAP you can:
 * Provide a suitable value for the `attrsList` parameter. This the same well-known `attributes` query param the spec refers to. This way you can reduce the amount of attributes retrieved per user. 
 
 For examples, see the following test cases:
-* [QueryParamCreateUpdateTest](https://github.com/GluuFederation/SCIM-Client/blob/3.2.0/src/test/java/gluu/scim2/client/singleresource/QueryParamCreateUpdateTest.java)
-* [QueryParamRetrievalTest](https://github.com/GluuFederation/SCIM-Client/blob/3.2.0/src/test/java/gluu/scim2/client/singleresource/QueryParamRetrievalTest.java)
-* [ComplexSearchUserTest](https://github.com/GluuFederation/SCIM-Client/blob/3.2.0/src/test/java/gluu/scim2/client/search/ComplexSearchUserTest.java)
+* [QueryParamCreateUpdateTest](src/test/java/gluu/scim2/client/singleresource/QueryParamCreateUpdateTest.java)
+* [QueryParamRetrievalTest](src/test/java/gluu/scim2/client/singleresource/QueryParamRetrievalTest.java)
+* [ComplexSearchUserTest](src/test/java/gluu/scim2/client/search/ComplexSearchUserTest.java)
 
 ##### Extended attributes
 
@@ -311,17 +315,8 @@ The following table lists fido devices methods found in the previous client that
 
 #### Miscelaneous
 
-The following table lists miscelaneous methods found in the previous client that are not present in the current one but that still have an alternative to achieve the same functionalities.
-
-|Method in ScimClient|Replace with method|Defined at interface|
-|--------------------|----------|--------------------|
-|processBulkOperation|**??**|ClientSideService|
-|processBulkOperationString|**??**|ClientSideService|
-
-##### New methods
-
-* `searchResourcesPost` allows to search all resource types at once (by using POST on /.search endpoint).
-* `close` allows to free resources allocated by the underlying RestEasy client employed to perform the networking operations. Once you call this method, you must not issue any request - you will have to obtain a new client instance from `gluu.scim2.client.factory.ScimClientFactory`
+* New method `searchResourcesPost` allows to search all resource types at once (by using POST on /.search endpoint).
+* New method `close` allows to free resources allocated by the underlying RestEasy client employed to perform the networking operations. Once you call this method, you must not issue any request - you will have to obtain a new client instance from `gluu.scim2.client.factory.ScimClientFactory`
 
 ## Are there any special cases to account if still using client version 3.1.x?
 
@@ -364,7 +359,7 @@ log.info("User with id {} created", response.getEntity().getId());
 
 2. Updating a user with Json String:
 
-Suppose file *myJsonPayload.js* exists with the following contents:
+Suppose file *myJsonPayload.js* exists in the filesystem with the following contents:
 
 ```
 {
@@ -443,4 +438,4 @@ public void handleError(String title, String description, String scimType){
 }
 ```
 
-Former SCIM-Client versions used to deal with `BaseClientResponse<T>` objects and it was not possible to read the entity as an instance of a class other than `T` (usually `T` being User or Group) because the response was already fully consumed, this usually led to errors like "Stream closed". Newer client allows you to read the response as many times as you need without restriction of type parameter `T` since the underlying response stream is buffered by default.
+Former SCIM-Client versions used to deal with `BaseClientResponse<T>` objects and it was not possible to read the entity as an instance of a class other than `T` (usually `T` being User or Group) because the response was already fully consumed, this usually led to errors like "Stream closed". Newer client allows you to read the response as many times as you need without restriction of type parameter `T` as the underlying response stream is buffered by default.
