@@ -110,7 +110,7 @@ public class FidoDeviceTest extends BaseTest {
 
     }
 
-    //@Test(dependsOnMethods = "updateWithObject", alwaysRun = true)
+    @Test(dependsOnMethods = "updateWithObject", alwaysRun = true)
     public void delete(){
 
         logger.debug("Deleting device");

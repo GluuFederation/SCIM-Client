@@ -6,7 +6,9 @@
 package gluu.scim2.client.singleresource;
 
 import gluu.scim2.client.UserBaseTest;
+import org.gluu.oxtrust.model.scim2.user.Email;
 import org.gluu.oxtrust.model.scim2.user.Group;
+import org.gluu.oxtrust.model.scim2.user.PhoneNumber;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -56,7 +58,7 @@ public class AverageUserTest extends UserBaseTest {
     }
 
     @Test(dependsOnMethods="updateWithJson")
-    public void updateWithObject() throws Exception{
+    public void updateWithObject1() throws Exception{
 
         UserResource clone=getDeepCloneUsr(user);
         clone.setPreferredLanguage("en_US");
@@ -84,7 +86,35 @@ public class AverageUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods="updateWithObject", alwaysRun = true)
+    @Test(dependsOnMethods="updateWithObject1")
+    public void updateWithObject2(){
+
+        UserResource aUser=new UserResource();
+        aUser.setEmails(user.getEmails());
+        aUser.setPhoneNumbers(user.getPhoneNumbers());
+
+        //Change some canonical values
+        aUser.getEmails().get(0).setType(Email.Type.HOME);
+        aUser.getPhoneNumbers().get(0).setType("fax");
+
+        PhoneNumber pager=new PhoneNumber();
+        pager.setValue("+1 234 566 9999");
+        pager.setType(PhoneNumber.Type.PAGER);
+        aUser.getPhoneNumbers().add(pager);
+
+        Response response=client.updateUser(aUser, user.getId(), "emails, addresses, phoneNumbers, userName", null);
+        user=response.readEntity(UserResource.class);
+
+        assertEquals(user.getEmails().get(0).getType(), Email.Type.HOME.name().toLowerCase());
+        assertEquals(user.getPhoneNumbers().get(0).getType(), PhoneNumber.Type.FAX.name().toLowerCase());
+        assertEquals(user.getPhoneNumbers().get(1).getType(), PhoneNumber.Type.PAGER.name().toLowerCase());
+        assertNull(user.getPreferredLanguage());
+
+        logger.debug("Updated user {}", user.getUserName());
+
+    }
+
+    @Test(dependsOnMethods="updateWithObject2", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }

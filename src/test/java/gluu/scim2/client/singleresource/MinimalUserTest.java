@@ -25,14 +25,14 @@ public class MinimalUserTest extends UserBaseTest {
 
     @Parameters("user_minimal_create")
     @Test
-    public void create(String json){
+    public void createUser(String json){
         logger.debug("Creating mimimal user from json...");
         user = createUserFromJson(json);
     }
 
     @Parameters("user_minimal_update")
-    @Test(dependsOnMethods="create")
-    public void update(String json){
+    @Test(dependsOnMethods="createUser")
+    public void updateUser(String json){
 
         logger.debug("Updating user {} with json", user.getUserName());
         Response response=client.updateUser(json, user.getId(), null, null);
@@ -45,7 +45,7 @@ public class MinimalUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods="update", alwaysRun = true)
+    @Test(dependsOnMethods="updateUser", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }

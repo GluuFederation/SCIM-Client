@@ -26,7 +26,7 @@ public class MinimalGroupTest extends BaseTest {
 
     @Parameters("group_minimal_create")
     @Test
-    public void create(String json){
+    public void createGroup(String json){
 
         logger.debug("Creating mimimal group from json...");
         Response response = client.createGroup(json, null, null);
@@ -39,8 +39,8 @@ public class MinimalGroupTest extends BaseTest {
     }
 
     @Parameters("group_minimal_update")
-    @Test(dependsOnMethods="create")
-    public void update(String json){
+    @Test(dependsOnMethods="createGroup")
+    public void updateGroup(String json){
 
         logger.debug("Updating group {} with json", group.getDisplayName());
         Response response=client.updateGroup(json, group.getId(), null, null);
@@ -53,7 +53,7 @@ public class MinimalGroupTest extends BaseTest {
 
     }
 
-    @Test(dependsOnMethods="update", alwaysRun = true)
+    @Test(dependsOnMethods="updateGroup", alwaysRun = true)
     public void delete(){
 
         logger.debug("Deleting group {}", group.getDisplayName());

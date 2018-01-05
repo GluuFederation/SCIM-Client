@@ -34,11 +34,12 @@ public class WrongPayloadUserPatchTest extends UserBaseTest {
     @Test
     public void patch(String patchRequest) {
         Response response = client.patchUser(patchRequest, user.getId(), null, null);
-        logger.debug(response.getStatus());
         assertNotEquals(response.getStatus(), OK.getStatusCode());
+    }
 
-        logger.debug(response.readEntity(String.class));
-
+    @Test(dependsOnMethods = "patch", alwaysRun = true)
+    public void delete() {
+        deleteUser(user);
     }
 
 }

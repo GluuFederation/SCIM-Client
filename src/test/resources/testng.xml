@@ -1,11 +1,10 @@
 <!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
 
-<!-- Only SCIM v2.0 compliance tests here -->
-<suite name="SCIM-Client v2.0 compliance gaps" parallel="false">
+<suite name="SCIM-Client v2.0" parallel="false">
 
     <parameter name="file" value="target/test-classes/testng2.properties" />
 
-    <test name="Service Provider Configuration Endpoints Test" enabled="false">
+    <test name="Service Provider Configuration Endpoints Test" enabled="true">
         <!-- section 4 RFC 7644 -->
         <classes>
             <class name="gluu.scim2.client.servicemeta.ServiceProviderConfigTest" />
@@ -14,21 +13,67 @@
         </classes>
     </test>
 
-    <test name="Minimalist resources Test" enabled="false">
+    <test name="Minimalist resources Test" enabled="true">
         <classes>
             <class name="gluu.scim2.client.singleresource.MinimalUserTest" />
             <class name="gluu.scim2.client.singleresource.MinimalGroupTest" />
         </classes>
     </test>
 
-    <test name="User Resource Test" enabled="false">
+    <test name="User Resource Test" enabled="true">
         <classes>
             <class name="gluu.scim2.client.singleresource.AverageUserTest" />
+            <class name="gluu.scim2.client.singleresource.FullUserTest" />
+        </classes>
+    </test>
+
+    <test name="User Resource Search Test" enabled="true">
+        <classes>
             <class name="gluu.scim2.client.search.SimpleSearchUserTest" />
             <class name="gluu.scim2.client.search.ComplexSearchUserTest" />
             <class name="gluu.scim2.client.search.PaginationUserSearchTest" />
-            <class name="gluu.scim2.client.singleresource.FullUserTest" />
+        </classes>
+    </test>
+
+    <test name="User and Groups Assignment Test" enabled="true">
+        <classes>
             <class name="gluu.scim2.client.multipleresource.GroupAssignUserTest" />
+        </classes>
+    </test>
+
+    <test name="Attributes query param tests" enabled="true">
+        <classes>
+            <class name="gluu.scim2.client.singleresource.QueryParamRetrievalTest" />
+            <class name="gluu.scim2.client.singleresource.QueryParamCreateUpdateTest" />
+        </classes>
+    </test>
+
+    <test name="Multiple Resources Test" enabled="true">
+        <classes>
+            <class name="gluu.scim2.client.search.MultipleResourcesSearchTest" />
+        </classes>
+    </test>
+
+    <test name="User Patches" enabled="true">
+        <classes>
+            <class name="gluu.scim2.client.patch.PatchReplaceUserTest" />
+            <class name="gluu.scim2.client.patch.PatchAddUserTest" />
+            <class name="gluu.scim2.client.patch.PatchDeleteUserTest" />
+            <class name="gluu.scim2.client.patch.PatchUserExtTest" />
+        </classes>
+    </test>
+
+    <test name="Miscelaneous Patches" enabled="true">
+        <classes>
+            <class name="gluu.scim2.client.patch.PatchValueFilterUserTest" />
+            <class name="gluu.scim2.client.patch.PatchGroupTest" />
+        </classes>
+    </test>
+
+    <test name="Bulk operations" enabled="true">
+        <classes>
+            <class name="gluu.scim2.client.bulk.UsersBulkTest" />
+            <class name="gluu.scim2.client.bulk.GroupsBulkTest" />
         </classes>
     </test>
 
@@ -38,46 +83,15 @@
         </classes>
     </test>
 
-    <test name="Attributes query param tests" enabled="false">
-        <classes>
-            <class name="gluu.scim2.client.singleresource.QueryParamRetrievalTest" />
-            <class name="gluu.scim2.client.singleresource.QueryParamCreateUpdateTest" />
-        </classes>
-    </test>
-
-    <test name="Multiple Resources Test" enabled="false">
-        <classes>
-            <class name="gluu.scim2.client.search.MultipleResourcesSearchTest" />
-        </classes>
-    </test>
-
-    <test name="Patches" enabled="false">
-        <classes>
-            <class name="gluu.scim2.client.patch.PatchReplaceUserTest" />
-            <class name="gluu.scim2.client.patch.PatchAddUserTest" />
-            <class name="gluu.scim2.client.patch.PatchDeleteUserTest" />
-            <class name="gluu.scim2.client.patch.PatchUserExtTest" />
-            <class name="gluu.scim2.client.patch.PatchValueFilterUserTest" />
-            <class name="gluu.scim2.client.patch.PatchGroupTest" />
-        </classes>
-    </test>
-
-    <test name="Corner and other weird cases" enabled="false">
+    <test name="Corner and other weird cases" enabled="true">
         <classes>
             <class name="gluu.scim2.client.corner.WrongPayloadUserExtTest" />
             <class name="gluu.scim2.client.corner.WrongPayloadUserTest" />
-            <class name="gluu.scim2.client.corner.WrongPayloadUserPatchTest" />
+            <!--class name="gluu.scim2.client.corner.WrongPayloadUserPatchTest" /-->
         </classes>
     </test>
 
-    <test name="Bulk operations" enabled="false">
-        <classes>
-            <class name="gluu.scim2.client.bulk.UsersBulkTest" />
-            <class name="gluu.scim2.client.bulk.GroupsBulkTest" />
-        </classes>
-    </test>
-
-    <test name="Naughty dummy tests" enabled="false">
+    <test name="Additional tests" enabled="false">
         <classes>
             <class name="gluu.scim2.client.SampleTest" />
         </classes>

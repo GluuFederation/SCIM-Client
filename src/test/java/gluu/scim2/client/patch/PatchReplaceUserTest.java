@@ -35,13 +35,13 @@ public class PatchReplaceUserTest extends UserBaseTest {
 
     @Parameters({"user_full_create"})
     @Test
-    public void create(String json){
+    public void createForReplace(String json){
         logger.debug("Creating user from json...");
         user=createUserFromJson(json);
     }
 
     @Parameters({"user_patchreplace_1"})
-    @Test(dependsOnMethods = "create", groups = "A")
+    @Test(dependsOnMethods = "createForReplace")
     public void jsonNoPathPatch1(String patchRequest){
 
         Response response = client.patchUser(patchRequest, user.getId(), null, null);

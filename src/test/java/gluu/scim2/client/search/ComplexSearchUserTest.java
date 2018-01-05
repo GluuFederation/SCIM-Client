@@ -28,6 +28,9 @@ import static javax.ws.rs.core.Response.Status.*;
 import static org.testng.Assert.*;
 
 /**
+ * NOTES:
+ * Check first if /install/community-edition-setup/templates/test/scim-client/data/scim-test-data.ldif has been loaded to LDAP.
+ *
  * Created by jgomer on 2017-10-23.
  */
 public class ComplexSearchUserTest extends UserBaseTest {
@@ -35,13 +38,13 @@ public class ComplexSearchUserTest extends UserBaseTest {
     private UserResource user;
 
     @Parameters("user_average_create")
-    @Test
-    public void create(String json){
+    @Test(dependsOnGroups = "simple")
+    public void createComplex(String json){
         logger.debug("Creating user from json...");
         user=createUserFromJson(json);
     }
 
-    @Test(dependsOnMethods="create", groups = "search")
+    //@Test(dependsOnMethods="createComplex", groups = "searchComplex")
     public void searchNoAttributesParam(){
 
         final String ims="Skype";
@@ -68,7 +71,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods="create", groups = "search")
+    @Test(dependsOnMethods="createComplex", groups = "searchComplex")
     public void searchAttributesParam() throws Exception{
 
         int count=3;
@@ -138,7 +141,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
         }
     }
 
-    @Test(dependsOnMethods="create", groups = "search")
+    @Test(dependsOnMethods="createComplex", groups = "searchComplex")
     public void searchExcludedAttributesParam() throws Exception {
 
         int count=3;
@@ -189,8 +192,8 @@ public class ComplexSearchUserTest extends UserBaseTest {
         }
     }
 
-    @Test(dependsOnGroups = "search", alwaysRun = true)
-    public void delete(){
+    @Test(dependsOnGroups = "searchComplex", alwaysRun = true)
+    public void deleteComplex(){
         deleteUser(user);
     }
 

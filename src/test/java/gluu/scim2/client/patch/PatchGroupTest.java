@@ -42,7 +42,7 @@ public class PatchGroupTest extends BaseTest{
 
     @Parameters("group_minimal_create")
     @Test
-    public void create(String json){
+    public void createGroup(String json){
 
         logger.debug("Creating group from json...");
         Response response = client.createGroup(json, null, null);
@@ -52,7 +52,7 @@ public class PatchGroupTest extends BaseTest{
     }
 
     @Parameters("group_patch")
-    @Test(dependsOnMethods = "create")
+    @Test(dependsOnMethods = "createGroup")
     public void patch1(String jsonPatch){
 
         Response response=client.patchGroup(jsonPatch, group.getId(), null, null);
