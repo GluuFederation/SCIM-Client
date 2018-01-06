@@ -1,0 +1,441 @@
+# New features and enhancements
+
+SCIM server implementation was updated to adhere more closely to SCIM standard and include features we had been missing. The following summarizes the most important enhancements:
+
+## Stricter validations
+
+Validations applied upon input data are more demanding now. We have added and fine-tuned checks to verify that data which is supposed to represent things like countries, languages, locales, timezones, e-mails, URLs, dates, etc. are syntactically valid and follow the standard recommendations.
+
+Also we have added business logic to correctly apply the processing rules when it comes to handling read-only and immutable attributes.
+
+## Broader searches and filter processing tuning
+
+We have added searching capabilities so that it's possible to make general searches now, that is, you can have in your search results a mix of different resource types (Users, groups, etc.).
+
+The processing of filter expressions used in searches adheres more closely to spec and now it generates more accurate LDAP expressions to run. Not only you can use filters with string attributes but also any mix of boolean, date, and integer typed attributes.
+
+Additionally if errors are found when parsing expressions, the descriptions returned are helpful to spot where the problem is.
+
+## Safer modifications of resources via PATCHes
+
+After studying how resource updates work according to the spec, it's easy to notice that PUT may lead to surprising results. Despite our PUT implementation is "relaxed" in a way that it's difficult to get into problematic scenarios, we have added PATCH support which enables developers to be concise about the changes they want to apply on SCIM resources. Now it's possible to define with precision what will be updated, removed, or added from a resource all in a single operation.
+
+To learn more about PATCH see section 3.5.2 of RFC 7644. For users of SCIM-Client there is a bunch of [test cases](src/test/java/gluu/scim2/client/patch) as well.
+
+## More control on what will be returned
+
+Now **all operations** (except for bulk and delete) allow developers to specify the attributes that will be returned for every resource (User, group, etc.) included in a response by means of `attributes` and `excludedAttributes` query params. See section 3.9 of RFC 7644.
+
+## More precise error descriptions and message logging
+
+When an anomaly is presented as a result of processing a service request (e.g. a malformed input, attribute mutability conflicts, non-existing resources, etc.), the trace of messages appearing in the log is more expressive so it's easier to be on the errors trail. The error responses returned by the server are accurate about the cause of errors so ideally instead of checking logs, developers just need to inspect the contents of the reponse.
+
+To learn more about how error handling is standardized in SCIM, please read section 3.12 of RFC 7644.
+
+[This section](#how-do-i-add-custom-error-handling) explains how to do error handling for SCIM-Client users.
+
+## Server output is compliant
+We have striven after standard compliance and fixed subtle mistakes and deviations from the spec that were detected in serialization routines. 
+
+
+# Important updates for developers
+
+## Behavior changes
+
+In previous implementations we detected a few practices that did not stick appropriately to the standard. Now they are fixed but you may need to adjust your applications or workflows accordingly.
+
+### No group assignments at /Users endpoint
+
+According to spec (see section 4.1.2 of RFC 7643) the multi-valued attribute "groups" in User resource "... has a mutability of *readOnly*, and group membership changes MUST be applied via the Group Resource". Mistakenly, our previous implementations allowed developers to do group assignments via POST or PUT in the /Users endpoint.
+
+Please adjust your code so that memberships are only manipulated via /Groups . This is done by passing a list for the Group's attribute called "members". It suffices to supply the "value" subattribute for every member: it will contain the "id" of the User you are trying to assign.
+
+The implementation takes care of updating group and user entries in LDAP accordingly and consistently after every modification. You can use PUT to replace (overwrite) all members of a Group at once, or PATCH to add or remove specific users to the existing members list.
+
+### Adjustments in how attributes are returned
+
+Two aspects have changed with regards to multi-valued attributes:
+
+* The subattribute *operation* was removed because it is simply not part of the specification. You will not be able to set its value or retrieve it now (even if it was stored in LDAP in the past)
+* When a multi-valued attribute is empty, it is not returned in the response. Previously, any operation (create, retrieve, update, etc...) that returned a resource was showing an empty json list `[]` for multi-valued attributes that had no data assigned (e.g. a user with no addresses). Update your code to account for the fact that the attribute will not be there when it has no info.
+
+For single-valued attributes that are not assigned (no data), the same rule applies. The previous implementation returned the attribute with null value in the Json response, like this:
+
+```
+{
+...
+   "language" : null,
+...
+}
+```
+
+In current version, the attribute/value pair is not present.
+
+### Bulks not returning resource contents
+
+As section 3.7 of RFC 7644 mentions, when a bulk operation is successful the server may elect to omit the response body. We have chosen to do so in contrast to previous implementation that included the complete resource contents back to the client. This allows us to reduce the overhead of Bulk operations.
+
+When the status of an operation is not in the 200-series response, the body of the error is actually included.
+
+
+## About SCIM-Client
+
+As previously mentioned, current SCIM server implementation is revamped with new features. This is also the case for the Java-based "SCIM-Client" project.  The following highlights the most prominent changes and improvements:
+
+* **Client now mirrors more closely the SCIM protocol**: We have adjusted the (client) API used to interact with the service: Java methods that developers must call to send requests to the service are now quite similar to the operations the SCIM standard itself contains. This is a big advantage: developers familiar with the SCIM spec can start working immediately, while those who are not can start learning about SCIM protocol and schema as they are coding.
+
+* **More Jsonized**: Complementary to the previous aspect, we have grown the number of examples (test cases) that use Json payloads. By glancing through a json file (not written in a single-line `.properties` file) developers can get the grasp of what's happenning in test cases more easily, and at the same time are learning about how requests are physically structured. In other words, getting acquainted with the SCIM spec.
+
+* **A simplified and type-safe approach to manipulate custom attributes**. Now it's easier to supply the values of attributes associated to the User extension. To retrieve values, convenience methods are available so there is no need to do casting or call data type constructors manually.
+
+* **Inclusion of a logging framework**:  We have added *Log4j2* support for a more comfortable debugging experience. In previous versions, the `out.println` approach was used.
+
+* **A thorough migration to RestEasy 3**: For version 3.1.0 of SCIM-Client, the project upgraded from RestEasy 2 to RestEasy 3. However, some deprecated APIs and 2.0 techniques still remained in the code. For current version we have introduced changes following the recommended 3.0 practices to stay current. This way the upcoming version of the client (that we aim to support RestEasy 3.1) will also have a smoother migration process. For more information on migration from RestEasy 2 to 3, see chapter 1 of the ["Upgrading from Resteasy 2 to Resteasy 3 guide"](http://docs.jboss.org/resteasy/docs/resteasy-upgrade-guide-en-US.pdf). As a byproduct of this update, developers can now add [custom error handling](#how-do-i-add-custom-error-handling) capabilities to their applications, a feature that had been missing for long.
+
+* **Requires Java SE 8**: This update not only allowed us to stay current but to write test cases in a more concise and straightforward way. 
+
+These **enhancements may come at a cost** for you. We will analyze the implications of this in the following section.
+
+## Is my existing code affected by new features?
+
+If you have been using SCIM-Client in your projects, and want to take advantage of the new features found in the server as well as in the client implementation we suggest to refactor your code so that it uses the new SCIM-Client library. By using the newer API you can, for instance:
+
+* Modify resources via PATCH (a convenient feature that had been missing for long)
+* Execute general searches, that is, searches not focused on a single type of resource (e.g. only Users)
+* Supply the `excludedAttributes` query param (whether in creation, modification or retrieval operations)
+* Inspecting the raw responses coming from the server
+* Do custom error handling
+* Release resources when no more requests will be issued
+
+If you definitely do not want to alter your existing code base you can still use the SCIM-Client jar (or maven dependency) in version 3.1.x and work as you used to (a few [special cases apply](#are-there-any-special-cases-to-account-if-still-using-client-version-31x)). Remember that by using the newer version your projects are staying more current (in terms of libraries) and you also have access to more complete java-docs.
+
+
+## How to migrate my current code to use the newer SCIM-Client API?
+
+If you have decided to migrate to newer SCIM-Client, take into account three major aspects this shift entails:
+
+### Changes in method signatures
+
+The Java interface `gluu.scim2.client.ScimClient` does not exist anylonger and has been replaced by `gluu.scim2.client.rest.ClientSideService`. This newer interface is basically the same interface used as contract for the web service implementation. In other words, the *client* and *server* side are using the same contract. Methods in the new interface are quite similar to those in the older, however,
+
+* A few method names have changed to follow a consistent naming convention,
+* Most methods are written in two versions: one that receives a Java object and another that expects a (Json) String, 
+* Almost all signatures contain additional parameters (for example to support `excludedAttributes` feature), and additionally, 
+* Methods do not have any `throw` clauses.
+
+The object you used to obtain when calling `gluu.scim2.client.factory.ScimClientFactory#getClient` or `gluu.scim2.client.factory.ScimClientFactory#getTestClient` belonged to the interface `ScimClient`. Now it can belong to `ClientSideService` or a more restrictive (smaller) interface if you wish (see gluu.scim2.client.BaseTest#setupClient and `gluu.scim2.client.factory.ScimClientFactory` to learn more).
+
+### Changes for reading responses
+
+As mentioned above, we upgraded to newer RestEasy 3.0 practices for building clients. We replaced the Resteasy client framework in `resteasy-jaxrs` by the JAX-RS 2.0 compliant resteasy-client module. The project now uses the JAX-RS 2.0 Client API in conjuction with the Resteasy Proxy Framework (see **links 49.1/2??**) and we share an interface between client and server. We have already touched upon this point: the client proxy now resembles more closely the service contract (we reuse the same service interface instead of defining a new one as in the older client).
+
+The most important implication regarding RestEasy changes is that `org.jboss.resteasy.client.core.BaseClientResponse<T>` is no longer used and instead `javax.ws.rs.core.Response` comes into play. So you will have no more something like:
+
+```
+BaseClientResponse<User> response = client.createUser(...);
+```
+
+but will have to use
+
+```
+Response response2 = client2.createUser(...);
+```
+
+Note that `Response`, unlike the deprecated `ClientResponse<T>` (superclass of `BaseClientResponse<T>`), is not a generic type, so it is necessary to give a type when extracting a response entity. Thus, you should turn the following:
+
+```
+user = response.getEntity();
+```
+
+into
+
+```
+user = response2.readEntity(UserResource.class);
+```
+
+`getEntity` method is also part of `Response` but it plays a different role (read the API docs of RestEasy). It is necessary to call `readEntity` to extract the response entity under most circumstances. 
+
+For convenience, SCIM-Client **automatically** buffers the response data for any call made to a service method. In other words, the underlying input stream is totally consumed and closed. This has a nice couple of advantages:
+
+* You don't have to worry about using the `close` method of `Response` - even if there is no usage of `readEntity` in your code. This may happen when you are only interested in the status code of a response.
+
+* You may call `readEntity` any number of times for the same `Response` object - something that will usually lead to exceptions using a standard approach. This way, you can make with no problem something like:
+```
+logger.info("Raw response received was {}", response2.readEntity(String.class);
+user = response2.readEntity(UserResource.class);
+```
+
+Note that now we are allowed to "see" the response received from the server - something not achievable with the previous SCIM-Client version.
+
+### Data model changes
+
+The package `org.gluu.oxtrust.model.scim2` has been refactored to be better structured. As usual this package resides in the `oxtrust-scim` maven module of oxTrust project. It has the main classes to represent the attributes and subattributes of SCIM resources (user, group and fido device), as well as other supporting classes. Despite `oxtrust-scim` lies in the "server side" project, it plays a key role for the client side. 
+
+The new SCIM server implementation brought a few changes:
+
+* A new subpackage `user` was created to hold all POJOs used to represent the attributes and sub-attributes (in SCIM spec jargon) for the user resource
+* A new subpackage `group` was created to hold all POJOs related to the group resource
+* A new subpackage `bulk` was created to hold classes used to describe bulk operations
+* A few class names have changed. The most impacting ones are listed [in the migration guide](#data-model)
+
+### Handling custom attributes
+
+To specify custom attributes in previous versions, developers used to pass an instance of `Extension` when calling method `addExtension` of `User` object. The usage of `Extension` class has been limited for metadata purposes only and now the way to represent a set of custom attributes is via the `CustomAttributes` class.
+
+The superclass for all SCIM resources, namely `org.gluu.oxtrust.model.scim2.BaseScimResource`, has methods `addCustomAttributes` and `getCustomAttributes` for setting and reading respectively the custom attributes values. 
+
+With `CustomAttributes` now is possible to specify values of type `Boolean`, `DateTime`, and `Integer` in addition to previously supported `String`, `BigDecimal`, `Date`, and `List`. Retrieving custom attribute values is not restricted to calling a `getValue` method returning a `String` anymore. Now it's possible to provide a return type parameter in order to receive instances of the desired type directly avoiding manual conversion to target types.
+The same goes for multi-valued attributes (the type of collection elements is parameterized as well). 
+
+Having `addCustomAttributes` and `getCustomAttributes` not directly tied to the User resource enables the possibility to offer extensions for any kind of resource in future implementations of SCIM service.
+
+## A small migration guide
+
+If you get to this point, you are a devoted developer happy of getting rid of deprecated stuff such as `ClientRequest`, `ProxyFactory`, and `ClientResponse`. Not to mention the methods in `gluu.scim2.client.ScimClient` and `gluu.scim2.client.rest.ScimService`...
+
+If you are lazy, or don't have time, just **keep using the SCIM-Client 3.1.2** as we mentioned [earlier](#is-my-existing-code-affected-by-new-features).
+
+The following will serve as a guide so you can quickly refactor your existing code. The use of an IDE is highly recommended:
+
+### Data model
+
+|Class in 3.1.2|In package|New class|In package|
+|--------------|----------|---------|----------|
+|**User**|org.gluu.oxtrust.model.scim2|**UserResource**|org.gluu.oxtrust.model.scim2.user|
+|**Group**|org.gluu.oxtrust.model.scim2|**GroupResource**|org.gluu.oxtrust.model.scim2.group|
+|**FidoDevice**|org.gluu.oxtrust.model.scim2.fido|**FidoDeviceResource**|org.gluu.oxtrust.model.scim2.fido|
+|**ResourceType**|org.gluu.oxtrust.model.scim2.provider|**ResourceType**|org.gluu.oxtrust.model.scim2.provider|
+|**SchemaType**|org.gluu.oxtrust.model.scim2.schema|**SchemaResource**|org.gluu.oxtrust.model.scim2.schema|
+|**Resource**|org.gluu.oxtrust.model.scim2|**BaseScimResource**|org.gluu.oxtrust.model.scim2|
+
+**Notes**:
+
+* The user supporting classes `Name`, `Address`, `Email`, `Entitlement`, `PhoneNumber`, `Photo`, `Role`, and `X509Certificate` have been moved to package `org.gluu.oxtrust.model.scim2.user`.
+
+### Service methods
+
+Recall that `ClientSideService` conglomerates all methods defined in the following interfaces:
+ 
+* gluu.scim2.client.rest.ClientSideUserService
+* gluu.scim2.client.rest.ClientSideGroupService
+* gluu.scim2.client.rest.ClientSideFidoDeviceService
+* org.gluu.oxtrust.ws.rs.scim2.IUserWebService
+* org.gluu.oxtrust.ws.rs.scim2.IGroupWebService
+* org.gluu.oxtrust.ws.rs.scim2.IFidoDeviceWebService
+
+#### Users manipulation
+
+The following table lists user methods found in the previous client that are not present in the current one but that still have an alternative to achieve the same functionalities.
+
+|Method in ScimClient|Replace with method|Defined at interface|
+|--------------------|----------|--------------------|
+|createPerson|createUser|IUserWebService|
+|createPersonString|createUser|IUserWebService|
+|retrievePerson|getUserById|IUserWebService|
+|retrieveUser|getUserById|IUserWebService|
+|updatePerson|updateUser|IUserWebService|
+|updatePersonString|updateUser|IUserWebService|
+|deletePerson|deleteUser|IUserWebService|
+
+##### Removed methods
+
+`retrieveAllUsers` is not available in new client. Providing a method that returns all users is discouraged since there is no way to force callers to provide parameters that restrict the amount of data returned apart from the `maxResults` inherent to service behavior (see section 5 of RFC 7643).
+
+If you still need to return a list of all users in LDAP you can:
+
+* Execute a search (use `searchUsersPost` or `searchUsers`)
+* Pass an empty (or null) filter
+* Pass null for count
+* Provide a suitable value for the `attrsList` parameter. This the same well-known `attributes` query param the spec refers to. This way you can reduce the amount of attributes retrieved per user. 
+
+For examples, see the following test cases:
+* [QueryParamCreateUpdateTest](src/test/java/gluu/scim2/client/singleresource/QueryParamCreateUpdateTest.java)
+* [QueryParamRetrievalTest](src/test/java/gluu/scim2/client/singleresource/QueryParamRetrievalTest.java)
+* [ComplexSearchUserTest](src/test/java/gluu/scim2/client/search/ComplexSearchUserTest.java)
+
+##### Extended attributes
+
+Custom attributes manipulation has been simplified: now they are handled via `CustomAttributes` class (check the api docs of `org.gluu.oxtrust.model.scim2.CustomAttributes` to learn more.). 
+
+To access the name/values of custom attributes please use the `getCustomAttributes` method of your SCIM resource and pass the `uri` of the extension that these custom attributes are associated to. Likewise, to set the values for your custom attributes, call the `addCustomAttributes` and pass a `CustomAttributes` instance. 
+
+The following test cases contain illustrative examples:
+
+* [FullUserTest](https://github.com/GluuFederation/SCIM-Client/blob/3.2.0/src/test/java/gluu/scim2/client/singleresource/FullUserTest.java)
+
+* [QueryParamCreateUpdateTest](https://github.com/GluuFederation/SCIM-Client/blob/3.2.0/src/test/java/gluu/scim2/client/singleresource/QueryParamCreateUpdateTest.java)
+
+* [PatchUserExtTest](https://github.com/GluuFederation/SCIM-Client/blob/3.2.0/src/test/java/gluu/scim2/client/patch/PatchUserExtTest.java)
+
+
+#### Groups manipulation
+
+The following table lists group methods found in the previous client that are not present in the current one but that still have an alternative to achieve the same functionalities.
+
+|Method in ScimClient|Replace with method|Defined at interface|
+|--------------------|----------|--------------------|
+|createGroupString|createGroup|IGroupWebService|
+|retrieveGroup|getGroupById|IGroupWebService|
+|updateGroupString|updateGroup|IGroupWebService|
+
+##### Removed methods
+
+`retrieveAllGroups` is not available in new client. Use a similar strategy to that of finding all users. Use `searchGroups` or `searchGroupsPost` for the task.
+
+##### New methods
+
+`patchGroup` allows you to apply a PATCH operation upon a group.
+
+#### Fido devices manipulation
+
+The following table lists fido devices methods found in the previous client that are not present in the current one but that still have an alternative to achieve the same functionalities.
+
+|Method in ScimClient|Replace with method|Defined at interface|
+|--------------------|----------|--------------------|
+|searchFidoDevices|searchDevices|IFidoDeviceWebService|
+|searchFidoDevicesPost|searchDevicesPost|IFidoDeviceWebService|
+|retrieveFidoDevice|getDeviceById|IFidoDeviceWebService|
+|updateFidoDevice|updateDevice|IFidoDeviceWebService|
+|deleteFidoDevice|deleteDevice|IFidoDeviceWebService|
+
+#### Metadata 
+
+|Method in ScimClient|Replace with method|Defined at interface|
+|--------------------|----------|--------------------|
+|retrieveServiceProviderConfig|getServiceProviderConfig|ClientSideService|
+|retrieveResourceTypes|getResourceTypes|ClientSideService|
+
+##### Removed methods
+
+* `getUserExtensionSchema` is not available in new client. Use the new `getSchemas` method of `ClientSideService` to obtain this information.
+
+##### New methods
+
+* `getSchemas` allows to issue a GET request to the `/Schemas` endpoint to retrieve all the information of supported schemas in the server implementation.
+
+#### Miscelaneous
+
+* New method `searchResourcesPost` allows to search all resource types at once (by using POST on /.search endpoint).
+* New method `close` allows to free resources allocated by the underlying RestEasy client employed to perform the networking operations. Once you call this method, you must not issue any request - you will have to obtain a new client instance from `gluu.scim2.client.factory.ScimClientFactory`
+
+## Are there any special cases to account if still using client version 3.1.x?
+
+Yes. The following are the limitations you should account for:
+
+* When using `searchUsersPost`, `searchGroupsPost`, and `searchFidoDevicesPost` methods, the *attributesArray* param is ignored.
+
+* For BulkOperations, requests must be sent as json Strings only (you can still create a `BulkRequest` object, convert it to a json String and replace "operations" by "Operations" in it. The big "O" is the correct way according to spec). Responses cannot be read unfortunately: the method `getOperations` of `BulkResponse` will not contain the results of the bulk because of this typo).
+
+* Passing custom attributes to a service invocation won't work using the `addExtension(Extension)` approach. You can supply a User representation (that includes custom attributes) as parameter in a service invocation using a Json String, or call the method `addExtension(String urn, Map<String, Object> map)`. Examples:
+
+1. Creating a user with Objects:
+
+```
+User user = new User();
+Name name = new Name();
+... set some subattributes
+user.setName(name)
+user.setUserName("joe");
+user.setDisplayName("Joe");
+
+//Obtain a date time String in ISO-8601 representation
+String nowIsoString=java.time.Instant.ofEpochMilli(System.currentTimeMillis()).toString();
+
+//Create a map to store custom attributes:
+Map<String, Object> custAttrs=new HashMap<String, Object>();
+custAttrs.put("scimCustomFirst", "Stringbeans");
+custAttrs.put("scimCustomSecond", Collections.singletonList(nowIsoString));
+custAttrs.put("scimCustomThird", 101);
+
+//Use alternative method addExtension
+user.addExtension(Constants.USER_EXT_SCHEMA_ID, custAttrs);
+
+//Invoke service operation for adding user
+BaseClientResponse<User> response = client.createUser(user, null);
+
+log.info("User with id {} created", response.getEntity().getId());
+...
+```
+
+2. Updating a user with Json String:
+
+Suppose file *myJsonPayload.js* exists in the filesystem with the following contents:
+
+```
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User",
+    "urn:ietf:params:scim:schemas:extension:gluu:2.0:User"
+  ],
+  "urn:ietf:params:scim:schemas:extension:gluu:2.0:User": {
+    "scimCustomFirst": "Stringbeans"
+  },
+  "userName": "joe",
+  "name": {
+    "givenName": "Joe",
+    "familyName": "Smith"
+  },
+  "displayName": "Joe"
+}
+```
+
+You could could do:
+
+```
+ObjectMapper mapper=new ObjectMapper();
+String payload=mapper.readValue(new File("myJsonPayload.js"), String.class);
+BaseClientResponse<User> response=client.updatePersonString(payload, id, MediaType.APPLICATION_JSON);
+
+log.info("User with id {} updated", response.getEntity().getId());
+
+```
+
+!!! Note: To read custom attributes (after a service invocation) you can do as usual: `user.getExtension(USER_EXT_SCHEMA_ID).getFields().get("customAttributeName")`.
+
+
+## How do I add custom error handling?
+
+This section shows an example on how to process a failed operation sent to your service. 
+
+When something happens that prevents an operation to succeed you have a chance to do some post-processing and show meaningful errors to your users. Here we are trying to create a user with `admin` user name, and checking if the status code is appropriate, if not, we parse error details using the `ErrorResponse` class.
+
+```
+...
+
+public void failedCreate(){
+
+        UserResource u=new UserResource();
+        u.setUserName("admin");
+        
+        Response r=client.createUser(u, null, null);
+        Status status=Status.fromStatusCode(r.getStatus());
+
+        switch (r.getStatusInfo().getFamily()){
+            case SUCCESSFUL:
+                //2xx HTTP sucess, add your processing logic here...
+                break;
+            case CLIENT_ERROR:
+                //4xx HTTP error
+                ErrorResponse error=r.readEntity(ErrorResponse.class);
+                if (status.equals(Status.BAD_REQUEST)) {
+                    handleError("The request is syntactically incorrect", error.getDetail(), error.getScimType());
+                }
+                else
+                if (status.equals(Status.CONFLICT)) {
+                    handleError("An attempt to create an already existing user occurred", error.getDetail(), error.getScimType());
+                }
+                break;
+            case SERVER_ERROR:
+                //5xx HTTP error
+                break;
+        }
+        
+}
+
+public void handleError(String title, String description, String scimType){
+    //Do your custom processing...
+    //For a list of possible values of scimType, see table 9 of RFC7644
+}
+```
+
+Former SCIM-Client versions used to deal with `BaseClientResponse<T>` objects and it was not possible to read the entity as an instance of a class other than `T` (usually `T` being User or Group) because the response was already fully consumed, this usually led to errors like "Stream closed". Newer client allows you to read the response as many times as you need without restriction of type parameter `T` as the underlying response stream is buffered by default.

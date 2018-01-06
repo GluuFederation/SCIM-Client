@@ -31,7 +31,7 @@ public class FullUserTest extends UserBaseTest {
 
     @Parameters("user_full_create")
     @Test
-    public void create(String json){
+    public void createFull(String json){
         logger.debug("Creating user from json...");
         user=createUserFromJson(json);
 
@@ -47,7 +47,7 @@ public class FullUserTest extends UserBaseTest {
     }
 
     @Parameters("user_full_update")
-    @Test(dependsOnMethods = "create")
+    @Test(dependsOnMethods = "createFull")
     public void update(String json){
 
         logger.debug("Updating user {} with json", user.getUserName());

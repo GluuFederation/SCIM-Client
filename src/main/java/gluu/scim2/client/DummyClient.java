@@ -8,7 +8,7 @@ package gluu.scim2.client;
 import javax.ws.rs.core.Response;
 
 /**
- * This type of client is only useful for developers of SCIM server code only.
+ * This type of client is useful for developers of SCIM server code only.
  * <p><b>Note:</b> Do not instantiate this class in your code. To interact with the service, call the corresponding method in
  * class {@link gluu.scim2.client.factory.ScimClientFactory ScimClientFactory} that returns a proxy object wrapping this client
  * @param <T> Type parameter of superclass

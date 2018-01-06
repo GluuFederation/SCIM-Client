@@ -26,13 +26,13 @@ public class PatchDeleteUserTest extends UserBaseTest{
 
     @Parameters({"user_full_create"})
     @Test
-    public void create(String json){
+    public void createForDel(String json){
         logger.debug("Creating user from json...");
         user=createUserFromJson(json);
     }
 
     @Parameters({"user_patchdelete"})
-    @Test(dependsOnMethods = "create")
+    @Test(dependsOnMethods = "createForDel")
     public void delete1(String patchRequest){
 
         Response response = client.patchUser(patchRequest, user.getId(), null, null);

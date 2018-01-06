@@ -37,6 +37,8 @@ public class GroupsBulkTest extends BaseTest {
     @Test
     public void bulkJson(String json){
 
+        logger.info("Creating one user and one group using bulk json string");
+
         Response response=client.processBulkOperations(json);
         assertEquals(response.getStatus(), Status.OK.getStatusCode());
 
@@ -61,6 +63,8 @@ public class GroupsBulkTest extends BaseTest {
     @Test(dependsOnMethods = "bulkJson")
     public void bulkObject(){
 
+        logger.info("Sending a bulk with a patch to insert admin user into group");
+
         //Creates a patch request consisting of adding the admin user to the group created
         PatchOperation po=new PatchOperation();
         po.setOperation("add");
@@ -70,7 +74,7 @@ public class GroupsBulkTest extends BaseTest {
         PatchRequest pr=new PatchRequest();
         pr.setOperations(Collections.singletonList(po));
 
-        //Creates the bulk operation associated to the path request
+        //Creates the bulk operation associated to the patch request
         BulkOperation bop =new BulkOperation();
         bop.setMethod("PATCH");
         bop.setPath("/Groups/" + groupId);
@@ -90,6 +94,8 @@ public class GroupsBulkTest extends BaseTest {
 
     @Test(dependsOnMethods = "bulkObject", alwaysRun = true)
     public void delete(){
+
+        logger.info("Cleaning...");
 
         //Prepare a bulk with 2 deletes
         List<BulkOperation> ops=new ArrayList<>();

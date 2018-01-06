@@ -26,13 +26,13 @@ public class PatchAddUserTest extends UserBaseTest{
 
     @Parameters({"user_average_create"})
     @Test
-    public void create(String json){
+    public void createForAdd(String json){
         logger.debug("Creating user from json...");
         user=createUserFromJson(json);
     }
 
     @Parameters({"user_patchadd"})
-    @Test(dependsOnMethods = "create",  groups = "A")
+    @Test(dependsOnMethods = "createForAdd")
     public void jsonPatch(String patchRequest){
         Response response = client.patchUser(patchRequest, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());

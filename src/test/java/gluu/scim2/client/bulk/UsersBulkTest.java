@@ -32,6 +32,7 @@ public class UsersBulkTest extends UserBaseTest {
     @Test
     public void bulkJson1(String json){
 
+        logger.info("Sending a bulk with POST, PUT, and PATCH operations...");
         Response response=client.processBulkOperations(json);
         assertEquals(response.getStatus(), Status.OK.getStatusCode());
 
@@ -46,11 +47,13 @@ public class UsersBulkTest extends UserBaseTest {
 
         id=location.substring(location.lastIndexOf("/")+1);
         logger.info("User id is {}", id);
+
     }
 
-    //@Test(dependsOnMethods = "bulkJson1")
-    public void bulkObject(){
+    @Test(dependsOnMethods = "bulkJson1")
+    public void bulkWithObject(){
 
+        logger.info("Sending a bulk with one DELETE...");
         BulkOperation op=new BulkOperation();
         op.setMethod("DELETE");
         op.setPath("/Users/" + id);
@@ -67,12 +70,14 @@ public class UsersBulkTest extends UserBaseTest {
 
         //Verify resource was deleted
         assertEquals(Status.NO_CONTENT.getStatusCode(), Integer.parseInt(ops.get(0).getStatus()));
+
     }
 
     @Parameters("users_bulk2")
-    //@Test(dependsOnMethods = "bulkObject")
+    @Test(dependsOnMethods = "bulkWithObject")
     public void bulkJson2(String json) throws Exception{
 
+        logger.info("Sending a bulk with POSTs and DELETEs operations...");
         Response response=client.processBulkOperations(json);
         assertEquals(response.getStatus(), Status.OK.getStatusCode());
 

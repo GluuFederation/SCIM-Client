@@ -127,7 +127,7 @@ public class SimpleSearchUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnGroups = "search", alwaysRun = true)
+    @Test(dependsOnGroups = "search", groups="simple", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }
