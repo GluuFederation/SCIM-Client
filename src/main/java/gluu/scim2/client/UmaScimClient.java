@@ -25,8 +25,6 @@ import org.xdi.util.StringHelper;
 
 import gluu.scim2.client.exception.ScimInitializationException;
 
-// import org.xdi.oxauth.model.util.JwtUtil;
-
 /**
  * SCIM UMA client
  *
@@ -181,4 +179,5 @@ public class UmaScimClient extends AbstractScimClient {
             throw new ScimInitializationException(ex.getMessage(), ex);
         }
     }
+
 }
