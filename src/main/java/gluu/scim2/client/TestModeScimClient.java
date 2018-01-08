@@ -97,7 +97,6 @@ public class TestModeScimClient extends AbstractScimClient {
         //String id_token=response.getIdToken();      //this is null
         //refresh_token = response.getRefreshToken(); //this is null
         access_token=getTokens(grant).getAccessToken();
-        System.out.println("tokens: " + access_token);
 
     }
 
@@ -137,8 +136,8 @@ public class TestModeScimClient extends AbstractScimClient {
     @Override
     protected boolean authorize(BaseClientResponse response){
         /*
-        This method is called if the attempt to use the service returned forbidden (status = 403), so here we check if
-        client expired to generate a new one & ask for another token, or else leave it that way (forbidden)
+        This method is called if the attempt to use the service returned unauthorized (status = 401), so here we check if
+        client expired to generate a new one & ask for another token, or else leave it that way (401)
          */
         try {
             triggerRegistrationIfNeeded();
