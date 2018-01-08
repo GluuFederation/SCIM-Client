@@ -60,7 +60,7 @@ public class UserFiltersMainTests extends BaseScimTest {
             "emails.type sw \"work\"",
             "emails.type ew \"work\"",
             "emails.type co \"work\"",
-            "emails[primary eq \"true\"]",
+            //"emails[primary eq \"true\"]",
             "emails[type eq \"work\" and value co \"test\"]",
             "emails[type eq \"home\" and value sw \"bbb\"]",
             "emails[type ne \"home\" and value ew \"111@test.email\"]",
@@ -96,13 +96,13 @@ public class UserFiltersMainTests extends BaseScimTest {
             USER_CORE_SCHEMA_ID + ":userName sw \"aaaa1111\"",
             USER_CORE_SCHEMA_ID + ":userName ew \"1111\" and emails.type eq \"work\"",
             USER_CORE_SCHEMA_ID + ":name.givenName co \"2222\" and addresses.type eq \"work\"",
-            USER_CORE_SCHEMA_ID + ":addresses.primary pr",
+            //USER_CORE_SCHEMA_ID + ":addresses.primary pr",
             USER_CORE_SCHEMA_ID + ":addresses pr",
             "emails.type pr",
             "emails pr",
-            "addresses.primary eq \"true\"",
+            //"addresses.primary eq \"true\"",
             "not emails.display pr",
-            "not " + USER_CORE_SCHEMA_ID + ":emails.primary eq \"true\""
+            //"not " + USER_CORE_SCHEMA_ID + ":emails.primary eq \"true\""
         };
 
         int startIndex = 1;
