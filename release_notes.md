@@ -1,6 +1,6 @@
 # New features and enhancements
 
-SCIM server implementation was updated to adhere more closely to SCIM standard and include features we had been missing. The following summarizes the most important enhancements:
+SCIM server implementation was updated to adhere more closely to SCIM standard and includes features we had been missing. The following summarizes the most important enhancements:
 
 ## Stricter validations
 
@@ -22,7 +22,7 @@ After studying how resource updates work according to the spec, it's easy to not
 
 To learn more about PATCH see section 3.5.2 of RFC 7644. For users of SCIM-Client there is a bunch of [test cases](src/test/java/gluu/scim2/client/patch) as well.
 
-## More control on what will be returned
+## More control on responses content
 
 Now **all operations** (except for bulk and delete) allow developers to specify the attributes that will be returned for every resource (User, group, etc.) included in a response by means of `attributes` and `excludedAttributes` query params. See section 3.9 of RFC 7644.
 
@@ -36,6 +36,9 @@ To learn more about how error handling is standardized in SCIM, please read sect
 
 ## Server output is compliant
 We have striven after standard compliance and fixed subtle mistakes and deviations from the spec that were detected in serialization routines. 
+
+## Better javadocs
+Java users can benefit from comprehensive api docs in maven projects such as `scim-client` and `oxtrust-scim`.
 
 
 # Important updates for developers
@@ -255,18 +258,7 @@ For examples, see the following test cases:
 
 ##### Extended attributes
 
-Custom attributes manipulation has been simplified: now they are handled via `CustomAttributes` class (check the api docs of `org.gluu.oxtrust.model.scim2.CustomAttributes` to learn more.). 
-
-To access the name/values of custom attributes please use the `getCustomAttributes` method of your SCIM resource and pass the `uri` of the extension that these custom attributes are associated to. Likewise, to set the values for your custom attributes, call the `addCustomAttributes` and pass a `CustomAttributes` instance. 
-
-The following test cases contain illustrative examples:
-
-* [FullUserTest](https://github.com/GluuFederation/SCIM-Client/blob/3.2.0/src/test/java/gluu/scim2/client/singleresource/FullUserTest.java)
-
-* [QueryParamCreateUpdateTest](https://github.com/GluuFederation/SCIM-Client/blob/3.2.0/src/test/java/gluu/scim2/client/singleresource/QueryParamCreateUpdateTest.java)
-
-* [PatchUserExtTest](https://github.com/GluuFederation/SCIM-Client/blob/3.2.0/src/test/java/gluu/scim2/client/patch/PatchUserExtTest.java)
-
+Custom attributes manipulation has been simplified: now they are handled via `CustomAttributes` class (check the api docs of `org.gluu.oxtrust.model.scim2.CustomAttributes`). Visit [this page](scim2.md#handling-custom-attributes-in-scim-client) to learn more about this topic. 
 
 #### Groups manipulation
 
@@ -395,47 +387,4 @@ log.info("User with id {} updated", response.getEntity().getId());
 
 ## How do I add custom error handling?
 
-This section shows an example on how to process a failed operation sent to your service. 
-
-When something happens that prevents an operation to succeed you have a chance to do some post-processing and show meaningful errors to your users. Here we are trying to create a user with `admin` user name, and checking if the status code is appropriate, if not, we parse error details using the `ErrorResponse` class.
-
-```
-...
-
-public void failedCreate(){
-
-        UserResource u=new UserResource();
-        u.setUserName("admin");
-        
-        Response r=client.createUser(u, null, null);
-        Status status=Status.fromStatusCode(r.getStatus());
-
-        switch (r.getStatusInfo().getFamily()){
-            case SUCCESSFUL:
-                //2xx HTTP sucess, add your processing logic here...
-                break;
-            case CLIENT_ERROR:
-                //4xx HTTP error
-                ErrorResponse error=r.readEntity(ErrorResponse.class);
-                if (status.equals(Status.BAD_REQUEST)) {
-                    handleError("The request is syntactically incorrect", error.getDetail(), error.getScimType());
-                }
-                else
-                if (status.equals(Status.CONFLICT)) {
-                    handleError("An attempt to create an already existing user occurred", error.getDetail(), error.getScimType());
-                }
-                break;
-            case SERVER_ERROR:
-                //5xx HTTP error
-                break;
-        }
-        
-}
-
-public void handleError(String title, String description, String scimType){
-    //Do your custom processing...
-    //For a list of possible values of scimType, see table 9 of RFC7644
-}
-```
-
-Former SCIM-Client versions used to deal with `BaseClientResponse<T>` objects and it was not possible to read the entity as an instance of a class other than `T` (usually `T` being User or Group) because the response was already fully consumed, this usually led to errors like "Stream closed". Newer client allows you to read the response as many times as you need without restriction of type parameter `T` as the underlying response stream is buffered by default.
+This [page](scim2.md#error-handling) shows examples on how to process a failed operation received from your service. 
