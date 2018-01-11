@@ -5,18 +5,31 @@ SCIM is a specification designed to reduce the complexity of user management ope
 and the patterns for exchanging this schema using HTTP in a platform-neutral fashion. The aim of SCIM is achieving
 interoperability, security, and scalability in the context of identity management.
 
-You can think of SCIM merely as a REST API with endpoints exposing CRUD functionality (create, update, retrieve and delete).
+Developers can think of SCIM merely as a REST API with endpoints exposing CRUD functionality (create, update, retrieve and delete).
 
 This project consists of a ready-to-use Java client to interact with those endpoints.
 
 Detailed specifications for SCIM can be found at [RFC 7642](https://tools.ietf.org/html/rfc7642),
-[RFC 7643](https://tools.ietf.org/html/rfc7643), and [RFC 7644](https://tools.ietf.org/html/rfc7644).
+[RFC 7643](https://tools.ietf.org/html/rfc7643), and [RFC 7644](https://tools.ietf.org/html/rfc7644). Documentation of
+Gluu's implementation of SCIM service is available at [User Management with SCIM](https://www.gluu.org/docs/ce/user-management/scim2/).
 
-In Gluu's implementation, we have User, Group and Bulk operations. Below are the links for the latest Gluu implementation
-for SCIM client:
+Below is the link for the latest Gluu implementation of SCIM client:
 
-* [SCIM 3.1.1 stable client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/3.1.2.Final/)
+* [SCIM stable client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/3.1.2.Final/)
 
-Recommended reading before using the client:
+### How to run tests
 
-* [User Management with SCIM](https://www.gluu.org/docs/ce/user-management/scim2/)
+* Ensure you have a [working installation](https://gluu.org/docs/oxd/install/) of Gluu Server
+
+* Enable and then protect your SCIM API using test mode or UMA (see [API protection](https://www.gluu.org/docs/ce/user-management/scim2/#api-protection))
+
+* Edit `profiles/default/config-scim-test.properties` or create a profile directory with your own copy of `config-scim-test.properties`.
+
+  Supply suitable values for properties file. Use [this](https://www.gluu.org/docs/ce/user-management/scim2/#testing-with-the-scim-client-uma)
+   as a guide if you are under UMA protection.
+
+* ... and run maven. Examples:
+
+   - `mvn test`
+   - `mvn -Dcfg=<profile-name> test`
+   - `mvn -Dtestmode=true test`
