@@ -24,7 +24,7 @@ import static javax.ws.rs.core.Response.Status.*;
 import static org.testng.Assert.*;
 
 /**
- * This test is quite representative of SCIM funtionalities: it covers a good amaount of operations in different flavors,
+ * This test is quite representative of SCIM funtionalities: it covers a good amount of operations in different flavors,
  * and at the same time showcases how User's group assignment works
  * Created by jgomer on 2017-12-28.
  */
@@ -44,7 +44,7 @@ public class GroupAssignUserTest extends UserBaseTest {
         for (UserResource user : mentals){
             Response response=client.createUser(user, null, null);
             assertEquals(response.getStatus(), CREATED.getStatusCode());
-            friends.add(response.readEntity(UserResource.class));
+            friends.add(response.readEntity(usrClass));
         }
 
     }
@@ -118,12 +118,12 @@ public class GroupAssignUserTest extends UserBaseTest {
         assertEquals(buddies.size(),3);
 
         //Verify all mad belong to group, and one of them, additionally to group2
-        buddies.stream().map(UserResource.class::cast).forEach(buddy -> {
+        buddies.stream().map(usrClass::cast).forEach(buddy -> {
             Set<String> groupIds=buddy.getGroups().stream().map(Group::getValue).collect(Collectors.toSet());
             assertTrue(groupIds.contains(group.getId()));
         });
 
-        Optional<UserResource> usrOpt=buddies.stream().map(UserResource.class::cast)
+        Optional<UserResource> usrOpt=buddies.stream().map(usrClass::cast)
                 .filter(buddy -> buddy.getGroups().size()>1).findFirst();
         assertTrue(usrOpt.isPresent());
 
@@ -141,7 +141,7 @@ public class GroupAssignUserTest extends UserBaseTest {
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         logger.info("Attempting to modify group membership using /Users endpoint...");
-        user=response.readEntity(UserResource.class);
+        user=response.readEntity(usrClass);
         Set<String> groupIds=user.getGroups().stream().map(Group::getValue).collect(Collectors.toSet());
 
         assertTrue(groupIds.contains(group.getId()));
@@ -149,7 +149,45 @@ public class GroupAssignUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods = "modifyGroupFromUser", alwaysRun = true)
+    @Test(dependsOnMethods = "modifyGroupFromUser")
+    public void alterMemberships(){
+
+        //Effectively remove one member and add admin
+        Member aMental=group.getMembers().stream().findAny().get();
+        Member admin=new Member();
+        admin.setValue(getAdminId());
+
+        group.getMembers().remove(aMental);
+        group.getMembers().add(admin);
+
+        logger.info("Removing one and adding one member...");
+        Response response=client.updateGroup(group, group.getId(), null, null);
+
+        assertEquals(response.getStatus(), OK.getStatusCode());
+        group=response.readEntity(GroupResource.class);
+
+        assertFalse(group.getMembers().contains(aMental));
+        assertTrue(group.getMembers().contains(admin));
+        logger.info("Group has correct members");
+
+        //Verify groups attribute in users reflected changes
+        response=client.getUserById(aMental.getValue(), "groups", null);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        UserResource patient=response.readEntity(usrClass);
+        assertTrue(patient.getGroups()==null || patient.getGroups().stream().noneMatch(gr -> gr.getValue().equals(group.getId())));
+
+        response=client.getUserById(admin.getValue(), "groups", null);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        patient=response.readEntity(usrClass);
+        assertTrue(patient.getGroups().stream().anyMatch(gr -> gr.getValue().equals(group.getId())));
+        logger.info("Users have correct memberships");
+
+    }
+
+
+    @Test(dependsOnMethods = "alterMemberships", alwaysRun = true)
     public void deleteGroups(){
 
         //Dismantle sanitarium...
@@ -186,6 +224,21 @@ public class GroupAssignUserTest extends UserBaseTest {
         user.setUserName("test-" + Math.random());
         user.setDisplayName(user.getUserName());
         return user;
+    }
+
+    private String getAdminId(){
+
+        //Search the id of the admin user
+        SearchRequest sr=new SearchRequest();
+        sr.setFilter("userName eq \"admin\"");
+
+        Response response=client.searchUsersPost(sr);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        ListResponse lr=response.readEntity(ListResponse.class);
+        assertTrue(lr.getResources().size()>0);
+        return lr.getResources().get(0).getId();
+
     }
 
 }
