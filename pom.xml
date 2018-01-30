@@ -36,9 +36,9 @@
     </repositories>
 
     <scm>
-        <url>https://github.com/GluuFederation/oxCore</url>
-        <connection>scm:git:git://github.com/GluuFederation/oxCore.git</connection>
-        <developerConnection>scm:git:git@github.com:GluuFederation/oxCore.git</developerConnection>
+        <url>https://github.com/GluuFederation/SCIM-Client</url>
+        <connection>scm:git:git://github.com/GluuFederation/SCIM-Client.git</connection>
+        <developerConnection>scm:git:git@github.com:GluuFederation/SCIM-Client.git</developerConnection>
     </scm>
 
     <modules>
