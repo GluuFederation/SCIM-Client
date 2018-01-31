@@ -23,6 +23,12 @@
         <oxcore.version>3.1.3-SNAPSHOT</oxcore.version>
     </properties>
 
+    <parent>
+        <groupId>org.xdi</groupId>
+        <artifactId>oxscim</artifactId>
+        <version>3.1.3-SNAPSHOT</version>
+    </parent>
+
     <build>
         <finalName>SCIM-Client</finalName>
         <filters>
@@ -82,19 +88,6 @@
         </plugins>
     </reporting>
 
-    <repositories>
-        <repository>
-            <id>repository.jboss.org</id>
-            <name>JBoss Repository</name>
-            <url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
-        <repository>
-            <id>gluu</id>
-            <name>Gluu repository</name>
-            <url>http://ox.gluu.org/maven</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <!-- Gluu -->
         <dependency>
@@ -113,12 +106,12 @@
             <version>${oxcore.version}</version>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.xdi</groupId>
             <artifactId>oxtrust-scim</artifactId>
