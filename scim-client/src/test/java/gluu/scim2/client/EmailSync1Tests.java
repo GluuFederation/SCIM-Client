@@ -63,12 +63,10 @@ public class EmailSync1Tests extends BaseScimTest {
         List<Email> emails = new ArrayList<Email>();
         for (int i = 1; i <= 2; i++) {
             Email email = new Email();
-            email.setOperation("UPDATE");
             email.setPrimary(i == 1 ? true : false);
             email.setValue(i == 1 ? "cs2t1@d.com" : "es2t1@f.com");
             email.setDisplay(i == 1 ? "cs2t1@d.com" : "es2t1@f.com");
             email.setType(i == 1 ? Email.Type.WORK : Email.Type.HOME);
-            email.setReference("");
             emails.add(email);
         }
         userCreated.setEmails(emails);
@@ -129,33 +127,27 @@ public class EmailSync1Tests extends BaseScimTest {
         user.setTitle("Ursa");
 
         Email email = new Email();
-        email.setOperation("CREATE");
         email.setPrimary(true);
         email.setValue("as2t1@b.com");
         email.setDisplay("as2t1@b.com");
         email.setType(Email.Type.WORK);
-        email.setReference("");
         user.getEmails().add(email);
 
         List<PhoneNumber> phoneNumbers = new ArrayList<PhoneNumber>();
         PhoneNumber phoneNumber = new PhoneNumber();
-        phoneNumber.setOperation("CREATE");
         phoneNumber.setPrimary(true);
         phoneNumber.setValue("123-456-7890");
         phoneNumber.setDisplay("123-456-7890");
         phoneNumber.setType(PhoneNumber.Type.WORK);
-        phoneNumber.setReference("");
         phoneNumbers.add(phoneNumber);
         user.setPhoneNumbers(phoneNumbers);
 
         List<Address> addresses = new ArrayList<Address>();
         Address address = new Address();
-        address.setOperation("CREATE");
         address.setPrimary(true);
         address.setValue("test");
         address.setDisplay("Baku, Azerbaijan");
         address.setType(Address.Type.WORK);
-        address.setReference("");
         address.setStreetAddress("Baku");
         address.setLocality("Baku");
         address.setPostalCode("12345");

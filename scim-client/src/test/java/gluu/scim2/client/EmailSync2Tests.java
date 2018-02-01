@@ -63,12 +63,10 @@ public class EmailSync2Tests extends BaseScimTest {
 
         List<Email> emails = new ArrayList<Email>();
         Email email = new Email();
-        email.setOperation("UPDATE");
         email.setPrimary(true);
         email.setValue("es2t2@f.com");
         email.setDisplay("es2t2@f.com");
         email.setType(Email.Type.WORK);
-        email.setReference("");
         emails.add(email);
         userCreated.setEmails(emails);
 
@@ -130,35 +128,29 @@ public class EmailSync2Tests extends BaseScimTest {
         List<Email> emails = new ArrayList<Email>();
         for (int i = 1; i <= 2; i++) {
             Email email = new Email();
-            email.setOperation("CREATE");
             email.setPrimary(i == 1 ? true : false);
             email.setValue(i == 1 ? "as2t2@b.com" : "cs2t2@d.com");
             email.setDisplay(i == 1 ? "as2t2@b.com" : "cs2t2@d.com");
             email.setType(i == 1 ? Email.Type.WORK : Email.Type.HOME);
-            email.setReference("");
             emails.add(email);
         }
         user.setEmails(emails);
 
         List<PhoneNumber> phoneNumbers = new ArrayList<PhoneNumber>();
         PhoneNumber phoneNumber = new PhoneNumber();
-        phoneNumber.setOperation("CREATE");
         phoneNumber.setPrimary(true);
         phoneNumber.setValue("123-456-7890");
         phoneNumber.setDisplay("123-456-7890");
         phoneNumber.setType(PhoneNumber.Type.WORK);
-        phoneNumber.setReference("");
         phoneNumbers.add(phoneNumber);
         user.setPhoneNumbers(phoneNumbers);
 
         List<Address> addresses = new ArrayList<Address>();
         Address address = new Address();
-        address.setOperation("CREATE");
         address.setPrimary(true);
         address.setValue("test");
         address.setDisplay("Tonsberg, Norway");
         address.setType(Address.Type.WORK);
-        address.setReference("");
         address.setStreetAddress("Tonsberg");
         address.setLocality("Tonsberg");
         address.setPostalCode("12345");

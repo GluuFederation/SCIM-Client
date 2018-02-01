@@ -17,6 +17,8 @@ import org.testng.annotations.Test;
 
 import javax.ws.rs.core.Response;
 
+import java.util.Arrays;
+
 import static org.gluu.oxtrust.model.scim2.Constants.USER_CORE_SCHEMA_ID;
 import static org.testng.Assert.assertEquals;
 
@@ -42,30 +44,28 @@ public class UserFiltersMainTests extends BaseScimTest {
     public void testSearchUsers1() throws Exception {
 
         String[] filters = new String[] {
-            "name[givenName co \"aaaa\" and name[familyName ew \"test\"]]",
-            "name[givenName co \"aaaa\" and emails[value ew \"111@test.email\"]]",
-            "name[givenName co \"bbb\" and emails[value sw \"bbb\"]]",
-            "name[name[givenName sw \"aaaa\"]]",
+            "name.givenName co \"aaaa\" and name.familyName ew \"test\"",
+            "name.givenName co \"aaaa\" and emails[value ew \"111@test.email\"]",
+            "name.givenName co \"bbb\" and emails[value sw \"bbb\"]",
+            "name.givenName sw \"aaaa\"",
             "id sw \"@\"",
-            //"groups sw \"inum=@\"",
             "externalId sw \"1\"",
             "externalId ew \"3000\"",
-            "birthdate ge \"20140101000000Z\" and externalId co \"2\"",
             "userName sw \"aaaa\"",
             "(name.givenName sw \"aaaa 1111\" and name.familyName ew \"test\")",
-            "emails.type pr",
-            "not emails.type pr",
-            "emails.type ne \"work\"",
-            "emails.type eq \"work\"",
-            "emails.type sw \"work\"",
-            "emails.type ew \"work\"",
-            "emails.type co \"work\"",
-            //"emails[primary eq \"true\"]",
+            "emails[type pr]",
+            "not (emails[type pr])",
+            "emails[type ne \"work\"]",
+            "emails[type eq \"work\"]",
+            "emails[type sw \"work\"]",
+            "emails[type ew \"work\"]",
+            "emails[type co \"work\"]",
+            "emails[primary eq true]",
             "emails[type eq \"work\" and value co \"test\"]",
             "emails[type eq \"home\" and value sw \"bbb\"]",
             "emails[type ne \"home\" and value ew \"111@test.email\"]",
-            "name[displayName co \"1111\"] and (name.familyName co \"filter\")",
-            "name[givenName sw \"aaaa 1111\" and familyName ew \"test\"]"
+            "displayName co \"1111\" and name.familyName co \"filter\"",
+            "name.givenName sw \"aaaa 1111\" and name.familyName ew \"test\""
         };
 
         int startIndex = 1;
@@ -73,8 +73,6 @@ public class UserFiltersMainTests extends BaseScimTest {
         String sortBy = "userName";
         String sortOrder = "ascending";
         String[] attributes = null;
-        // String[] attributes = new String[] {"name","emails","addresses"};  // Not supported as per spec
-        // String[] attributes = new String[] {"name.givenName","emails.type","emails.primary","emails.value"};  // Supported
 
         for (int i = 0; i < filters.length; i++) {
 
@@ -94,15 +92,15 @@ public class UserFiltersMainTests extends BaseScimTest {
 
         String[] filters = new String[] {
             USER_CORE_SCHEMA_ID + ":userName sw \"aaaa1111\"",
-            USER_CORE_SCHEMA_ID + ":userName ew \"1111\" and emails.type eq \"work\"",
-            USER_CORE_SCHEMA_ID + ":name.givenName co \"2222\" and addresses.type eq \"work\"",
-            //USER_CORE_SCHEMA_ID + ":addresses.primary pr",
+            USER_CORE_SCHEMA_ID + ":userName ew \"1111\" and emails[type eq \"work\"]",
+            USER_CORE_SCHEMA_ID + ":name.givenName co \"2222\" and addresses[type eq \"work\"]",
+            USER_CORE_SCHEMA_ID + ":addresses[primary pr]",
             USER_CORE_SCHEMA_ID + ":addresses pr",
-            "emails.type pr",
+            "emails[type pr]",
             "emails pr",
-            //"addresses.primary eq \"true\"",
-            "not emails.display pr",
-            //"not " + USER_CORE_SCHEMA_ID + ":emails.primary eq \"true\""
+            "addresses[primary eq true]",
+            "not (emails[display pr])",
+            "not (" + USER_CORE_SCHEMA_ID + ":emails[primary eq true])"
         };
 
         int startIndex = 1;
@@ -111,7 +109,7 @@ public class UserFiltersMainTests extends BaseScimTest {
         String sortOrder = "descending";
         String[] attributes = new String[] {
             "name.honorificPrefix", "name.givenName", "name.middleName", "name.familyName", "name.honorificSuffix",
-            "emails.value", "emails.type", "emails.primary",
+            "emails.value", "emails.type", "emails.primary", "userName",
             "addresses.formatted", "addresses.country", "addresses.type"
         };
 

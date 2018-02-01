@@ -89,7 +89,7 @@ public class GroupObjectAttributesFilterTests extends BaseScimTest {
 
         Thread.sleep(3000);  // Sleep for 3 seconds
 
-        String[] attributesArray = new String[]{"displayName"};
+        String[] attributesArray = new String[]{"displayName", "meta"};
         BaseClientResponse<Group> response = client.retrieveGroup(this.id, attributesArray);
 
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());

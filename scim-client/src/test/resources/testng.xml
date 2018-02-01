@@ -92,11 +92,12 @@
         </classes>
     </test>
 
-    <test name="Person Patch test" enabled="true">
+    <!-- Patch has never been supported in client <= 3.1.2 -->
+    <!--test name="Person Patch test">
         <classes>
             <class name="gluu.scim2.client.UserPatchWebServiceTestCases"/>
         </classes>
-    </test>
+    </test-->
 
     <!-- Tests run in test mode only. Enable test mode in oxTrust first! -->
     <test name="Basic test for test-mode" enabled="false">

@@ -41,7 +41,6 @@ public class UserFiltersNegativeTests extends BaseScimTest {
     @Test
     public void testRetrieveAllUsers() throws Exception {
 
-        // This is the old method
         BaseClientResponse<ListResponse> response = client.retrieveAllUsers();
 
         assertEquals(response.getStatus(), 200, "Status != 200");
@@ -83,4 +82,5 @@ public class UserFiltersNegativeTests extends BaseScimTest {
         BaseClientResponse<ListResponse> response = client.searchUsers("", 0, (MAX_COUNT + 1), "", "", new String[]{""});
         assertEquals(response.getStatus(), Response.Status.BAD_REQUEST.getStatusCode(), "Status != 400");
     }
+
 }
