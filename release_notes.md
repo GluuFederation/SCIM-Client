@@ -83,7 +83,7 @@ When the status of an operation is not in the 200-series response, the body of t
 
 ## About SCIM-Client
 
-As previously mentioned, current SCIM server implementation is revamped with new features. This is also the case for the Java-based "SCIM-Client" project.  The following highlights the most prominent changes and improvements:
+As previously mentioned, current SCIM server implementation is revamped with new features. This is also the case for the Java-based "SCIM-Client" project. The following highlights the most prominent changes and improvements:
 
 * **Client now mirrors more closely the SCIM protocol**: We have adjusted the (client) API used to interact with the service: Java methods that developers must call to send requests to the service are now quite similar to the operations the SCIM standard itself contains. This is a big advantage: developers familiar with the SCIM spec can start working immediately, while those who are not can start learning about SCIM protocol and schema as they are coding.
 
@@ -110,7 +110,14 @@ If you have been using SCIM-Client in your projects, and want to take advantage 
 * Do custom error handling
 * Release resources when no more requests will be issued
 
-If you definitely do not want to alter your existing code base you can still use the SCIM-Client jar (or maven dependency) in version 3.1.x and work as you used to (a few [special cases apply](#are-there-any-special-cases-to-account-if-still-using-client-version-31x)). Remember that by using the newer version your projects are staying more current (in terms of libraries) and you also have access to more complete java-docs.
+If you definitely do not want to alter your existing code base you can still use the SCIM-Client jar (or maven dependency) in version 3.1.x (x = 0, 1, 2) and work as you used to (a few [special cases apply](#are-there-any-special-cases-to-account-if-still-using-older-client). 
+
+For version 3.1.3 the project includes two modules:
+
+* scim-client: Basically the same as 3.1.2 (a few test cases were updated to conform to newer service implementation)
+* scim-client2: The newer client. For 3.2 onwards, this will be the only module delivered in this project.
+
+By using the newer version your projects are staying more current and you also have access to more complete java-docs.
 
 
 ## How to migrate my current code to use the newer SCIM-Client API?
@@ -310,13 +317,13 @@ The following table lists fido devices methods found in the previous client that
 * New method `searchResourcesPost` allows to search all resource types at once (by using POST on /.search endpoint).
 * New method `close` allows to free resources allocated by the underlying RestEasy client employed to perform the networking operations. Once you call this method, you must not issue any request - you will have to obtain a new client instance from `gluu.scim2.client.factory.ScimClientFactory`
 
-## Are there any special cases to account if still using client version 3.1.x?
+## Are there any special cases to account if still using older client?
 
 Yes. The following are the limitations you should account for:
 
 * When using `searchUsersPost`, `searchGroupsPost`, and `searchFidoDevicesPost` methods, the *attributesArray* param is ignored.
 
-* For BulkOperations, requests must be sent as json Strings only (you can still create a `BulkRequest` object, convert it to a json String and replace "operations" by "Operations" in it. The big "O" is the correct way according to spec). Responses cannot be read unfortunately: the method `getOperations` of `BulkResponse` will not contain the results of the bulk because of this typo).
+* For BulkOperations, responses cannot be read, more exactly, calling `getOperations` on class `BulkResponse` will always return an empty list. This is due to a problem in deserialization of bulk responses for versions <= 3.1.2.
 
 ## How do I add custom error handling?
 
