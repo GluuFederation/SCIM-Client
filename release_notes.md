@@ -34,6 +34,10 @@ To learn more about how error handling is standardized in SCIM, please read sect
 
 [This section](#how-do-i-add-custom-error-handling) explains how to do error handling for SCIM-Client users.
 
+## New chances for post-processing
+
+Formerly, developers might execute custom code via Python interception scripts just before changes were being saved to LDAP whether for creation, update, or removal of users and groups. Now, in addition to pre-persistence events, there is also room for post-persistence processing. This way developers can trigger execution of custom code that is applicable only after changes are actually saved.
+
 ## Server output is compliant
 We have striven after standard compliance and fixed subtle mistakes and deviations from the spec that were detected in serialization routines. 
 
