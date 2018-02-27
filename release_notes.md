@@ -8,9 +8,11 @@ Validations applied upon input data are more demanding now. We have added and fi
 
 Also we have added business logic to correctly apply the processing rules when it comes to handling read-only and immutable attributes.
 
-## Broader searches and filter processing tuning
+## Improved searching behaviour
 
 We have added searching capabilities so that it's possible to make general searches now, that is, you can have in your search results a mix of different resource types (Users, groups, etc.).
+
+Sorting is not an experimental feature anymore. Developers can now retrieve results sorted by most of SCIM resource attributes. Check [here](scim2.md#retrieval-with-filtering) to learn more.
 
 The processing of filter expressions used in searches adheres more closely to spec and now it generates more accurate LDAP expressions to run. Not only you can use filters with string attributes but also any mix of boolean, date, and integer typed attributes.
 
