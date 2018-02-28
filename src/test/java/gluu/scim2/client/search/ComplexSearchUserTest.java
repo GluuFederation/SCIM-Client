@@ -13,15 +13,12 @@ import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.gluu.oxtrust.model.scim2.SearchRequest;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.gluu.oxtrust.model.scim2.util.IntrospectUtil;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.Response;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.OffsetDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.Response.Status.*;
@@ -35,16 +32,7 @@ import static org.testng.Assert.*;
  */
 public class ComplexSearchUserTest extends UserBaseTest {
 
-    private UserResource user;
-
-    @Parameters("user_average_create")
-    @Test(dependsOnGroups = "simple")
-    public void createComplex(String json){
-        logger.debug("Creating user from json...");
-        user=createUserFromJson(json);
-    }
-
-    //@Test(dependsOnMethods="createComplex", groups = "searchComplex")
+    @Test
     public void searchNoAttributesParam(){
 
         final String ims="Skype";
@@ -71,8 +59,8 @@ public class ComplexSearchUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods="createComplex", groups = "searchComplex")
-    public void searchAttributesParam() throws Exception{
+    @Test
+    public void searchAttributesParam() throws Exception {
 
         int count=3;
         List<String> attrList=Arrays.asList("name.familyName", "active");
@@ -97,7 +85,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
         else{
             //Obtain an array of results
             UserResource users[]=listResponse.getResources().stream().map(usrClass::cast)
-                    .collect(Collectors.toList()).toArray(new UserResource[]{});
+                    .collect(Collectors.toList()).toArray(new UserResource[0]);
             assertEquals(users.length, count);
 
             //Build a set of all attributes that should not appear in the response
@@ -135,14 +123,15 @@ public class ComplexSearchUserTest extends UserBaseTest {
                 String familyName=users[i-1].getName().getFamilyName().toLowerCase();
                 String familyName2=users[i].getName().getFamilyName().toLowerCase();
 
-                //Check if first string is greater or equal than second
+                //Check if first string is not greater than or equal second
                 assertFalse(familyName.compareTo(familyName2)<0);
             }
         }
+
     }
 
-    @Test(dependsOnMethods="createComplex", groups = "searchComplex")
-    public void searchExcludedAttributesParam() throws Exception {
+    @Test
+    public void searchExcludedAttributesParam() {
 
         int count=3;
         List<String> attrList=Arrays.asList("x509Certificates", "entitlements", "roles", "ims", "phoneNumbers",
@@ -154,6 +143,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
         SearchRequest sr=new SearchRequest();
         sr.setFilter("displayName pr");
         sr.setSortBy("displayName");
+        sr.setSortOrder("descending");
         //Generate a string with the attributes to exclude
         sr.setExcludedAttributes(attrList.toString().replaceFirst("\\[","").replaceFirst("]",""));
         sr.setCount(count);
@@ -167,7 +157,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
         else {
             //Obtain an array of results
             UserResource users[] = listResponse.getResources().stream().map(usrClass::cast)
-                    .collect(Collectors.toList()).toArray(new UserResource[]{});
+                    .collect(Collectors.toList()).toArray(new UserResource[0]);
             assertEquals(users.length, count);
 
             //Verify attributes were excluded
@@ -185,16 +175,72 @@ public class ComplexSearchUserTest extends UserBaseTest {
                 String displayName=users[i-1].getDisplayName().toLowerCase();
                 String displayName2 =users[i].getDisplayName().toLowerCase();
 
-                //Check if second string is greater or equal than first
-                assertFalse(displayName2.compareTo(displayName)<0);
+                //Check if second string is less or equal than first
+                assertTrue(displayName.compareTo(displayName2)>=0);
             }
 
         }
     }
 
-    @Test(dependsOnGroups = "searchComplex", alwaysRun = true)
-    public void deleteComplex(){
-        deleteUser(user);
+    @Test
+    public void searchSortByDate() {
+
+        SearchRequest sr=new SearchRequest();
+        sr.setFilter("userName pr");
+        sr.setSortBy("meta.lastModified");
+        sr.setAttributes(Collections.singletonList(sr.getSortBy()));
+
+        Response response=client.searchUsersPost(sr);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        ListResponse listResponse=response.readEntity(ListResponse.class);
+        UserResource users[] = listResponse.getResources().stream().map(usrClass::cast).collect(Collectors.toList())
+                .toArray(new UserResource[0]);
+
+        for (int i=1; i<users.length; i++) {
+            String lastMod1=users[i-1].getMeta()==null ? null : users[i-1].getMeta().getLastModified();
+            String lastMod2=users[i].getMeta()==null ? null : users[i].getMeta().getLastModified();
+
+            if (lastMod1!=null)     //Both being non null is OK
+                assertNotNull(lastMod2);
+            if (lastMod2==null)     //If second is null, first must be
+                assertNull(lastMod1);
+            if (lastMod1!=null && lastMod2!=null) {
+                OffsetDateTime dt1=OffsetDateTime.parse(lastMod1);
+                OffsetDateTime dt2=OffsetDateTime.parse(lastMod2);
+                assertTrue(dt1.isEqual(dt2) || dt1.isBefore(dt2));
+            }
+        }
+
+    }
+
+    @Test
+    public void searchSortByExternalId() {
+
+        Response response=client.searchUsers(null, null, null, "externalId", "descending", "externalId", null);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        ListResponse listResponse=response.readEntity(ListResponse.class);
+        UserResource users[] = listResponse.getResources().stream().map(usrClass::cast).collect(Collectors.toList())
+                .toArray(new UserResource[0]);
+
+        assertEquals(listResponse.getStartIndex(), 1);
+        assertEquals(listResponse.getItemsPerPage(), users.length);
+        assertEquals(listResponse.getResources().size(), users.length);
+
+        for (int i=1; i<users.length; i++) {
+            String exId1=users[i-1].getExternalId();
+            String exId2=users[i].getExternalId();
+
+            if (exId2!=null)
+                assertNotNull(exId1);
+            if (exId1==null)
+                assertNull(exId2);
+
+            if (exId1!=null && exId2!=null)     //In descending order exId1 must be higher than exId2
+                assertFalse(exId1.compareTo(exId2)<0);
+        }
+
     }
 
 }
