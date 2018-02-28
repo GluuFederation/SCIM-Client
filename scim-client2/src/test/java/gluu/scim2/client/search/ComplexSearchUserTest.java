@@ -32,7 +32,7 @@ import static org.testng.Assert.*;
  */
 public class ComplexSearchUserTest extends UserBaseTest {
 
-    //@Test
+    @Test
     public void searchNoAttributesParam(){
 
         final String ims="Skype";
@@ -59,7 +59,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
 
     }
 
-    //@Test
+    @Test
     public void searchAttributesParam() throws Exception {
 
         int count=3;
@@ -130,7 +130,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
 
     }
 
-    //@Test
+    @Test
     public void searchExcludedAttributesParam() {
 
         int count=3;
@@ -182,7 +182,7 @@ public class ComplexSearchUserTest extends UserBaseTest {
         }
     }
 
-    //@Test
+    @Test
     public void searchSortByDate() {
 
         SearchRequest sr=new SearchRequest();
