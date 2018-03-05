@@ -128,6 +128,4 @@ public interface ScimClient extends Serializable {
     //Deletes a FIDO device
     BaseClientResponse deleteFidoDevice(String id) throws IOException;
 
-    BaseClientResponse<User> patchUser(ScimPatchUser scimPatchUser, String id, String[] attributesArray) throws IOException, URISyntaxException;
-
 }

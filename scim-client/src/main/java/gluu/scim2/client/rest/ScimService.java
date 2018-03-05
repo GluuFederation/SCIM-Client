@@ -195,9 +195,4 @@ public interface ScimService {
     @Consumes({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
     BaseClientResponse deleteFidoDevice(@PathParam("id") String id, @HeaderParam("Authorization") String authorization);
 
-    @Path("/scim/v2/Users/patch/{id}")
-    @PUT
-    @Produces({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
-    @Consumes({Constants.MEDIA_TYPE_SCIM_JSON + "; charset=utf-8"})
-    BaseClientResponse<User> patchUser(@PathParam("id") String id, ScimPatchUser scimPatchUser, @QueryParam("attributes") String attributesArray, @HeaderParam("Authorization") String authorization);
 }

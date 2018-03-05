@@ -528,21 +528,6 @@ public abstract class AbstractScimClient implements ScimClient {
     }
 
 
-    @Override
-    public final BaseClientResponse<User> patchUser(ScimPatchUser scimPatchUser, String id, String[] attributesArray) {
-        BaseClientResponse<User> response = null;
-        prepareRequest();
-        String attributes = (attributesArray != null && attributesArray.length > 0) ? StringUtils.join(attributesArray, ',') : null;
-        try {
-            response = scimService.patchUser(id, scimPatchUser, attributes, getAuthenticationHeader());
-            if (isNeededToAuthorize(response))
-                response = scimService.patchUser(id, scimPatchUser, attributes, getAuthenticationHeader());
-            return response;
-        } finally {
-            finalize(response);
-        }
-    }
-
     private void finalize(BaseClientResponse response) {
         if (response == null)
             return;
@@ -551,4 +536,5 @@ public abstract class AbstractScimClient implements ScimClient {
             response.getEntity();
         response.releaseConnection(); // then close InputStream
     }
+
 }
