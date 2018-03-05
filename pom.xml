@@ -42,7 +42,7 @@
     </scm>
 
     <modules>
-        <module>SCIM-Client</module>
+        <module>scim-client</module>
         <module>scim-client2</module>
     </modules>
 
