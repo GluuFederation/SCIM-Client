@@ -54,7 +54,7 @@ public class UserFiltersMainTests extends BaseScimTest {
             "userName sw \"aaaa\"",
             "(name.givenName sw \"aaaa 1111\" and name.familyName ew \"test\")",
             "emails[type pr]",
-            "not (emails[type pr])",
+            //"not (emails[type pr])",
             "emails[type ne \"work\"]",
             "emails[type eq \"work\"]",
             "emails[type sw \"work\"]",

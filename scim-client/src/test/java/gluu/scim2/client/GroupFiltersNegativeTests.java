@@ -73,11 +73,10 @@ public class GroupFiltersNegativeTests extends BaseScimTest {
         Assert.assertTrue(listResponse.getTotalResults() > 0);
     }
 
-    @Test
+    //Test disabled: MAX_COUNT was raised in Gluu Server 3.1.3: https://github.com/GluuFederation/oxTrust/issues/876
+    //@Test
     public void testMoreThanMaxCount() throws Exception {
-
         BaseClientResponse<ListResponse> response = client.searchGroups("", 0, (MAX_COUNT + 1), "", "", new String[]{""});
-
         assertEquals(response.getStatus(), Response.Status.BAD_REQUEST.getStatusCode(), "Status != 400");
     }
 }
