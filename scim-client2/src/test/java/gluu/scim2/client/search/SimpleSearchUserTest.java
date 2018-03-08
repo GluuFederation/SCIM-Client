@@ -98,7 +98,7 @@ public class SimpleSearchUserTest extends UserBaseTest {
         }
         if (other.getPhoneNumbers() != null) {
             cond2 = other.getPhoneNumbers().stream().anyMatch(phone -> phone.getValue().contains("+"));
-            cond3 = other.getPhoneNumbers().stream().anyMatch(phone -> phone.getType().contains("+"));
+            cond3 = other.getPhoneNumbers().stream().anyMatch(phone -> phone.getType() == null);
         }
         assertTrue(cond1 || cond2 || cond3);
 
