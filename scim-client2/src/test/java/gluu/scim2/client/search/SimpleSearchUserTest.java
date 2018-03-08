@@ -91,7 +91,16 @@ public class SimpleSearchUserTest extends UserBaseTest {
 
         //Retrieve first user in results
         UserResource other=listResponse.getResources().stream().map(usrClass::cast).findFirst().get();
-        assertTrue(other.getEmails().stream().anyMatch(mail -> mail.getValue().endsWith(host)));
+
+        boolean cond1 = false, cond2 = false, cond3 = false;
+        if (other.getEmails() != null) {
+             cond1 = other.getEmails().stream().anyMatch(mail -> mail.getValue().endsWith(host));
+        }
+        if (other.getPhoneNumbers() != null) {
+            cond2 = other.getPhoneNumbers().stream().anyMatch(phone -> phone.getValue().contains("+"));
+            cond3 = other.getPhoneNumbers().stream().anyMatch(phone -> phone.getType().contains("+"));
+        }
+        assertTrue(cond1 || cond2 || cond3);
 
     }
 
