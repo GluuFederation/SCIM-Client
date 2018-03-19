@@ -34,7 +34,7 @@ public class FidoDeviceTest extends BaseTest {
     public void search(){
 
         logger.debug("Searching all fido devices");
-        Response response=client.searchDevices("application pr", null, null, null, null, null, null);
+        Response response=client.searchDevices(null, "application pr", null, null, null, null, null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse=response.readEntity(ListResponse.class);
