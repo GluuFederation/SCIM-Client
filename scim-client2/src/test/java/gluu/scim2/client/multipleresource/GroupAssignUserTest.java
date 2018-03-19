@@ -167,7 +167,8 @@ public class GroupAssignUserTest extends UserBaseTest {
         group=response.readEntity(GroupResource.class);
 
         assertFalse(group.getMembers().contains(aMental));
-        assertTrue(group.getMembers().contains(admin));
+        //Here we don't use contains because equality in Member object inspects all fields (not only value)
+        assertTrue(group.getMembers().stream().anyMatch(m -> admin.getValue().equals(m.getValue())));
         logger.info("Group has correct members");
 
         //Verify groups attribute in users reflected changes
