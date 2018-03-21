@@ -44,7 +44,7 @@ public class QueryParamRetrievalTest extends UserBaseTest {
         for (UserResource usr : list){
             assertNotNull(usr.getDisplayName());
             assertTrue(usr.getDisplayName().toLowerCase().contains("test"));
-            assertNotNull(usr.getExternalId());
+            //assertNotNull(usr.getExternalId());
         }
 
     }
