@@ -70,11 +70,18 @@ public abstract class AbstractScimClient<T> implements InvocationHandler, Serial
      * stream is fully consumed, so there is no need to create finally blocks with close(). Also, the readEntity method
      * can be called any number of times. For instance, the "raw" response can be inspected by using readEntity(String.class)
      */
-    private Response invokeServiceMethod(Method method, Object[] args) throws ReflectiveOperationException{
+    private Response invokeServiceMethod(Method method, Object[] args) throws ReflectiveOperationException {
 
         logger.trace("Sending service request for method {}", method.getName());
         Response response = (Response) method.invoke(scimService, args);
-        logger.trace("Received response entity was{} buffered", response.bufferEntity() ? "" : " not");
+        boolean buffered = false;
+        try {
+            //This try block helps prevent a RestEasy NPE that arises when the response is empty (has no content)
+            buffered = response.bufferEntity();
+        } catch (Exception e) {
+            logger.trace(e.getMessage(), e);
+        }
+        logger.trace("Received response entity was{} buffered", buffered ? "" : " not");
         logger.trace("Response status code was {}", response.getStatus());
         return response;
 
