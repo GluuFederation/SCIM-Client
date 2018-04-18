@@ -41,7 +41,7 @@ public class PairwiseIdentifiersTest extends BaseTest {
             //Prepare the removal of the user's PPIDs
             PatchOperation operation = new PatchOperation();
             operation.setOperation("remove");
-            operation.setPath("pairwiseIdentifiers");
+            operation.setPath("pairwiseIdentitifers");
 
             PatchRequest pr = new PatchRequest();
             pr.setOperations(Collections.singletonList(operation));
