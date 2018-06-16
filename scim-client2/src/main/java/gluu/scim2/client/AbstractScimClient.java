@@ -8,6 +8,7 @@ package gluu.scim2.client;
 import gluu.scim2.client.rest.FreelyAccessible;
 import gluu.scim2.client.rest.provider.AuthorizationInjectionFilter;
 import gluu.scim2.client.rest.provider.ListResponseProvider;
+import gluu.scim2.client.rest.provider.ScimResourceProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -61,6 +62,7 @@ public abstract class AbstractScimClient<T> implements InvocationHandler, Serial
         scimService = target.proxy(serviceClass);
         target.register(ListResponseProvider.class);
         target.register(AuthorizationInjectionFilter.class);
+        target.register(ScimResourceProvider.class);
 
         ClientMap.update(client, null);
     }
