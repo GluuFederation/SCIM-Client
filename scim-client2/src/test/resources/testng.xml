@@ -89,6 +89,7 @@
             <class name="gluu.scim2.client.corner.WrongPayloadUserTest" />
             <!--class name="gluu.scim2.client.corner.WrongPayloadUserPatchTest" /-->
             <class name="gluu.scim2.client.corner.PairwiseIdentifiersTest" />
+            <class name="gluu.scim2.client.corner.SpecialCharsTest" />
         </classes>
     </test>
 
