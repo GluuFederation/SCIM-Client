@@ -9,16 +9,21 @@ import gluu.scim2.client.rest.FreelyAccessible;
 import gluu.scim2.client.rest.provider.AuthorizationInjectionFilter;
 import gluu.scim2.client.rest.provider.ListResponseProvider;
 import gluu.scim2.client.rest.provider.ScimResourceProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 
 import javax.ws.rs.core.Response;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 /**
  * The base class for specific SCIM clients.
@@ -56,7 +61,22 @@ public abstract class AbstractScimClient<T> implements InvocationHandler, Serial
          Configures a proxy to interact with the service using the new JAX-RS 2.0 Client API, see section
          "Resteasy Proxy Framework" of RESTEasy JAX-RS user guide
          */
-        client = new ResteasyClientBuilder().build();
+        if (System.getProperty("httpclient.multithreaded") == null) {
+            client = new ResteasyClientBuilder().build();
+        } else {
+            PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+            //Change defaults if supplied
+            getIntegerProperty("httpclient.multithreaded.maxtotal").ifPresent(cm::setMaxTotal);
+            getIntegerProperty("httpclient.multithreaded.maxperroute").ifPresent(cm::setDefaultMaxPerRoute);
+
+            logger.debug("Using multithreaded support with maxTotalConnections={} and maxPerRoutConnections={}", cm.getMaxTotal(), cm.getDefaultMaxPerRoute());
+            logger.warn("Ensure your oxTrust 'rptConnectionPoolUseConnectionPooling' property is set to true");
+
+            CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(cm).build();
+            ApacheHttpClient4Engine engine = new ApacheHttpClient4Engine(httpClient);
+
+            client = new ResteasyClientBuilder().httpEngine(engine).build();
+        }
         ResteasyWebTarget target = client.target(domain);
 
         scimService = target.proxy(serviceClass);
@@ -72,7 +92,7 @@ public abstract class AbstractScimClient<T> implements InvocationHandler, Serial
      * stream is fully consumed, so there is no need to create finally blocks with close(). Also, the readEntity method
      * can be called any number of times. For instance, the "raw" response can be inspected by using readEntity(String.class)
      */
-    private Response invokeServiceMethod(Method method, Object[] args) throws ReflectiveOperationException{
+    private Response invokeServiceMethod(Method method, Object[] args) throws ReflectiveOperationException {
 
         logger.trace("Sending service request for method {}", method.getName());
         Response response = (Response) method.invoke(scimService, args);
@@ -136,5 +156,17 @@ public abstract class AbstractScimClient<T> implements InvocationHandler, Serial
     abstract String getAuthenticationHeader();
 
     abstract boolean authorize(Response response);
+
+    private Optional<Integer> getIntegerProperty(String name) {
+
+        return Optional.ofNullable(System.getProperty(name)).map(prop -> {
+            try {
+                return new Integer(prop);
+            } catch (Exception e) {
+                return null;
+            }
+        });
+
+    }
 
 }
