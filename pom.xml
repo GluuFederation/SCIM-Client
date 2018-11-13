@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>gluu.scim.client</groupId>
-    <artifactId>SCIM-Client</artifactId>
+    <artifactId>scim-client2</artifactId>
     <version>4.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
