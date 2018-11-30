@@ -68,6 +68,7 @@ public abstract class AbstractScimClient<T> implements InvocationHandler, Serial
             //Change defaults if supplied
             getIntegerProperty("httpclient.multithreaded.maxtotal").ifPresent(cm::setMaxTotal);
             getIntegerProperty("httpclient.multithreaded.maxperroute").ifPresent(cm::setDefaultMaxPerRoute);
+            getIntegerProperty("httpclient.multithreaded.validateafterinactivity").ifPresent(cm::setValidateAfterInactivity);
 
             logger.debug("Using multithreaded support with maxTotalConnections={} and maxPerRoutConnections={}", cm.getMaxTotal(), cm.getDefaultMaxPerRoute());
             logger.warn("Ensure your oxTrust 'rptConnectionPoolUseConnectionPooling' property is set to true");
