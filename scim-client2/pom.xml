@@ -5,7 +5,7 @@
 
     <groupId>gluu.scim.client</groupId>
     <artifactId>scim-client2</artifactId>
-    <version>3.1.5.Final</version>
+    <version>3.1.6.Final</version>
     <packaging>jar</packaging>
 
     <name>SCIM-Client</name>
@@ -19,14 +19,14 @@
         <jackson.version>1.9.13</jackson.version>
         <resteasy.version>3.0.21.Final</resteasy.version>
 		<jaxr.version>3.0.12.Final</jaxr.version>
-        <oxauth.version>3.1.5.Final</oxauth.version>
-        <oxcore.version>3.1.5.Final</oxcore.version>
+        <oxauth.version>3.1.6.Final</oxauth.version>
+        <oxcore.version>3.1.6.Final</oxcore.version>
     </properties>
 
     <parent>
         <groupId>org.xdi</groupId>
         <artifactId>oxscim</artifactId>
-        <version>3.1.5.Final</version>
+        <version>3.1.6.Final</version>
     </parent>
 
     <build>
@@ -115,7 +115,7 @@
         <dependency>
             <groupId>org.xdi</groupId>
             <artifactId>oxtrust-scim</artifactId>
-            <version>3.1.5.Final</version>
+            <version>3.1.6.Final</version>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
