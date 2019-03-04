@@ -100,7 +100,7 @@ public class TestModeScimClient<T> extends AbstractScimClient<T> {
             RegisterResponse response = registerClient.exec();
             clientId=response.getClientId();
             password=response.getClientSecret();
-            clientExpiration=response.getClientSecretExpiresAt().getTime();
+            clientExpiration=Optional.ofNullable(response.getClientSecretExpiresAt()).map(Date::getTime).orElse(Long.MAX_VALUE);
 
             flag=true;
         }
