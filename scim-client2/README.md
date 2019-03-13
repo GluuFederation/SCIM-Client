@@ -19,7 +19,7 @@ Below is the link for the latest Gluu implementation of SCIM client:
 
 ### How to run tests
 
-* Ensure you have a [working installation](https://gluu.org/docs/oxd/install/) of Gluu Server
+* Ensure you have a [working installation](https://gluu.org/docs/ce/installation-guide/) of Gluu Server
 
 * Enable and then protect your SCIM API using test mode or UMA (see [API protection](https://www.gluu.org/docs/ce/user-management/scim2/#api-protection))
 
