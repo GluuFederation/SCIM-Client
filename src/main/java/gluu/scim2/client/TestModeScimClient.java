@@ -9,10 +9,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.xdi.oxauth.client.*;
-import org.xdi.oxauth.model.common.*;
-import org.xdi.oxauth.model.util.Util;
-import org.xdi.oxauth.model.register.ApplicationType;
+import org.gluu.oxauth.model.common.*;
+import org.gluu.oxauth.model.register.ApplicationType;
+import org.gluu.oxauth.model.util.Util;
+import org.gluu.oxauth.client.*;
 
 import javax.ws.rs.core.Response;
 import java.net.URL;
@@ -83,7 +83,7 @@ public class TestModeScimClient<T> extends AbstractScimClient<T> {
 
         boolean flag=false;
 
-        //registration example at org.xdi.oxauth.ws.rs.RegistrationRestWebServiceHttpTest
+        //registration example at org.gluu.oxauth.ws.rs.RegistrationRestWebServiceHttpTest
         long now=new Date().getTime();
         if (clientExpiration<now) {  //registration must take place
             RegisterRequest request = new RegisterRequest(ApplicationType.NATIVE, "SCIM-Client", new ArrayList<String>());

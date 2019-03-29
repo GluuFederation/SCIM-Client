@@ -7,11 +7,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.gluu.oxauth.model.util.SecurityProviderUtility;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
-import org.xdi.oxauth.model.util.SecurityProviderUtility;
 
 import java.io.BufferedReader;
 import java.io.IOException;

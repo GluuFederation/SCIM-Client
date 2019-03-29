@@ -12,16 +12,16 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.xdi.oxauth.client.TokenRequest;
-import org.xdi.oxauth.client.uma.UmaClientFactory;
-import org.xdi.oxauth.client.uma.UmaTokenService;
-import org.xdi.oxauth.model.common.AuthenticationMethod;
-import org.xdi.oxauth.model.common.GrantType;
-import org.xdi.oxauth.model.crypto.OxAuthCryptoProvider;
-import org.xdi.oxauth.model.token.ClientAssertionType;
-import org.xdi.oxauth.model.uma.UmaMetadata;
-import org.xdi.oxauth.model.uma.UmaTokenResponse;
-import org.xdi.util.StringHelper;
+import org.gluu.oxauth.model.common.AuthenticationMethod;
+import org.gluu.oxauth.model.common.GrantType;
+import org.gluu.oxauth.model.crypto.OxAuthCryptoProvider;
+import org.gluu.oxauth.model.token.ClientAssertionType;
+import org.gluu.oxauth.model.uma.UmaMetadata;
+import org.gluu.oxauth.model.uma.UmaTokenResponse;
+import org.gluu.util.StringHelper;
+import org.gluu.oxauth.client.TokenRequest;
+import org.gluu.oxauth.client.uma.UmaClientFactory;
+import org.gluu.oxauth.client.uma.UmaTokenService;
 
 import gluu.scim2.client.exception.ScimInitializationException;
 

@@ -9,10 +9,11 @@ import gluu.scim2.client.TestModeScimClient;
 import gluu.scim2.client.UmaScimClient;
 import gluu.scim2.client.DummyClient;
 import gluu.scim2.client.rest.ClientSideService;
-import org.xdi.oxauth.model.util.SecurityProviderUtility;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+
+import org.gluu.oxauth.model.util.SecurityProviderUtility;
 
 /**
  * A factory class to obtain "client" objects that allow interaction with the SCIM service. Two types of clients can be
