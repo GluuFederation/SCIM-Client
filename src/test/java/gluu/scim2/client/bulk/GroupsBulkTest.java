@@ -5,8 +5,8 @@
  */
 package gluu.scim2.client.bulk;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import gluu.scim2.client.BaseTest;
-import org.codehaus.jackson.type.TypeReference;
 import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.gluu.oxtrust.model.scim2.SearchRequest;
 import org.gluu.oxtrust.model.scim2.bulk.BulkOperation;

@@ -1,6 +1,6 @@
 package gluu.scim2.client.rest.provider;
 
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;

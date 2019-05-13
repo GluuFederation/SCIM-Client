@@ -1,12 +1,11 @@
 package gluu.scim2.client;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gluu.scim2.client.factory.ScimClientFactory;
 import gluu.scim2.client.rest.ClientSideService;
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxauth.model.util.SecurityProviderUtility;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.testng.ITestContext;
@@ -57,7 +56,7 @@ public class BaseTest {
 
         if (client==null) {
             setupClient(context.getSuite().getXmlSuite().getParameters());
-            mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+            mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         }
 
     }

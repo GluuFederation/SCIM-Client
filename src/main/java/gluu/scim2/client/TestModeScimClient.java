@@ -5,10 +5,11 @@
  */
 package gluu.scim2.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.gluu.oxauth.model.common.*;
 import org.gluu.oxauth.model.register.ApplicationType;
 import org.gluu.oxauth.model.util.Util;
