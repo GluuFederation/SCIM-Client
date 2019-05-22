@@ -79,7 +79,8 @@
 
     <test name="Fido Devices Test" enabled="false">
         <classes>
-            <class name="gluu.scim2.client.singleresource.FidoDeviceTest" />
+            <class name="gluu.scim2.client.singleresource.FidoU2fDeviceTest" />
+            <class name="gluu.scim2.client.singleresource.Fido2DeviceTest" />
         </classes>
     </test>
 

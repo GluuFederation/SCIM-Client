@@ -7,7 +7,6 @@ package gluu.scim2.client.rest;
 
 import org.gluu.oxtrust.model.scim2.SearchRequest;
 import org.gluu.oxtrust.model.scim2.bulk.BulkRequest;
-import org.gluu.oxtrust.ws.rs.scim2.IUserWebService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -16,8 +15,8 @@ import javax.ws.rs.core.Response;
 import static org.gluu.oxtrust.model.scim2.Constants.*;
 
 /**
- * A conglomerate interface that exhibits a rich amount of methods to manipulate User, Group, and Fido Device resources
- * via the SCIM API. It also has support to call service metadata endpoints (see section 4 of RFC 7644).
+ * A conglomerate interface that exhibits a rich amount of methods to manipulate User, Group, and Fido u2f and Fido 2
+ * Device resources via the SCIM API. It also has support to call service metadata endpoints (see section 4 of RFC 7644).
  *
  * <p>The <i>ClientSide*</i> super interfaces add methods to actual interfaces used in server side implementation (those
  * in package {@link org.gluu.oxtrust.ws.rs.scim2 org.gluu.oxtrust.ws.rs.scim2}) enabling a more straightforward
@@ -27,7 +26,7 @@ import static org.gluu.oxtrust.model.scim2.Constants.*;
 /*
  * Created by jgomer on 2017-09-04.
  */
-public interface ClientSideService extends ClientSideUserService, ClientSideGroupService, ClientSideFidoDeviceService {
+public interface ClientSideService extends ClientSideUserService, ClientSideGroupService, ClientSideFidoDeviceService, ClientSideFido2DeviceService {
 
     /**
      * Performs a GET to the <code>/ServiceProviderConfig</code> endpoint that returns a JSON structure that describes
