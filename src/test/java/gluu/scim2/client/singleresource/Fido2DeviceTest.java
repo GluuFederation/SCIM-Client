@@ -9,12 +9,12 @@ import gluu.scim2.client.BaseTest;
 import org.apache.commons.beanutils.BeanUtils;
 import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.gluu.oxtrust.model.scim2.fido.Fido2DeviceResource;
-import org.gluu.oxtrust.model.scim2.fido.FidoDeviceResource;
 import org.gluu.oxtrust.model.scim2.util.IntrospectUtil;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.Response;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.testng.Assert.*;
@@ -32,7 +32,7 @@ public class Fido2DeviceTest extends BaseTest {
     public void search(){
 
         logger.debug("Searching all fido 2 devices");
-        Response response=client.searchF2Devices(null, "userId pr", null, null, null, null, null, null);
+        Response response=client.searchF2Devices(null, "id pr", null, null, null, null, null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse=response.readEntity(ListResponse.class);
@@ -90,17 +90,15 @@ public class Fido2DeviceTest extends BaseTest {
         for (String path : IntrospectUtil.allAttrs.get(fido2Class)){
             String val=BeanUtils.getProperty(device, path);
             //Exclude metas since they diverge and skip if original attribute was null (when passing null for an update, server ignores)
-            if (!path.startsWith("meta") && val!=null)
+            if (!path.startsWith("meta") && val!=null) {
                 assertEquals(BeanUtils.getProperty(updated, path), val);
+            }
         }
 
         //Update an immutable attribute
         updated.setCounter(Integer.MIN_VALUE);
         response=client.updateF2Device(updated, updated.getId(), null, null);
-        assertEquals(response.getStatus(), OK.getStatusCode());
-
-        updated=response.readEntity(fido2Class);
-        assertNotEquals(updated.getCounter(), Integer.MIN_VALUE);
+        assertEquals(response.getStatus(), BAD_REQUEST.getStatusCode());
 
     }
 
