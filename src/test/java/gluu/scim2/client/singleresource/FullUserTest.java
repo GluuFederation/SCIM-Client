@@ -92,7 +92,8 @@ public class FullUserTest extends UserBaseTest {
         user.setPreferredLanguage("en-us");
         user.setLocale("en_US");
 
-        Response response=client.updateUser(user, user.getId(), "preferredLanguage, locale", null);
+        //Don't remove name from the list (needed in the next case :P)
+        Response response=client.updateUser(user, user.getId(), "preferredLanguage, locale, name", null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         user=response.readEntity(usrClass);
@@ -105,28 +106,36 @@ public class FullUserTest extends UserBaseTest {
     public void searchEscapingChars() {
 
         char quote = '"', backslash = '\\';
-        String scapedQuote = String.valueOf(new char[]{quote, backslash});
+        String scapedQuote = String.valueOf(new char[]{backslash, quote});
         String scapedBkSlash = String.valueOf(new char[]{backslash, backslash});
-        String rnd = String.format("\\u%s", UUID.randomUUID().toString().substring(0,4));
+        //Used to generate a random Unicode char
+        String rnd = UUID.randomUUID().toString().substring(0,4);
 
         Name name = user.getName();
         name.setGivenName(String.format("with %cquotes%c", quote, quote));
         name.setMiddleName(String.format("with %cbackslash", backslash));
-        name.setFamilyName(String.format("%c %c %s", quote, backslash, rnd));
+        name.setFamilyName(String.format("%c %c %s", quote, backslash, String.valueOf(Character.toChars(Integer.parseInt(rnd, 16)))));
 
-        Response response = client.updateUser(user, user.getId(), "id", null);
+        CustomAttributes attrs = new CustomAttributes(USER_EXT_SCHEMA_ID);
+        attrs.setAttribute("scimCustomFirst", String.valueOf(quote));
+        user.addCustomAttributes(attrs);
+
+        Response response = client.updateUser(user, user.getId(), null, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
-        String filter = String.format("name.givenName co %c%s%c", quote, scapedQuote, quote);   // => name.givenName co ""\"
-        filter += String.format("and name.middleName ew %c%s%c", quote, scapedBkSlash, quote);  // => and name.middleName ew "\\"
+        String filter = String.format("name.givenName co %c%s%c", quote, scapedQuote, quote);   // => name.givenName co "\""
+        filter += String.format(" and name.middleName ew %c%s%c", quote, scapedBkSlash, quote);  // => and name.middleName ew "\\"
 
-        String compValue = String.format("%s %s %s", scapedQuote, scapedBkSlash, String.valueOf(backslash) + rnd);
-        filter += String.format("and name.familyName eq %c%s%c", quote, compValue, quote);  // => and name.familyName eq ""\ \\ \\uWXYZ"
+        String compValue = String.format("%s %s %cu%s", scapedQuote, scapedBkSlash, backslash, rnd);
+        filter += String.format(" and name.familyName eq %c%s%c", quote, compValue, quote);  // => and name.familyName eq ""\ \\ \\uWXYZ"
+
+        String customFirst = String.format("%s:%s", USER_EXT_SCHEMA_ID, "scimCustomFirst");
+        filter += String.format("and %s eq %c%s%c", customFirst, quote, scapedQuote, quote);
 
         SearchRequest sr = new SearchRequest();
         sr.setFilter(filter);
         sr.setCount(1);
-        sr.setAttributes("name");
+        sr.setAttributes("name "+ customFirst);
 
         response = client.searchUsersPost(sr);
         user = (UserResource) response.readEntity(ListResponse.class).getResources().get(0);
