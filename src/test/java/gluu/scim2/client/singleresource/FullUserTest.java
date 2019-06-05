@@ -7,21 +7,22 @@ package gluu.scim2.client.singleresource;
 
 import gluu.scim2.client.UserBaseTest;
 import org.gluu.oxtrust.model.scim2.CustomAttributes;
+import org.gluu.oxtrust.model.scim2.ListResponse;
+import org.gluu.oxtrust.model.scim2.SearchRequest;
+import org.gluu.oxtrust.model.scim2.user.Name;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.Response;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static javax.ws.rs.core.Response.Status.*;
 
 import static org.testng.Assert.*;
 
 import static org.gluu.oxtrust.model.scim2.Constants.USER_EXT_SCHEMA_ID;
+
 /**
  * Created by jgomer on 2017-11-01.
  */
@@ -100,7 +101,43 @@ public class FullUserTest extends UserBaseTest {
 
     }
 
-    @Test(dependsOnMethods = "updateNonExisting", alwaysRun = true)
+    @Test(dependsOnMethods="updateNonExisting")
+    public void searchEscapingChars() {
+
+        char quote = '"', backslash = '\\';
+        String scapedQuote = String.valueOf(new char[]{quote, backslash});
+        String scapedBkSlash = String.valueOf(new char[]{backslash, backslash});
+        String rnd = String.format("\\u%s", UUID.randomUUID().toString().substring(0,4));
+
+        Name name = user.getName();
+        name.setGivenName(String.format("with %cquotes%c", quote, quote));
+        name.setMiddleName(String.format("with %cbackslash", backslash));
+        name.setFamilyName(String.format("%c %c %s", quote, backslash, rnd));
+
+        Response response = client.updateUser(user, user.getId(), "id", null);
+        assertEquals(response.getStatus(), OK.getStatusCode());
+
+        String filter = String.format("name.givenName co %c%s%c", quote, scapedQuote, quote);   // => name.givenName co ""\"
+        filter += String.format("and name.middleName ew %c%s%c", quote, scapedBkSlash, quote);  // => and name.middleName ew "\\"
+
+        String compValue = String.format("%s %s %s", scapedQuote, scapedBkSlash, String.valueOf(backslash) + rnd);
+        filter += String.format("and name.familyName eq %c%s%c", quote, compValue, quote);  // => and name.familyName eq ""\ \\ \\uWXYZ"
+
+        SearchRequest sr = new SearchRequest();
+        sr.setFilter(filter);
+        sr.setCount(1);
+        sr.setAttributes("name");
+
+        response = client.searchUsersPost(sr);
+        user = (UserResource) response.readEntity(ListResponse.class).getResources().get(0);
+
+        assertEquals(name.getGivenName(), user.getName().getGivenName());
+        assertEquals(name.getMiddleName(), user.getName().getMiddleName());
+        assertEquals(name.getFamilyName(), user.getName().getFamilyName());
+
+    }
+
+    @Test(dependsOnMethods = "searchEscapingChars", alwaysRun = true)
     public void delete(){
         deleteUser(user);
     }
