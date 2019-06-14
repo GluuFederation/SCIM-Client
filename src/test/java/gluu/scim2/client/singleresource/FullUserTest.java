@@ -110,11 +110,12 @@ public class FullUserTest extends UserBaseTest {
         String scapedBkSlash = String.valueOf(new char[]{backslash, backslash});
         //Used to generate a random Unicode char
         String rnd = UUID.randomUUID().toString().substring(0,4);
+        String unicodeStr = String.valueOf(Character.toChars(Integer.parseInt(rnd, 16)));
 
         Name name = user.getName();
         name.setGivenName(String.format("with %cquotes%c", quote, quote));
-        name.setMiddleName(String.format("with %cbackslash", backslash));
-        name.setFamilyName(String.format("%c %c %s", quote, backslash, String.valueOf(Character.toChars(Integer.parseInt(rnd, 16)))));
+        name.setMiddleName(String.format("with backslash %c", backslash));
+        name.setFamilyName(String.format("%c %c %s", quote, backslash, unicodeStr));
 
         CustomAttributes attrs = new CustomAttributes(USER_EXT_SCHEMA_ID);
         attrs.setAttribute("scimCustomFirst", String.valueOf(quote));
@@ -130,12 +131,12 @@ public class FullUserTest extends UserBaseTest {
         filter += String.format(" and name.familyName eq %c%s%c", quote, compValue, quote);  // => and name.familyName eq ""\ \\ \\uWXYZ"
 
         String customFirst = String.format("%s:%s", USER_EXT_SCHEMA_ID, "scimCustomFirst");
-        filter += String.format("and %s eq %c%s%c", customFirst, quote, scapedQuote, quote);
+        filter += String.format(" and %s eq %c%s%c", customFirst, quote, scapedQuote, quote);
 
         SearchRequest sr = new SearchRequest();
         sr.setFilter(filter);
         sr.setCount(1);
-        sr.setAttributes("name "+ customFirst);
+        sr.setAttributes("name, "+ customFirst);
 
         response = client.searchUsersPost(sr);
         user = (UserResource) response.readEntity(ListResponse.class).getResources().get(0);
@@ -143,6 +144,11 @@ public class FullUserTest extends UserBaseTest {
         assertEquals(name.getGivenName(), user.getName().getGivenName());
         assertEquals(name.getMiddleName(), user.getName().getMiddleName());
         assertEquals(name.getFamilyName(), user.getName().getFamilyName());
+
+        //Verify the unicode character is intact
+        compValue = user.getName().getFamilyName();
+        compValue = compValue.substring(compValue.length()-1);  //pick the last char
+        assertEquals(unicodeStr, compValue);
 
     }
 
