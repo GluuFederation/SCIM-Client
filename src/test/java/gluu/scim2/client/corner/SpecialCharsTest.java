@@ -1,6 +1,7 @@
 package gluu.scim2.client.corner;
 
 import gluu.scim2.client.UserBaseTest;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.gluu.oxtrust.model.scim2.ListResponse;
 import org.gluu.oxtrust.model.scim2.SearchRequest;
 import org.gluu.oxtrust.model.scim2.user.UserResource;
@@ -23,14 +24,16 @@ import static org.testng.Assert.*;
  */
 public class SpecialCharsTest extends UserBaseTest {
 
-    private static final List<String> specialFilterLdapChars = Stream.of("*", "\\", "(", ")").collect(Collectors.toList());//, "\0" (see nullChar test)
+    private static final String[] SPECIAL_CHARS = new String[]{"*", "\\", "(", ")"};    //, "\0" (see nullChar test)
+    private List<String> specialFilterLdapChars = null;
 
     private List<String> userNames;
 
     @BeforeTest
     private void addOne() {
+        specialFilterLdapChars = Stream.of(SPECIAL_CHARS).map(StringEscapeUtils::escapeJson).collect(Collectors.toList());
         //Per customer request
-        specialFilterLdapChars.add("/");
+        specialFilterLdapChars.add(StringEscapeUtils.escapeJson("/"));
     }
 
     @Test
@@ -62,7 +65,7 @@ public class SpecialCharsTest extends UserBaseTest {
         //Builds a long "and" based clause
         String filter = specialFilterLdapChars.stream().reduce("", (partial, next) -> partial + String.format(" and userName co \"%s\"", next));
         SearchRequest sr = new SearchRequest();
-        sr.setFilter(filter.substring(4));   //Drop beginning (namely " or ")
+        sr.setFilter(filter.substring(4));   //Drop beginning (namely " and ")
         sr.setAttributes("userName");
 
         //Search users whose usernames contain ALL the chars
@@ -74,7 +77,7 @@ public class SpecialCharsTest extends UserBaseTest {
 
         String userName = resources.get(0).getUserName();
         assertEquals(resources.size(), 1);
-        assertTrue(specialFilterLdapChars.stream().allMatch(userName::contains));
+        assertTrue(Stream.of(SPECIAL_CHARS).allMatch(userName::contains));
 
     }
 
@@ -83,7 +86,7 @@ public class SpecialCharsTest extends UserBaseTest {
 
         String filter = specialFilterLdapChars.stream().reduce("", (partial, next) -> partial + String.format(" and name.givenName co \"%s\"", next));
         SearchRequest sr = new SearchRequest();
-        sr.setFilter(filter.substring(4));   //Drop beginning (namely " or ")
+        sr.setFilter(filter.substring(4));   //Drop beginning (namely " and ")
         sr.setAttributes("name");
 
         //Search users whose given names contain ALL the chars
@@ -95,7 +98,7 @@ public class SpecialCharsTest extends UserBaseTest {
 
         String givenName = resources.get(0).getName().getGivenName();
         assertEquals(resources.size(), 1);
-        assertTrue(specialFilterLdapChars.stream().allMatch(givenName::contains));
+        assertTrue(Stream.of(SPECIAL_CHARS).allMatch(givenName::contains));
 
     }
 
@@ -106,7 +109,7 @@ public class SpecialCharsTest extends UserBaseTest {
         for (String userName : userNames) {
 
             SearchRequest sr = new SearchRequest();
-            sr.setFilter(String.format("userName eq \"%s\"", userName));
+            sr.setFilter(String.format("userName eq \"%s\"", StringEscapeUtils.escapeJson(userName)));
             sr.setAttributes("userName, name.givenName");
 
             Response response = client.searchUsersPost(sr);
