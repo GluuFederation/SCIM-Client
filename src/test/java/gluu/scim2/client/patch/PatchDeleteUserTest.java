@@ -39,13 +39,20 @@ public class PatchDeleteUserTest extends UserBaseTest{
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
-        assertNull(other.getName().getMiddleName());
-        assertNull(other.getNickName());
-        assertNull(other.getEntitlements());
+        for (int i = 0 ; i < 2; i++) {
+            assertNull(other.getName().getMiddleName());
+            assertNull(other.getNickName());
+            assertNull(other.getEntitlements());
 
-        assertNull(other.getAddresses().get(0).getPostalCode());
-        assertNull(other.getAddresses().get(0).getLocality());
-        assertNotNull(other.getAddresses().get(0).getStreetAddress());
+            assertNull(other.getAddresses().get(0).getPostalCode());
+            assertNull(other.getAddresses().get(0).getLocality());
+            assertNotNull(other.getAddresses().get(0).getStreetAddress());
+
+            //Double check
+            response = client.getUserById(user.getId(), null, null);
+            other = response.readEntity(usrClass);
+        }
+
     }
 
     @Test(dependsOnMethods = "delete1", alwaysRun = true)

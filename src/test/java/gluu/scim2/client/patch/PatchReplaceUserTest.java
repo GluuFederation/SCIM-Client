@@ -184,12 +184,18 @@ public class PatchReplaceUserTest extends UserBaseTest {
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         UserResource other=response.readEntity(usrClass);
-        //Verify different info appeared
-        InstantMessagingAddress newIms=other.getIms().get(0);
-        assertTrue(newIms.getDisplay().equals(ims.getDisplay()));
-        assertTrue(newIms.getValue().equals(ims.getValue()));
-        assertTrue(newIms.getType().equals(ims.getType()));
-        assertTrue(newIms.getPrimary().equals(ims.getPrimary()));
+        for (int i = 0; i < 2; i++) {
+            //Verify different info appeared
+            InstantMessagingAddress newIms = other.getIms().get(0);
+            assertEquals(newIms.getDisplay, ims.getDisplay());
+            assertEquals(newIms.getValue(), ims.getValue());
+            assertEquals(newIms.getType(), ims.getType());
+            assertEquals(newIms.getPrimary(), ims.getPrimary());
+
+            //Double check
+            response = client.getUserById(user.getId(), "ims", null);
+            other=response.readEntity(usrClass);
+        }
 
     }
 
