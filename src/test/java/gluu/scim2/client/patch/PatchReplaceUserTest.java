@@ -187,7 +187,7 @@ public class PatchReplaceUserTest extends UserBaseTest {
         for (int i = 0; i < 2; i++) {
             //Verify different info appeared
             InstantMessagingAddress newIms = other.getIms().get(0);
-            assertEquals(newIms.getDisplay, ims.getDisplay());
+            assertEquals(newIms.getDisplay(), ims.getDisplay());
             assertEquals(newIms.getValue(), ims.getValue());
             assertEquals(newIms.getType(), ims.getType());
             assertEquals(newIms.getPrimary(), ims.getPrimary());
