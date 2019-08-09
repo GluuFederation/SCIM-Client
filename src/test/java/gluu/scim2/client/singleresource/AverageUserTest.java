@@ -86,7 +86,7 @@ public class AverageUserTest extends UserBaseTest {
         logger.debug("Updated user {}", user.getName().getGivenName());
 
         //Double check update did take update in the original source (eg. LDAP):
-        String json = response.readEntity(String.class).replaceAll("\\s", "");
+        String json = response.readEntity(String.class);
         response = client.getUserById(clone.getId(), null, "meta");
         //both json contents should be the same since meta attribute was removed and serialization involves UserResource class
         assertEquals(json, response.readEntity(String.class));

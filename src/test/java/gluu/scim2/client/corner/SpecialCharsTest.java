@@ -42,7 +42,7 @@ public class SpecialCharsTest extends UserBaseTest {
         //Builds a long "or" based clause
         String filter = specialFilterLdapChars.stream().reduce("", (partial, next) -> partial + String.format(" or userName co \"%s\"", next));
         SearchRequest sr = new SearchRequest();
-        sr.setFilter(filter.substring(4));   //Drop beginning (namely " or ")
+        sr.setFilter(filter.substring(4));   //Drop beginning (namely ' or ')
         sr.setAttributes("userName");
 
         //Search users whose usernames contain ANY of the chars
@@ -86,7 +86,7 @@ public class SpecialCharsTest extends UserBaseTest {
 
         String filter = specialFilterLdapChars.stream().reduce("", (partial, next) -> partial + String.format(" and name.givenName co \"%s\"", next));
         SearchRequest sr = new SearchRequest();
-        sr.setFilter(filter.substring(4));   //Drop beginning (namely " and ")
+        sr.setFilter(filter.substring(5));   //Drop beginning (namely ' and ')
         sr.setAttributes("name");
 
         //Search users whose given names contain ALL the chars
