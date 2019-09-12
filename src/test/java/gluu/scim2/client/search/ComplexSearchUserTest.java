@@ -106,27 +106,41 @@ public class ComplexSearchUserTest extends UserBaseTest {
             check.removeAll(IntrospectUtil.alwaysCoreAttrs.get(usrClass).keySet());
 
             //Confirm for every user, those attributes are not there
-            for (UserResource user : users)
-                for (String path : check){
-                    String val=null;
+            for (UserResource user : users) {
+                for (String path : check) {
+                    String val = null;
                     try {
-                        val=BeanUtils.getProperty(user, path);
-                    }
-                    catch (NestedNullException nne){
+                        val = BeanUtils.getProperty(user, path);
+                    } catch (NestedNullException nne) {
                         //Intentionally left empty
-                    }
-                    finally {
+                    } finally {
                         assertNull(val);
                     }
                 }
-
-            for (int i=1;i<users.length;i++) {
-                String familyName=users[i-1].getName().getFamilyName().toLowerCase();
-                String familyName2=users[i].getName().getFamilyName().toLowerCase();
-
-                //Check if first string is not greater than or equal second
-                assertFalse(familyName.compareTo(familyName2)<0);
             }
+
+            boolean correctSorting = true;
+            for (int i=1;i<users.length && correctSorting;i++) {
+                String familyName=users[i-1].getName().getFamilyName();
+                String familyName2=users[i].getName().getFamilyName();
+
+                //First string has to be greater than or equal second
+                correctSorting = familyName.compareTo(familyName2)>=0;
+            }
+
+            if (!correctSorting) {
+                //LDAP may ignore case sensitivity, try again using lowercasing
+                correctSorting = true;
+                for (int i=1;i<users.length && correctSorting;i++) {
+                    String familyName=users[i-1].getName().getFamilyName().toLowerCase();
+                    String familyName2=users[i].getName().getFamilyName().toLowerCase();
+
+                    //First string has to be greater than or equal second
+                    correctSorting = familyName.compareTo(familyName2)>=0;
+                }
+            }
+            assertTrue(correctSorting);
+
         }
 
     }
