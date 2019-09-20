@@ -29,14 +29,14 @@ public class PairwiseIdentifiersTest extends BaseTest {
     public void queryAndRemoval() throws Exception{
 
         //Get a list (of at most 1 user) who has a persisted pairwise identifier
-        Response response=client.searchUsers("pairwiseIdentitifers pr", null, 1, null, null, "pairwiseIdentitifers, id", null);
+        Response response=client.searchUsers("pairwiseIdentifiers pr", null, 1, null, null, "pairwiseIdentifiers, id", null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse lr = response.readEntity(ListResponse.class);
         //If the list is empty do nothing (successful test)
         if (lr.getItemsPerPage()>0) {
             UserResource user=(UserResource) lr.getResources().get(0);
-            assertNotNull(user.getPairwiseIdentitifers());
+            assertNotNull(user.getPairwiseIdentifiers());
 
             //Prepare the removal of the user's PPIDs
             PatchOperation operation = new PatchOperation();
@@ -50,7 +50,7 @@ public class PairwiseIdentifiersTest extends BaseTest {
 
             //Ensure they are not there anymore.
             user=response.readEntity(UserResource.class);
-            assertNull(user.getPairwiseIdentitifers());
+            assertNull(user.getPairwiseIdentifiers());
 
             //This test does not guarantee the ou=pairwiseIdentifiers sub-branch disappears... only the oxPPID LDAP attribute
         }
