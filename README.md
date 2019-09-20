@@ -15,7 +15,7 @@ Gluu's implementation of SCIM service is available at [User Management with SCIM
 
 Below is the link for the latest Gluu implementation of SCIM client:
 
-* [SCIM stable client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/4.0.0-SNAPSHOT/)
+* [SCIM stable client library binary](http://ox.gluu.org/maven/gluu/scim/client/SCIM-Client/4.0.rc2/)
 
 ### How to run tests
 
