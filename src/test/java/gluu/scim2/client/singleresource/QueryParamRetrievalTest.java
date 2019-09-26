@@ -34,7 +34,7 @@ public class QueryParamRetrievalTest extends UserBaseTest {
         logger.debug("Retrieving test users...");
         String include="displayName, externalId";
 
-        Response response=client.searchUsers("displayName co \"test\"", null, null, null, null, include, null);
+        Response response=client.searchUsers("displayName co \"Test\"", null, null, null, null, include, null);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse = response.readEntity(ListResponse.class);
@@ -54,7 +54,7 @@ public class QueryParamRetrievalTest extends UserBaseTest {
         logger.debug("Retrieving test users...");
         String exclude="displayName, externalId, name, addresses, emails";
 
-        Response response=client.searchUsers("displayName co \"test\"", null, null, null, null, null, exclude);
+        Response response=client.searchUsers("displayName co \"Test\"", null, null, null, null, null, exclude);
         assertEquals(response.getStatus(), OK.getStatusCode());
 
         ListResponse listResponse = response.readEntity(ListResponse.class);

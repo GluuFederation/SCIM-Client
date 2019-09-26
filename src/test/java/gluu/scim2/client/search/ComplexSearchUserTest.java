@@ -186,14 +186,27 @@ public class ComplexSearchUserTest extends UserBaseTest {
                 assertNull(u.getEmails());
             }
 
-            for (int i=1;i<users.length;i++) {
-                String displayName=users[i-1].getDisplayName().toLowerCase();
-                String displayName2 =users[i].getDisplayName().toLowerCase();
+            boolean correctSorting = true;
+            for (int i=1;i<users.length && correctSorting;i++) {
+                String displayName=users[i-1].getDisplayName();
+                String displayName2 =users[i].getDisplayName();
 
                 //Check if second string is less or equal than first
-                assertTrue(displayName.compareTo(displayName2)>=0);
+                correctSorting = displayName.compareTo(displayName2)>=0;
             }
 
+            if (!correctSorting) {
+                //LDAP may ignore case sensitivity, try again using lowercasing
+                correctSorting = true;
+                for (int i=1;i<users.length && correctSorting;i++) {
+                    String displayName=users[i-1].getDisplayName().toLowerCase();
+                    String displayName2 =users[i].getDisplayName().toLowerCase();
+
+                    //Check if second string is less or equal than first
+                    correctSorting = displayName.compareTo(displayName2)>=0;
+                }
+            }
+            assertTrue(correctSorting);
         }
     }
 

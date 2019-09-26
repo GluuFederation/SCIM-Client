@@ -54,7 +54,7 @@ public class MultipleResourcesSearchTest extends BaseTest {
         sr = new SearchRequest();
         sr.setAttributes("id"); //return a few attributes
         sr.setStartIndex(1);
-        sr.setFilter("displayName co \"1111\" or displayName co \"group\"");    //Aimed at having both users and groups
+        sr.setFilter("displayName co \"1111\" or displayName co \"Group\"");    //Aimed at having both users and groups
 
         Response response = client.searchResourcesPost(sr);
         assertEquals(response.getStatus(), OK.getStatusCode());
