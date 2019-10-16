@@ -35,7 +35,7 @@ public class PaginationUserSearchTest extends UserBaseTest {
         //Issue a default request except for a filter and reducing the attributes returned
         sr = new SearchRequest();
         sr.setFilter("name.familyName co \"Filter\"");
-        sr.setSortBy("name.familyName");    //Couchbase result set order is not deterministic, requires ORDER BY to workaround it
+        sr.setSortBy("id");    //Couchbase result set order is not deterministic, requires ORDER BY to workaround it
         sr.setAttributes("meta.location");
 
         Response response = client.searchUsersPost(sr);
