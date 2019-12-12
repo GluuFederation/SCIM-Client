@@ -61,7 +61,8 @@ public class UmaScimClient<T> extends AbstractScimClient<T> {
      * @param umaAatClientJksPassword Keystore password
      * @param umaAatClientKeyId Key Id in the keystore. Pass an empty string to use the first key in keystore
      */
-    public UmaScimClient(Class<T> serviceClass, String domain, String umaAatClientId, String umaAatClientJksPath, String umaAatClientJksPassword, String umaAatClientKeyId) {
+    public UmaScimClient(Class<T> serviceClass, String domain, String umaAatClientId, String umaAatClientJksPath,
+                         String umaAatClientJksPassword, String umaAatClientKeyId) {
         super(domain, serviceClass);
         this.umaAatClientId = umaAatClientId;
         this.umaAatClientJksPath = umaAatClientJksPath;
@@ -106,9 +107,9 @@ public class UmaScimClient<T> extends AbstractScimClient<T> {
                         asUri = headerKeyValue.substring(7);
                     }
                 }
-                value= !StringHelper.isEmpty(asUri) && !StringHelper.isEmpty(permissionTicket) && obtainAuthorizedRpt(asUri, permissionTicket);
-            }
-            catch (Exception e) {
+                value= StringHelper.isNotEmpty(asUri) && StringHelper.isNotEmpty(permissionTicket)
+                        && obtainAuthorizedRpt(asUri, permissionTicket);
+            } catch (Exception e) {
                 throw new ScimInitializationException(e.getMessage(), e);
             }
         }
@@ -120,8 +121,7 @@ public class UmaScimClient<T> extends AbstractScimClient<T> {
 
         try {
             return StringUtils.isNotBlank(getAuthorizedRpt(asUri, ticket));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ScimInitializationException(e.getMessage(), e);
         }
 
@@ -140,7 +140,8 @@ public class UmaScimClient<T> extends AbstractScimClient<T> {
             //No need for claims token. See comments on issue https://github.com/GluuFederation/SCIM-Client/issues/22
 
             UmaTokenService tokenService = UmaClientFactory.instance().createTokenService(umaMetadata);
-            UmaTokenResponse rptResponse = tokenService.requestJwtAuthorizationRpt(ClientAssertionType.JWT_BEARER.toString(), tokenRequest.getClientAssertion(), GrantType.OXAUTH_UMA_TICKET.getValue(), ticket, null, null, null, null, null); //ClaimTokenFormatType.ID_TOKEN.getValue()
+            UmaTokenResponse rptResponse = tokenService.requestJwtAuthorizationRpt(ClientAssertionType.JWT_BEARER.toString(),
+                    tokenRequest.getClientAssertion(), GrantType.OXAUTH_UMA_TICKET.getValue(), ticket, null, null, null, null, null); //ClaimTokenFormatType.ID_TOKEN.getValue()
 
             if (rptResponse == null) {
                 throw new ScimInitializationException("UMA RPT token response is invalid");
@@ -151,10 +152,9 @@ public class UmaScimClient<T> extends AbstractScimClient<T> {
             }
             
             this.rpt = rptResponse.getAccessToken();
-
             return rpt;
-        }
-        catch (Exception ex) {
+
+        } catch (Exception ex) {
             throw new ScimInitializationException(ex.getMessage(), ex);
         }
 
@@ -166,11 +166,11 @@ public class UmaScimClient<T> extends AbstractScimClient<T> {
             if (StringHelper.isEmpty(umaAatClientJksPath) || StringHelper.isEmpty(umaAatClientJksPassword)) {
                 throw new ScimInitializationException("UMA JKS keystore path or password is empty");
             }
+
             OxAuthCryptoProvider cryptoProvider;
             try {
                 cryptoProvider = new OxAuthCryptoProvider(umaAatClientJksPath, umaAatClientJksPassword, null);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 throw new ScimInitializationException("Failed to initialize crypto provider");
             }
 
@@ -196,8 +196,8 @@ public class UmaScimClient<T> extends AbstractScimClient<T> {
             tokenRequest.setAudience(umaMetadata.getTokenEndpoint());
 
             return tokenRequest;
-        }
-        catch (Exception ex) {
+
+        } catch (Exception ex) {
             throw new ScimInitializationException("Failed to get client token", ex);
         }
 

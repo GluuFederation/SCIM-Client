@@ -23,26 +23,29 @@ import java.util.Map;
  */
 public class ClientMap {
 
-    private static ClientMap map=new ClientMap();
+    private static ClientMap map = new ClientMap();
 
-    private static Map<Client, String> mappings=new HashMap<>();
+    private static Map<Client, String> mappings = new HashMap<>();
 
-    private ClientMap(){}
+    private ClientMap() {
+    }
 
     /**
      * Puts a new client/value pair in the map. If client already exists, the value is replaced.
+     *
      * @param client RestEasy client
-     * @param value Value to associate to this client - normally an access token
+     * @param value  Value to associate to this client - normally an access token
      */
-    public static void update(Client client, String value){
+    public static void update(Client client, String value) {
         mappings.put(client, value);
     }
 
     /**
      * Removes a client from the map and then calls its close method to free resources.
+     *
      * @param client Client to remove
      */
-    public static void remove(Client client){
+    public static void remove(Client client) {
         //Frees the resources associated to this RestEasy client
         client.close();
         mappings.remove(client);
@@ -50,10 +53,11 @@ public class ClientMap {
 
     /**
      * Gets the value associated to this client in the map.
+     *
      * @param client RestEasy client
      * @return A string value. If there is no entry for client in the map, returns null
      */
-    public static String getValue(Client client){
+    public static String getValue(Client client) {
         return mappings.get(client);
     }
 
@@ -61,9 +65,10 @@ public class ClientMap {
      * Flushes the client/value map (it will be empty after invocation).
      * Call this method when your application is being shut-down.
      */
-    public static void clean(){
-        for (Client client : mappings.keySet())
+    public static void clean() {
+        for (Client client : mappings.keySet()) {
             remove(client);
+        }
     }
 
 }

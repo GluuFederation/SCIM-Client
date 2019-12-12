@@ -130,11 +130,6 @@
         </dependency>
         <dependency>
             <groupId>org.gluu</groupId>
-            <artifactId>oxauth-model</artifactId>
-            <version>${ox.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.gluu</groupId>
             <artifactId>oxtrust-scim</artifactId>
             <version>${ox.version}</version>
         </dependency>

@@ -56,7 +56,7 @@ public abstract class AbstractScimClient<T> implements InvocationHandler, Serial
 
     private ResteasyClient client;
 
-    AbstractScimClient(String domain, Class<T> serviceClass){
+    AbstractScimClient(String domain, Class<T> serviceClass) {
         /*
          Configures a proxy to interact with the service using the new JAX-RS 2.0 Client API, see section
          "Resteasy Proxy Framework" of RESTEasy JAX-RS user guide
@@ -116,26 +116,25 @@ public abstract class AbstractScimClient<T> implements InvocationHandler, Serial
      * <p>As with all methods of this class and its subclasses, invoke is not called directly by developers: the calls are
      * triggered when the objects returned by factory methods of {@link gluu.scim2.client.factory.ScimClientFactory ScimClientFactory}
      * are manipulated.</p>
+     *
      * @return The response associated to the invocation (normally a javax.ws.rs.core.Response instance)
      */
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable{
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        String methodName=method.getName();
+        String methodName = method.getName();
 
         if (methodName.equals("close")) {
             logger.info("Closing RestEasy client");
             ClientMap.remove(client);
             return null;
-        }
-        else{
+        } else {
             Response response;
-            FreelyAccessible unprotected=method.getAnnotation(FreelyAccessible.class);
+            FreelyAccessible unprotected = method.getAnnotation(FreelyAccessible.class);
 
             //Set authorization header if needed
-            if (unprotected!=null){
+            if (unprotected != null) {
                 response = invokeServiceMethod(method, args);
-            }
-            else{
+            } else {
                 ClientMap.update(client, getAuthenticationHeader());
                 response = invokeServiceMethod(method, args);
 
@@ -144,9 +143,9 @@ public abstract class AbstractScimClient<T> implements InvocationHandler, Serial
                         logger.trace("Trying second attempt of request (former received unauthorized response code)");
                         ClientMap.update(client, getAuthenticationHeader());
                         response = invokeServiceMethod(method, args);
-                    }
-                    else
+                    } else {
                         logger.error("Could not get access token for current request: {}", methodName);
+                    }
                 }
             }
             return response;
