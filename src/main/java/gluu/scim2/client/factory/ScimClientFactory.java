@@ -7,7 +7,6 @@ package gluu.scim2.client.factory;
 
 import gluu.scim2.client.TestModeScimClient;
 import gluu.scim2.client.UmaScimClient;
-import gluu.scim2.client.DummyClient;
 import gluu.scim2.client.rest.ClientSideService;
 
 import java.lang.reflect.InvocationHandler;
@@ -104,11 +103,6 @@ public class ScimClientFactory {
      */
     public static ClientSideService getTestClient(String domain, String OIDCMetadataUrl) throws Exception {
         return getTestClient(defaultInterface, domain, OIDCMetadataUrl);
-    }
-
-    public static ClientSideService getDummyClient(String domain) throws Exception{
-        InvocationHandler handler = new DummyClient<>(defaultInterface, domain);
-        return typedProxy(defaultInterface, handler);
     }
 
     private static <T> T typedProxy(Class <T> interfaceClass, InvocationHandler handler){
