@@ -1,8 +1,3 @@
-/*
- * SCIM-Client is available under the MIT License (2008). See http://opensource.org/licenses/MIT for full text.
- *
- * Copyright (c) 2017, Gluu
- */
 package gluu.scim2.client.patch;
 
 import gluu.scim2.client.UserBaseTest;
@@ -18,7 +13,6 @@ import org.testng.annotations.Test;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.stream.Stream;
 
 import static javax.ws.rs.core.Response.Status.*;
 

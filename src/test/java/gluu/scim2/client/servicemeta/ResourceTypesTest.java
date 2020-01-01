@@ -1,8 +1,3 @@
-/*
- * SCIM-Client is available under the MIT License (2008). See http://opensource.org/licenses/MIT for full text.
- *
- * Copyright (c) 2017, Gluu
- */
 package gluu.scim2.client.servicemeta;
 
 import gluu.scim2.client.BaseTest;
@@ -31,8 +26,8 @@ public class ResourceTypesTest extends BaseTest {
     public void checkResourcesExistence(){
         assertTrue(listResponse.getTotalResults()>0);
 
-        listResponse.getResources().stream()
-                .forEach(res -> assertTrue(res.getSchemas().contains("urn:ietf:params:scim:schemas:core:2.0:ResourceType")));
+        listResponse.getResources().forEach(
+                res -> assertTrue(res.getSchemas().contains("urn:ietf:params:scim:schemas:core:2.0:ResourceType")));
 
     }
 }

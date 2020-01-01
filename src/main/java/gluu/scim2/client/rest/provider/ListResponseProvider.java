@@ -1,8 +1,3 @@
-/*
- * SCIM-Client is available under the MIT License (2008). See http://opensource.org/licenses/MIT for full text.
- *
- * Copyright (c) 2017, Gluu
- */
 package gluu.scim2.client.rest.provider;
 
 import com.fasterxml.jackson.core.type.TypeReference;
