@@ -172,7 +172,7 @@ public class UmaScimClient<T> extends AbstractScimClient<T> {
             String keyId = umaAatClientKeyId;
             if (StringHelper.isEmpty(keyId)) {
                 // Get first key
-                List<String> aliases = cryptoProvider.getKeyAliases();
+                List<String> aliases = cryptoProvider.getKeys();
                 if (aliases.size() > 0) {
                     keyId = aliases.get(0);
                 }
